@@ -4,7 +4,39 @@ using System.Text;
 using System.Text.Json;
 
 namespace HelloServer;
+public class GameConfig
+{
+    public float stateGameStartTime;
+    public float stateGenreAssignAndLiarSelectTime;
+    public float stateKeywordDistributeTime;
+    public float stateMartEnterTime;
 
+    public float stateMartReturnTime;
+    public float stateShowItemAndSpeakTime;
+    public float stateSpeechEndTime;
+
+    public float statePointAtSuspectTime;
+    public float statePointAtSuspectEndTime;
+
+    public float stateLiarOutButtonPressedTime;
+
+    public float stateDebateTime; // 예외: Time 중복 방지를 위해 그대로 유지
+    public float stateDebateEndTime;
+
+    public float stateVoteTime;
+    public float stateVoteEndTime;
+
+    public float stateLiarConfirmedTime;
+    public float stateLiarKeywordGuessTime;
+    public float stateLiarKeywordGuessEndTime;
+
+    public float stateScoreTallyTime;
+    public float stateScoreTallyEndTime;
+    public float stateMartMoveTime;
+
+    public float stateFinalResultTime;
+    public float stateFinalResultEndTime;
+}
 // 방 하나. 방에 있는 사람들을 들고 있다가
 // 메세지를 전달해 준다.
 // 방의 기능은 아래와 같습니다
@@ -18,6 +50,7 @@ namespace HelloServer;
 
 public class Room
 {
+    
     // 접속자 한 명.
     private class Member
     {
@@ -61,11 +94,13 @@ public class Room
     private readonly int logMovesPerSecond; // 룸허브를 통해서 전달 받습니다. 
 
     public bool IsEmpty => members.IsEmpty;
+    public GameConfig GameConfig { get; }
     
-    public Room(string code, int logMovesPerSecond)
+    public Room(string code, int logMovesPerSecond, GameConfig config)
     {
         this.code = code;
         this.logMovesPerSecond = logMovesPerSecond;
+        this.GameConfig = config;
     }
 
     #region 듣기
