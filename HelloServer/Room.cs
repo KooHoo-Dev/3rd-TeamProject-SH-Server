@@ -206,7 +206,7 @@ public class Room
                if (m.IsHost)
                {
 
-                   SendAsync(m, new AllReadyMessage());
+                  await SendAsync(m, new AllReadyMessage());
 
                }
            }
