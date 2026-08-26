@@ -163,7 +163,7 @@ public class Room
             TypeOnly kind = JsonSerializer.Deserialize<TypeOnly>(text);
             
             if(kind?.Type == "move") HandleMove(member, text);
-            else if(kind?.Type == "chat") await HandleChatAsync(member, text);
+            else if(kind?.Type == "normalChat") await HandleChatAsync(member, text);
             
             // 모르는 정보는 그냥 흘려버립니다.
             // Tip
@@ -172,6 +172,10 @@ public class Room
         }
     }
 
+    private void HandleSpecialChat(Member member, string text)
+    {
+        
+    }
     // 이동 관련 메시지를 처리하는 함수
     private void HandleMove(Member member, string text)
     {

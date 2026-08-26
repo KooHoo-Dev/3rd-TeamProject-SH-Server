@@ -79,7 +79,7 @@ namespace HelloServer
         public string selectNum{get;set;} // 라이어가 아니다 or 모르겠다 or 라이어다
     }
     
-    // 키워드 결정
+    // 라이어가 키워드 맞추기 채팅
     [Serializable]
     public class KeywordChatMessage
     {
@@ -108,7 +108,13 @@ namespace HelloServer
         
         public string currentCategory{get;set;}
     }
-    
+
+    [Serializable]
+    public class ReadyMessage
+    {
+        public string Type{get;set;} = "ready";
+        public string ID{get;set;}
+    }
     // 게임 시작 (클라이언트 -> 서버)
     [Serializable]
     public class GameStartMessage
