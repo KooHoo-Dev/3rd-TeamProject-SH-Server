@@ -50,7 +50,7 @@ public class Program
 
         
         // 서버에 방을 추가해 줍시다.
-        RoomHub hub = new RoomHub(perSecond, logMoves,  gameConfig,dataManager);
+        RoomHub hub = new RoomHub(perSecond, logMoves,  gameConfig);
         
         app.UseWebSockets();
         app.MapGet("/ping", () => "pong");

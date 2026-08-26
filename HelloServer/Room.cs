@@ -2,6 +2,7 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using Study.MiniDefence;
 
 namespace HelloServer;
 public class GameConfig
@@ -302,7 +303,7 @@ public class Room
         // hello인지 확인해준다
         if (kind?.Type != "hello") 
         {
-            Console.WriteLine($"[{code}] 첫 메시지가 hello가 아님 : {kind}");
+            Console.WriteLine($"[{code}] 첫 메시지가 hello가 아님 : {kind?.Type}");
             return null;
         }
         

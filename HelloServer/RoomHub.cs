@@ -30,14 +30,13 @@ public class RoomHub
 
     GameConfig DefulatConfig;
 
-    DataManager dataManager;
 
-    public RoomHub(int broadcastPerSecond, int logMovesPerSecond, GameConfig  defulatConfig, DataManager dataManager)
+    public RoomHub(int broadcastPerSecond, int logMovesPerSecond, GameConfig  defulatConfig)
     {
         this.broadcastPerSecond = broadcastPerSecond;
         this.logMovesPerSecond = logMovesPerSecond;
         this.DefulatConfig = defulatConfig;
-        this.dataManager = dataManager;
+
     }
 
     #region 방 관리 함수들(찾기, 지우기)
