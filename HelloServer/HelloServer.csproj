@@ -9,5 +9,9 @@
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="33.1.0" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="Table\**\*.tsv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

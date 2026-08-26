@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 
-
 public class GenreTable 
 {
     private const string TableName = "Table/genre_keywords.tsv";
@@ -15,7 +14,7 @@ public class GenreTable
     public void Load()
     {
         genreDefs.Clear();
-        string filePath = Path.Combine(AppContext.BaseDirectory, TableName);
+        string filePath = Path.Combine(AppContext.BaseDirectory, TableName);;
 
         List<GenreDTO> rows = TSVReader.ReadTable<GenreDTO>(filePath);
         int count = 0;

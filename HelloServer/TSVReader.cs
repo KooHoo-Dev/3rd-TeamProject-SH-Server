@@ -77,6 +77,7 @@ namespace Jay.FileIO
             if (!File.Exists(filePath))
             {
                 OnError?.Invoke($"[TSVReader] 파일이 존재하지 않습니다: {filePath}");
+                OnError?.Invoke($"[TSVReader] 경로 존재 여부: {{File.Exists(filePath)}}");
                 return null;
             }
 

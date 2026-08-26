@@ -30,7 +30,7 @@ namespace Study.MiniDefence
         {
             itemDefs.Clear();
             // Path클래스의 Combine함수를 이용해서 경로를 이어준다.
-            string filePath = Path.Combine(AppContext.BaseDirectory, TableName);
+            string filePath = Path.Combine(AppContext.BaseDirectory, TableName);;
 
 
             List<ItemDTO> rows = TSVReader.ReadTable<ItemDTO>(filePath);

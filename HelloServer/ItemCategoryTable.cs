@@ -20,7 +20,7 @@ namespace Study.MiniDefence
         {
             itemCategoryDefs.Clear();
 
-            string filePath = Path.Combine(AppContext.BaseDirectory, TableName);
+            string filePath = Path.Combine(AppContext.BaseDirectory, TableName);;
 
             List<ItemCategoryDTO> rows = TSVReader.ReadTable<ItemCategoryDTO>(filePath);
             int count = 0;
