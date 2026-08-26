@@ -1,4 +1,5 @@
 ﻿using System.Net.WebSockets;
+using Study.MiniDefence;
 
 namespace HelloServer;
 
@@ -26,14 +27,17 @@ public class RoomHub
     private readonly object gate = new object();
 
     private int lastId;
-    
-    GameConfig DefulatConfig = new();
 
-    public RoomHub(int broadcastPerSecond, int logMovesPerSecond, GameConfig  defulatConfig)
+    GameConfig DefulatConfig;
+
+    DataManager dataManager;
+
+    public RoomHub(int broadcastPerSecond, int logMovesPerSecond, GameConfig  defulatConfig, DataManager dataManager)
     {
         this.broadcastPerSecond = broadcastPerSecond;
         this.logMovesPerSecond = logMovesPerSecond;
         this.DefulatConfig = defulatConfig;
+        this.dataManager = dataManager;
     }
 
     #region 방 관리 함수들(찾기, 지우기)

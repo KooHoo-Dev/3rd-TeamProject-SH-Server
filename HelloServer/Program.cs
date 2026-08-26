@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Net.WebSockets;
 using System.Text;
+using Study.MiniDefence;
 
 namespace HelloServer;
 
@@ -42,12 +43,14 @@ public class Program
         
         // 앱의 구성에 값을 가져온다 "Room:LogMovesPerSecond" 키의 값을, 없다면 1을 넣는다
         int logMoves = app.Configuration.GetValue("Room:LogMovesPerSecond", 1);
-        
+
+        DataManager dataManager = new DataManager();
+        dataManager.Load();
         GameConfig gameConfig = app.Configuration.GetSection("GameConfig").Get<GameConfig>();
 
         
         // 서버에 방을 추가해 줍시다.
-        RoomHub hub = new RoomHub(perSecond, logMoves,  gameConfig);
+        RoomHub hub = new RoomHub(perSecond, logMoves,  gameConfig,dataManager);
         
         app.UseWebSockets();
         app.MapGet("/ping", () => "pong");
