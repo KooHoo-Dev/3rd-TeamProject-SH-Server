@@ -115,6 +115,11 @@ namespace HelloServer
         public string Type{get;set;} = "ready";
         public string ID{get;set;}
     }
+    [Serializable]
+    public class AllReadyMessage
+    {
+        public string Type{get;set;} = "AllReady";
+    }
     // 게임 시작 (클라이언트 -> 서버)
     [Serializable]
     public class GameStartMessage
@@ -134,7 +139,8 @@ namespace HelloServer
     [Serializable]
     public class GameLeaveMessage
     {
-        public string Type{get;set;}
+        public string Type{get;set;} = "GameLeave";
+        public string ID{get;set;}
     }
     // 키워드 제공 (서버 -> 클라이언트)
     [Serializable]

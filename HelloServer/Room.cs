@@ -52,6 +52,7 @@ public class GameConfig
 public class Room
 {
     
+    
     // 접속자 한 명.
     private class Member
     {
@@ -61,10 +62,14 @@ public class Room
         // 원래는 벡터로 Position으로 묶어서 사용하는게 좋습니다.
         // 님들이 개발할때는 그렇게 하세여
         public float X;
-        public float Y;
+        public float Z;
 
         public int MovesSinceLog;
-        
+
+
+        public bool IsReady = false;
+
+        public bool IsHost = false;
         // DateTime?
         // : 날짜랑 시간을 표현하고 조작할 때 사용하는 구조체 입니다.
         //  DateTime.Now : 현재 지역 시간을 나타낼 수 있ㅅ브니다
@@ -163,7 +168,11 @@ public class Room
             TypeOnly kind = JsonSerializer.Deserialize<TypeOnly>(text);
             
             if(kind?.Type == "move") HandleMove(member, text);
+            else if(kind?.Type == "chat") await HandleChatAsync(member, text);
             else if(kind?.Type == "normalChat") await HandleChatAsync(member, text);
+            else if(kind?.Type == "specialChat") await HandleSpecialChat(member, text);
+            else if(kind?.Type == "keywordChat") await HandleKeywordChat(member, text);
+            else if (kind?.Type == "Ready") await HandleReady(member, text);
             
             // 모르는 정보는 그냥 흘려버립니다.
             // Tip
@@ -172,9 +181,73 @@ public class Room
         }
     }
 
-    private void HandleSpecialChat(Member member, string text)
+    private async Task HandleReady(Member member, string text)
+    {
+       ReadyMessage readyMessage = JsonSerializer.Deserialize<ReadyMessage>(text);
+       bool isReady = members[readyMessage.ID].IsReady;
+       members[readyMessage.ID].IsReady = !isReady;
+       Console.WriteLine($"[{code}] {readyMessage.ID} : 준비 버튼을 눌렀다!");
+       bool isAllReeay = true;
+       foreach (Member m in members.Values)
+       {
+           if (m.IsReady == false)
+           {
+               isAllReeay = false;
+               break;
+           }
+       }
+       
+       await BroadcastAsync(readyMessage);
+       if (isAllReeay)
+       {
+
+           foreach (Member m in members.Values)
+           {
+               if (m.IsHost)
+               {
+
+                   SendAsync(m, new AllReadyMessage());
+
+               }
+           }
+
+       }
+       
+    }
+
+    private async Task HandleAllReady(Member member, string text)
     {
         
+    }
+    private async Task HandleSpecialChat(Member member, string text)
+    {
+        // 먼저 Chat메시지를 읽어 준다
+        SpecialChatMessage chat = JsonSerializer.Deserialize<SpecialChatMessage>(text);
+        // 온 메시지에서 사용자가 말한 부분만 읽어준다.
+        // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
+        string said = chat.Text?.Trim();
+        Console.WriteLine($"[{code}] {chat.ID} : {said}");
+        // 예시 출력 : [5623] Jay : 안뇽
+        
+        // 여기까지 처리됐으면
+        // (서버) -> (다른 클라이언트) 들에게 보낸다
+        // 받은 객체를 그대로 보낸다.
+        await BroadcastAsync(chat);
+    }
+    private async Task HandleKeywordChat(Member member, string text)
+    {
+        // 먼저 Chat메시지를 읽어 준다
+        KeywordChatMessage chat = JsonSerializer.Deserialize<KeywordChatMessage>(text);
+        // 온 메시지에서 사용자가 말한 부분만 읽어준다.
+        // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
+        string said = chat.Text?.Trim();
+        Console.WriteLine($"[{code}] {chat.Id} : {said}");
+        // 예시 출력 : [5623] Jay : 안뇽
+        
+        // 여기까지 처리됐으면
+        // (서버) -> (다른 클라이언트) 들에게 보낸다
+        // 받은 객체를 그대로 보낸다.
+        await BroadcastAsync(chat);
     }
     // 이동 관련 메시지를 처리하는 함수
     private void HandleMove(Member member, string text)
@@ -183,7 +256,7 @@ public class Room
         MoveMessage move = JsonSerializer.Deserialize<MoveMessage>(text);
         // move 메시지의 내용을 member의 X,Y 내용에 카피해준다
         member.X = move.X;
-        member.Y = move.Y;
+        member.Z = move.Y;
         member.MovesSinceLog++;
         
         LogMove(member, move);
@@ -281,7 +354,7 @@ public class Room
             {
                 Id = member.User.Id,
                 X = member.X,
-                Y = member.Y,
+                Y = member.Z,
             });
         }
 
@@ -344,7 +417,7 @@ public class Room
             welcome.User = member.User; // 서버에서 생성한 유저 정보를 접속자에게 보낸다
             welcome.Users = already.ToArray(); // 현재 방에 있는 유저들 정보를 보낸다
             await SendAsync(member, welcome);
-
+            if (members.IsEmpty) member.IsHost = true; // 가장 처음 접속하면 호스트 취급한다.
             members[member.User.Id] = member;
             // join 메시지를 뿌린다. 접속자인 member 에게는 보내지 않는다
             await BroadcastAsync(new JoinMessage { User = member.User }, member.User.Id);
@@ -391,7 +464,6 @@ public class Room
         Member member = await JoinAsync(socket, id, token);
         // hello 안보내고 딴소리 했다. 방에 못 들인다
         if (member == null) return;
-
         try
         {
             // 접속완료 했으면 메시지를 계속 들을 수 있게
@@ -433,7 +505,7 @@ public class Room
 
         Console.WriteLine(
             $"[{code}] 받음 {member.User.NickName}({member.User.Id}) " +
-            $"({member.X,7:F2}, {member.Y,7:F2})  " +
+            $"({member.X,7:F2}, {member.Z,7:F2})  " +
             $"지난 {gap.TotalSeconds:F1}초에 {member.MovesSinceLog}번{claimed}");
 
         member.MovesSinceLog = 0;
