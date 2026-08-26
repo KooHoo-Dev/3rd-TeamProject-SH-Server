@@ -55,5 +55,18 @@ namespace Study.MiniDefence
             }
             return itemsInCategory;
         }
+
+        public List<KeyWordDef> GetKeyWordDefsByGenre(string genre)
+        {
+            List<KeyWordDef> keyWordDefs = new List<KeyWordDef>();
+            foreach (var keyWordDef in Keywords.GetAllList())
+            {
+                if (keyWordDef.GenreName == genre)
+                {
+                    keyWordDefs.Add(keyWordDef);
+                }
+            }
+            return keyWordDefs;
+        }
     }
 }

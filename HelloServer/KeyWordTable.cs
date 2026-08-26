@@ -29,4 +29,5 @@ public class KeyWordTable
             };
         }
     }
+    public List<KeyWordDef> GetAllList() => keyWorldDefs.Values.ToList();
 }

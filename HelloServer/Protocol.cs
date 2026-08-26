@@ -38,6 +38,7 @@ namespace HelloServer
     public class NormalChatMessage 
     {
         public string Type{get;set;} = "normalChat";
+        public string NickName{get;set;}
         public string Text{get;set;}
         public string ID{get;set;}
     }
@@ -46,6 +47,7 @@ namespace HelloServer
     public class SpecialChatMessage 
     {
         public string Type{get;set;} = "specialChat";
+        public string NickName{get;set;}
         public string Text{get;set;}
         public string ID{get;set;}
     }
@@ -98,7 +100,7 @@ namespace HelloServer
     
         public string currentOwnerID{get;set;} // 서버에서 선택한 유저
     
-        public string Ganre{get;set;} // 장르
+
 
 
         
@@ -147,7 +149,8 @@ namespace HelloServer
     public class KeywordMessage
     {
         public string Type{get;set;} = "keyword";
-        public string Keyword {get;set;}
+        public KeyWordDef Keyword {get;set;}
+        public GenreDef Ganre{get;set;} // 장르
     }
     
     // 라이어 버튼 누름 감지 
@@ -181,7 +184,7 @@ namespace HelloServer
 
         // 지목 단계
         public string statePointAtSuspect {get;set;}= "지목";
-        public string statePointAtSuspectEnd{get;set;} = "지목 종료";
+        public string statePointAtSuspectEnd {get;set;} = "지목 종료";
 
         // 라이어 아웃 단계
         public string stateLiarOutButtonPressed{get;set;} = "라밍아웃 버튼 누름";

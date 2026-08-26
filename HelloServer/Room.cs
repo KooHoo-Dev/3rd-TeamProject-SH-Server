@@ -37,6 +37,9 @@ public class GameConfig
 
     public float stateFinalResultTime;
     public float stateFinalResultEndTime;
+
+    public int MaxRound;
+    public int MaxCycle;
 }
 // 방 하나. 방에 있는 사람들을 들고 있다가
 // 메세지를 전달해 준다.
@@ -51,10 +54,10 @@ public class GameConfig
 
 public class Room
 {
-    
-    
+
+    public GameManager gameManager;
     // 접속자 한 명.
-    private class Member
+    public class Member
     {
         public User User;
         public WebSocket Socket;
@@ -91,7 +94,7 @@ public class Room
     // race condition이 발생하면 깨질꺼에여.
     // 여러 쓰레드에서 동시에 사용하더라도 딕셔너리의 한 상태를 유지 시킬 수 있는
     // 안정성이 보장된 딕셔너리 입니다.
-    private readonly ConcurrentDictionary<string, Member> members = new();
+    public readonly ConcurrentDictionary<string, Member> members = new();
 
     // 들어오고 나가는 메시지 처리(일)을 한줄로 세우는 자물쇠 입니다.
     // lock블록이 await가 안먹어서 사용합니다.
@@ -107,6 +110,8 @@ public class Room
         this.code = code;
         this.logMovesPerSecond = logMovesPerSecond;
         this.GameConfig = config;
+        
+        gameManager = new GameManager(config,this);
     }
 
     #region 듣기
@@ -173,7 +178,7 @@ public class Room
             else if(kind?.Type == "specialChat") await HandleSpecialChat(member, text);
             else if(kind?.Type == "keywordChat") await HandleKeywordChat(member, text);
             else if (kind?.Type == "Ready") await HandleReady(member, text);
-            else if (kind?.Type == "게임 시작") await HandleGameStart(text);
+            else if (kind?.Type == "게임 시작") await HandleGameStart();
             
             // 모르는 정보는 그냥 흘려버립니다.
             // Tip
@@ -216,9 +221,19 @@ public class Room
        
     }
 
-    private async Task HandleGameStart(string text)
+    private async Task HandleGameStart()
     {
-        await BroadcastAsync(text);
+        GameStartOKMessage gameStartOkMessage = new GameStartOKMessage();
+        NewGameConfig newGameConfig = new NewGameConfig();
+        newGameConfig.MaxCycle = GameConfig.MaxCycle;
+        newGameConfig.MaxRound = GameConfig.MaxRound;
+        gameStartOkMessage.newGameConfig = newGameConfig;
+        await BroadcastAsync(gameStartOkMessage);
+    }
+
+    private async Task HandleTurnTimer()
+    {
+        
     }
     private async Task HandleSpecialChat(Member member, string text)
     {
@@ -285,7 +300,7 @@ public class Room
     #region 뿌리기
 
     // 메시지를 여러명한테 뿌리는 함수
-    private async Task BroadcastAsync(object message, string exceptId = null)
+    public async Task BroadcastAsync(object message, string exceptId = null)
     {
         string json = JsonSerializer.Serialize(message, message.GetType());
         
@@ -334,7 +349,7 @@ public class Room
     }
 
     // 단순 호출용 유틸 함수
-    private Task SendAsync(Member member, object message)
+    public Task SendAsync(Member member, object message)
     {
         return SendRawAsync(member, JsonSerializer.Serialize(message, message.GetType()));
     }
