@@ -303,7 +303,7 @@ public class Room
         // hello인지 확인해준다
         if (kind?.Type != "hello") 
         {
-            Console.WriteLine($"[{code}] 첫 메시지가 hello가 아님 : {kind?.Type}");
+            Console.WriteLine($"[{code}] 첫 메시지가 hello가 아님 : {kind?.Type}  first : {first}");
             return null;
         }
         
