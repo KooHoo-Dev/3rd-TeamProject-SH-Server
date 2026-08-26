@@ -4,11 +4,20 @@ using System.Collections.Generic;
 namespace HelloServer
 {
     [Serializable]
+    public class NewGameConfig
+    {
+        public int MaxRound;
+        public int MaxCycle;
+        
+    }
+
+    [Serializable]
     public class User
     {
         public string Id;
         public string NickName;
         public int score; // 점수 
+        
     }
 
     [Serializable]
@@ -90,18 +99,38 @@ namespace HelloServer
         public string currentOwnerID; // 서버에서 선택한 유저
     
         public string Ganre; // 장르
-    
-        public Dictionary <int, string> Cycles; // int : 현재 사이클, string : 현재 카테고리
+
+
+        
+        public int CurrentCycle;
+
+        public int CurrentRound;
+        
+        public string currentCategory;
     }
     
-    // 게임 시작 
+    // 게임 시작 (클라이언트 -> 서버)
     [Serializable]
     public class GameStartMessage
     {
         public string Type = "게임 시작";
+        
+    }
+    // 서버 -> 클라이언트
+    [Serializable]
+    public class GameStartOKMessage
+    {
+        public string Type = "게임 시작 확인";
+        public NewGameConfig newGameConfig;
     }
     
-    // 키워드 제공
+    // 클라이언트 -> 서버
+    [Serializable]
+    public class GameLeaveMessage
+    {
+        public string Type;
+    }
+    // 키워드 제공 (서버 -> 클라이언트)
     [Serializable]
     public class KeywordMessage
     {
@@ -109,7 +138,7 @@ namespace HelloServer
         public string Keyword ;
     }
     
-    // 라이어 버튼 누름 감지
+    // 라이어 버튼 누름 감지 
     [Serializable]
     public class PressLiarButtonMessage // 클라이언트 -> 서버
     {
@@ -201,6 +230,7 @@ namespace HelloServer
         public User User;
         public User[] Users;
     }
+
 
     // 누가 새로 들어왔다.
     [Serializable]
