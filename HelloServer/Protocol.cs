@@ -229,7 +229,7 @@ namespace HelloServer
     [Serializable]
     public class WelcomeMessage
     {
-        public string Type{get;set;}
+        public string Type{get;set;} = "welcome";
 
         public string RoomCode{get;set;}
 
@@ -242,7 +242,7 @@ namespace HelloServer
     [Serializable]
     public class JoinMessage
     {
-        public string Type{get;set;}
+        public string Type{get;set;} = "join";
         public User User{get;set;}
     }
 
@@ -250,7 +250,7 @@ namespace HelloServer
     [Serializable]
     public class LeaveMessage
     {
-        public string Type{get;set;}
+        public string Type{get;set;} = "leave";
         public string Id{get;set;}
     }
 
@@ -266,7 +266,7 @@ namespace HelloServer
     [Serializable]
     public class StateMessage
     {
-        public string Type{get;set;}
+        public string Type { get; set; } = "state";
         public PlayerState[] States{get;set;}
     }
 
