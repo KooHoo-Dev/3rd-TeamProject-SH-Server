@@ -173,6 +173,7 @@ public class Room
             else if(kind?.Type == "specialChat") await HandleSpecialChat(member, text);
             else if(kind?.Type == "keywordChat") await HandleKeywordChat(member, text);
             else if (kind?.Type == "Ready") await HandleReady(member, text);
+            else if (kind?.Type == "게임 시작") await HandleGameStart(text);
             
             // 모르는 정보는 그냥 흘려버립니다.
             // Tip
@@ -180,7 +181,7 @@ public class Room
             // 구간을 만들면 되겠죠?   
         }
     }
-
+    
     private async Task HandleReady(Member member, string text)
     {
        ReadyMessage readyMessage = JsonSerializer.Deserialize<ReadyMessage>(text);
@@ -215,9 +216,9 @@ public class Room
        
     }
 
-    private async Task HandleAllReady(Member member, string text)
+    private async Task HandleGameStart(string text)
     {
-        
+        await BroadcastAsync(text);
     }
     private async Task HandleSpecialChat(Member member, string text)
     {

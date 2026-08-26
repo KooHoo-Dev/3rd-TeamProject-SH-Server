@@ -154,10 +154,16 @@ namespace HelloServer
     [Serializable]
     public class PressLiarButtonMessage // 클라이언트 -> 서버
     {
-        public User User{get;set;}
+        public PlayerState PlayerState{get;set;}
         public string Type {get;set;}= "라밍아웃 버튼 누름";
     }
 
+    [Serializable]
+    public class LiarSelfDisclose
+    {
+        public string Type = "LiarSelfDisclose";
+        public string ID;
+    }
     // 게임 상태
     [Serializable]
     public class GameState
