@@ -63,13 +63,13 @@ namespace Jay.FSM
             prev?.Exit();
             CurrentState = next;
             next.Enter();
-            NewChangeGameStateMessage.Type = next.GetGameStateString();
-            // 밀리세컨드로 넘어갈 예정
-            NewChangeGameStateMessage.Timer = next.MaxMsTime;
-            NewChangeGameStateMessage.currentCategory = next.gameManager.currentCategory.ToString();
-            NewChangeGameStateMessage.CurrentCycle = next.gameManager.currentCycle;
-            NewChangeGameStateMessage.CurrentRound = next.gameManager.currentRound;
-            NewChangeGameStateMessage.currentOwnerID = next.gameManager.focausUser.Id;
+            // NewChangeGameStateMessage.Type = next.GetGameStateString();
+            // // 밀리세컨드로 넘어갈 예정
+            // NewChangeGameStateMessage.Timer = next.MaxMsTime;
+            // NewChangeGameStateMessage.currentCategory = next.gameManager.currentCategory.ToString();
+            // NewChangeGameStateMessage.CurrentCycle = next.gameManager.currentCycle;
+            // NewChangeGameStateMessage.CurrentRound = next.gameManager.currentRound;
+            // NewChangeGameStateMessage.currentOwnerID = next.gameManager.focausUser.Id;
 
             Console.WriteLine($"[상태 메세지] 바뀐 상태 : {next.GetType().Name} \n 보낸 메세지 : {NewChangeGameStateMessage.Type}");
            // next.gameManager.currentRoom.BroadcastAsync(NewChangeGameStateMessage);
