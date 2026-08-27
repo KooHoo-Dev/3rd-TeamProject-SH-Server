@@ -12,6 +12,7 @@ public class GameManager
 
     public Room currentRoom;
 
+    
     public GameStartState startState;
     public GenreAssignAndLiarSelectState genreAssignAndLiarSelectState;
     public KeywordDistributeState keywordDistributeState;
@@ -93,6 +94,7 @@ public class GameManager
         stateMachine.Add(liarKeywordGuessState);
         stateMachine.Add(liarKeywordGuessEndState);
         stateMachine.Add(scoreTallyState);
+        stateMachine.Add(scoreTallyEndState);
         stateMachine.Add(finalResultState);
         stateMachine.Add(finalResultEndState);
         
