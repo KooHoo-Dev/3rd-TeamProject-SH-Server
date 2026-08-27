@@ -98,14 +98,14 @@ public class GameManager
         
     }
 
-    public void GameStart()
+    public async void GameStart()
     {
         if(IsGameRunning) return;
-        Init();
+       await Init();
         stateMachine.ChangeState<GameStartState>();
     }
 
-    private void Init()
+    private async Task Init()
     {
         IsGameRunning = true;
         AllCategories = GetRandomCategories();
