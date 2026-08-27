@@ -150,7 +150,7 @@ public class GenreAssignAndLiarSelectStateMessage
     public float TimerMs { get; set; }
     public int CurrentCycle { get; set; }
     public int CurrentRound { get; set; }
-    public int GanreId{get;set;} // 장르
+    public int GenreId{get;set;} // 장르
     public string CurrentOwnerID { get; set; }  // 선정된 라이어
     
 }

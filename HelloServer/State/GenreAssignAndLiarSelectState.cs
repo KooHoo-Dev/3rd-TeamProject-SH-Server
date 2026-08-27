@@ -23,7 +23,7 @@ public class GenreAssignAndLiarSelectState: GameTurnState
         genreAssignAndLiarSelectStateMessage.TimerMs = MaxMsTime;
         genreAssignAndLiarSelectStateMessage.CurrentCycle = gameManager.currentCycle;
         genreAssignAndLiarSelectStateMessage.CurrentRound = gameManager.currentRound;
-        genreAssignAndLiarSelectStateMessage.GanreId = gameManager.CurrentGanre.GenreId;
+        genreAssignAndLiarSelectStateMessage.GenreId = gameManager.CurrentGanre.GenreId;
         BroadcastAsync(genreAssignAndLiarSelectStateMessage);
     }
     public override string GetGameStateString()
