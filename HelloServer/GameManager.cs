@@ -1,4 +1,5 @@
-﻿using HelloServer.State;
+﻿using System.Collections.Concurrent;
+using HelloServer.State;
 using Jay.FSM;
 
 namespace HelloServer;
@@ -46,10 +47,11 @@ public class GameManager
     public KeyWordDef CurrentLiarKeyword;
     public List<KeyWordDef> OldKeyWords;
    
+
     public readonly SemaphoreSlim TriggerLock 
         = new SemaphoreSlim(1, 1);
 
-    #region 비동기 함수에서 보내는 트리거들
+    #region 비동기 함수에서 보내는 정보들
 
     public bool changeSpeakerTrigger = false;
     public bool ChangeSpeakerTrigger
@@ -89,6 +91,8 @@ public class GameManager
         }
     }
 
+    // Key :한 유저, Value : 지목을 받은 유저 (만약 없다면 빈 스트링)(모든 유저가 key값으로 있음)
+    public readonly ConcurrentDictionary<string, string> PointInfo;
     
     #endregion
 
@@ -194,6 +198,10 @@ public class GameManager
                 list.Add(randomValue);
         }
 
+        foreach (User user in users)
+        {
+            PointInfo.TryAdd(user.Id, "");
+        }
         AllCategories = new CategoryType[list.Count];
         for (int i = 0; i < list.Count; i++)
         {
@@ -205,5 +213,6 @@ public class GameManager
     public void GameEnd()
     {
         IsGameRunning = false;
+        PointInfo.Clear();
     }
 }

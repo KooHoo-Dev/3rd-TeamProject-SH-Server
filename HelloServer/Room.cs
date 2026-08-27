@@ -185,6 +185,7 @@ public class Room
             else if (kind?.Type == "Ready") await HandleReady(member, text);
             else if (kind?.Type == "게임 시작") await HandleGameStart();
             else if(kind?.Type == "NonPoint")  await HandleNonPoint(member, text);
+            else if(kind?.Type == "Select") await HandleSelectUser( member, text);
             
             // 모르는 정보는 그냥 흘려버립니다.
             // Tip
@@ -199,6 +200,17 @@ public class Room
         NonPointMessage nonPointMessage = new NonPointMessage();
         nonPointMessage.UserID = member.User.Id;
         await BroadcastAsync(nonPointMessage);
+    }
+
+    private async Task HandleSelectUser(Member member, string text)
+    {
+        SelectMessage selectMessage = JsonSerializer.Deserialize<SelectMessage>(text);
+
+        gameManager.PointInfo[member.User.Id] = selectMessage.IsSelectCancel ? "" : selectMessage.selectedID.ToString();
+            
+        
+        
+        await BroadcastAsync(selectMessage);
     }
     private async Task HandleReady(Member member, string text)
     {
