@@ -23,9 +23,13 @@ public abstract class GameTurnState : IState
 
     public virtual void Enter()
     {
+        if (gameManager?.currentRoom == null)
+        {
+            Console.WriteLine($"[조기 종료됨]; 게임매니저 == null :{gameManager == null}, 현재 방 == null : {gameManager?.currentRoom == null}");
+        }
         timer = new System.Timers.Timer(IntarvelMs);
      timer.AutoReset = false;
-     currentMsTime = (int)MaxMsTime;
+     currentMsTime = 0;
      timer.Elapsed += OnTimedEvent;
      timer.Start();
         Console.WriteLine($"[스테이트 머신] 현재 Enter 상태: {stateMachine.CurrentState}, 제한시간(ms): {MaxMsTime}");
