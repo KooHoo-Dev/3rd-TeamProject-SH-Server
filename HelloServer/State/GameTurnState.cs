@@ -26,6 +26,7 @@ public abstract class GameTurnState : IState
         if (gameManager?.currentRoom == null)
         {
             Console.WriteLine($"[조기 종료됨]; 게임매니저 == null :{gameManager == null}, 현재 방 == null : {gameManager?.currentRoom == null}");
+            return;
         }
         timer = gameManager.currentRoom.timer;
      timer.AutoReset = true;

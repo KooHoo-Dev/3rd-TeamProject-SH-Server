@@ -2,6 +2,7 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using Timer = System.Timers.Timer;
 
 
 namespace HelloServer;
@@ -56,7 +57,8 @@ public class Room
 {
 
     public  GameManager gameManager;
-    public System.Timers.Timer timer;
+
+    public System.Timers.Timer timer = new Timer();
     // 접속자 한 명.
     public class Member
     {
