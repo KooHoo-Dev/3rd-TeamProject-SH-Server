@@ -43,9 +43,9 @@ public class GameManager
     public User focausUser;
     public GenreDef CurrentGanre;
     public KeyWordDef CurrentKeyWord;
+    public KeyWordDef CurrentLiarKeyword;
     public List<KeyWordDef> OldKeyWords;
-    public string currentNomalKeyword;
-    public string currentLiarKeyword;
+   
     public readonly SemaphoreSlim TriggerLock 
         = new SemaphoreSlim(1, 1);
 

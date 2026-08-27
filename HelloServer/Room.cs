@@ -76,6 +76,8 @@ public class Room
         public bool IsReady = false;
 
         public bool IsHost = false;
+
+        public PlayerState playerState = new PlayerState();
         // DateTime?
         // : 날짜랑 시간을 표현하고 조작할 때 사용하는 구조체 입니다.
         //  DateTime.Now : 현재 지역 시간을 나타낼 수 있ㅅ브니다
@@ -202,7 +204,7 @@ public class Room
     {
        ReadyMessage readyMessage = JsonSerializer.Deserialize<ReadyMessage>(text);
        bool isReady = members[readyMessage.ID].IsReady;
-       members[readyMessage.ID].IsReady = !isReady;
+       members[readyMessage.ID].IsReady = isReady;
        Console.WriteLine($"[{code}] {readyMessage.ID} : 준비 버튼을 눌렀다!");
        bool isAllReeay = true;
        foreach (Member m in members.Values)
@@ -245,11 +247,7 @@ public class Room
         gameManager.GameStart();
         
     }
-
-    private async Task HandleTurnTimer()
-    {
-        
-    }
+    
     private async Task HandleSpecialChat(Member member, string text)
     {
         // 먼저 Chat메시지를 읽어 준다

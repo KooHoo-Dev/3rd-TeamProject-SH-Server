@@ -20,13 +20,37 @@ public class KeywordDistributeState : GameTurnState
         List<KeyWordDef> NewList = list.Union(gameManager.OldKeyWords).ToList();
         gameManager.CurrentKeyWord = NewList[rnd.Next(NewList.Count)];
         gameManager.OldKeyWords.Add(gameManager.CurrentKeyWord);
-        
+        NewList.Remove(gameManager.CurrentKeyWord);
         keywordDistributeStateMessage.CurrentCycle = gameManager.currentCycle;
         keywordDistributeStateMessage.CurrentRound = gameManager.currentRound;
         keywordDistributeStateMessage.TimerMs = MaxMsTime;
 
         keywordDistributeStateMessage.KeywordId = gameManager.CurrentKeyWord.KeywordId;
-        BroadcastAsync(keywordDistributeStateMessage);
+        
+        for (int i = 0; i < gameManager.users.Length; i++)
+        {
+            
+            if (gameManager.currentRoom.members[gameManager.users[i].Id].playerState.IsLiar)
+            {
+                KeywordDistributeStateMessage LiarMessage = new  KeywordDistributeStateMessage();
+                List<KeyWordDef> Liarlist = DataManager.Instance.GetKeyWordDefsByGenre(gameManager.CurrentGanre.GenreName);
+                List<KeyWordDef> LiarNewList = Liarlist.Union(gameManager.OldKeyWords).ToList();
+                gameManager.CurrentLiarKeyword = LiarNewList[rnd.Next(LiarNewList.Count)];
+                gameManager.OldKeyWords.Add(gameManager.CurrentLiarKeyword);
+                LiarNewList.Remove(gameManager.CurrentKeyWord);
+                LiarMessage.CurrentCycle = gameManager.currentCycle;
+                LiarMessage.CurrentRound = gameManager.currentRound;
+                LiarMessage.TimerMs = MaxMsTime;
+
+                LiarMessage.KeywordId = gameManager.CurrentKeyWord.KeywordId;
+                SendAsync(gameManager.currentRoom.members[gameManager.users[i].Id], LiarMessage);
+            }
+            else
+            {
+                SendAsync(gameManager.currentRoom.members[gameManager.users[i].Id], keywordDistributeStateMessage);
+            }
+        }
+        
     }
 
     public override string GetGameStateString()

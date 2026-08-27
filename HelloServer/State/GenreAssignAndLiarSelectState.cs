@@ -19,11 +19,16 @@ public class GenreAssignAndLiarSelectState: GameTurnState
         GenreDef genreDef = DataManager.Instance.Genres.Get(rnd.Next(DataManager.Instance.Genres.Count));
         gameManager.CurrentGanre = genreDef;
         
-
+        
+        User Liar = gameManager.users[rnd.Next(0, gameManager.users.Length)];
+        gameManager.currentRoom.members[Liar.Id].playerState.IsLiar = true;
+        genreAssignAndLiarSelectStateMessage.CurrentOwnerID = Liar.Id;
+        
         genreAssignAndLiarSelectStateMessage.TimerMs = MaxMsTime;
         genreAssignAndLiarSelectStateMessage.CurrentCycle = gameManager.currentCycle;
         genreAssignAndLiarSelectStateMessage.CurrentRound = gameManager.currentRound;
         genreAssignAndLiarSelectStateMessage.GenreId = gameManager.CurrentGanre.GenreId;
+        
         BroadcastAsync(genreAssignAndLiarSelectStateMessage);
     }
     public override string GetGameStateString()
