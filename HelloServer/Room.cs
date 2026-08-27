@@ -176,7 +176,7 @@ public class Room
             else if(kind?.Type == "chat") await HandleChatAsync(member, text);
             else if(kind?.Type == "normalChat") await HandleChatAsync(member, text);
             else if(kind?.Type == "specialChat") await HandleSpecialChat(member, text);
-            else if(kind?.Type == "keywordChat") await HandleKeywordChat(member, text);
+            else if(kind?.Type == "KeywordChat") await HandleKeywordChat(member, text);
             else if (kind?.Type == "Ready") await HandleReady(member, text);
             else if (kind?.Type == "게임 시작") await HandleGameStart();
             
