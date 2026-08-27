@@ -12,12 +12,11 @@ namespace HelloServer
     }
 
     [Serializable]
-    public class User
+    public class User // room에 들어와을 때 서버-> 클라 한번만 뿌려준다
     {
         public string Id{get;set;}
         public string NickName{get;set;}
-        public int score{get;set;} // 점수 
-        public bool IsLiar{get;set;} // 라이어 인가?
+
     }
 
     [Serializable]
@@ -29,8 +28,9 @@ namespace HelloServer
         
         // 추가 코드
         public float Z { get; set; } 
-
-        public string[] Items{get;set;}
+        public int score{get;set;} // 점수 
+        public bool IsLiar{get;set;} // 라이어 인가?
+        public string[] Items{get;set;} // 카테고리별 최종 선택한 아이템
     }
     
     // 일반 채팅 모드 (C2S / S2C 공유)
