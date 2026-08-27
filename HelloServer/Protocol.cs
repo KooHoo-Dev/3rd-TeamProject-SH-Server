@@ -20,7 +20,7 @@ namespace HelloServer
     }
 
     [Serializable]
-    public class PlayerState
+    public class PlayerState // 지속적으로 클라이언트에게 뿌려주는 데이터
     {
         public string Id{get;set;}
         public float X{get;set;}
