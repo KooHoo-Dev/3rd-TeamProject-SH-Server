@@ -10,7 +10,7 @@ public class VoteEndState : GameTurnState
     }
     public override string GetGameStateString()
     {
-        return gameManager.allStateString.stateVote;
+        return gameManager.allStateString.stateVoteEnd;
     }
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {

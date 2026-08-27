@@ -10,7 +10,7 @@ public class PointAtSuspectState : GameTurnState
     }
     public override string GetGameStateString()
     {
-        return gameManager.allStateString.stateFinalResult;
+        return gameManager.allStateString.statePointAtSuspect;
     }
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {

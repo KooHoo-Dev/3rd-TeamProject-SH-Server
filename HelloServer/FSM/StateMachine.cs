@@ -72,7 +72,7 @@ namespace Jay.FSM
             NewChangeGameStateMessage.currentOwnerID = next.gameManager.focausUser?.Id;
 
             Console.WriteLine($"[상태 메세지] 바뀐 상태 : {next.GetType().Name} \n 보낸 메세지 : {NewChangeGameStateMessage.Type}");
-           next.gameManager.currentRoom.BroadcastAsync(NewChangeGameStateMessage);
+            next.gameManager.currentRoom.BroadcastAsync(NewChangeGameStateMessage);
             OnStateChanged?.Invoke(prev, next);
         }
 

@@ -11,7 +11,7 @@ public class FinalResultEndState : GameTurnState
     
     public override string GetGameStateString()
     {
-        return gameManager.allStateString.stateDebateTime;
+        return gameManager.allStateString.stateFinalResultEnd;
     }
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {
