@@ -9,6 +9,7 @@ public class GameManager
     
     StateMachine<IState> stateMachine;
 
+    public bool IsGameRunning = false;
     public GameState allStateString = new GameState();
     public Room currentRoom;
 
@@ -99,13 +100,14 @@ public class GameManager
 
     public void GameStart()
     {
+        if(IsGameRunning) return;
         Init();
         stateMachine.ChangeState<GameStartState>();
     }
 
     private void Init()
     {
-
+        IsGameRunning = true;
         AllCategories = GetRandomCategories();
         currentCycle = 0;
         currentRound = 0;

@@ -229,6 +229,9 @@ public class Room
         newGameConfig.MaxRound = GameConfig.MaxRound;
         gameStartOkMessage.newGameConfig = newGameConfig;
         await BroadcastAsync(gameStartOkMessage);
+        // 게임 루프 시작
+        gameManager.GameStart();
+        
     }
 
     private async Task HandleTurnTimer()
