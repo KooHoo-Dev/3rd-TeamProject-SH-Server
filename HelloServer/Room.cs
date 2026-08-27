@@ -242,7 +242,7 @@ public class Room
         // 온 메시지에서 사용자가 말한 부분만 읽어준다.
         // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
         string said = chat.Text?.Trim();
-        Console.WriteLine($"[{code}] {chat.ID} : {said}");
+        Console.WriteLine($"[special][{code}] {chat.ID} : {said}");
         // 예시 출력 : [5623] Jay : 안뇽
         
         // 여기까지 처리됐으면
@@ -257,7 +257,7 @@ public class Room
         // 온 메시지에서 사용자가 말한 부분만 읽어준다.
         // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
         string said = chat.Text?.Trim();
-        Console.WriteLine($"[{code}] {chat.Id} : {said}");
+        Console.WriteLine($"[Keyword][{code}] {chat.Id} : {said}");
         // 예시 출력 : [5623] Jay : 안뇽
         
         // 여기까지 처리됐으면
@@ -286,7 +286,7 @@ public class Room
         // 온 메시지에서 사용자가 말한 부분만 읽어준다.
         // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
         string said = chat.Text?.Trim();
-        Console.WriteLine($"[{code}] {chat.NickName} : {said}");
+        Console.WriteLine($"[normal][{code}] {chat.NickName} : {said}");
         // 예시 출력 : [5623] Jay : 안뇽
         
         // 여기까지 처리됐으면
