@@ -7,39 +7,39 @@ using System.Text.Json;
 namespace HelloServer;
 public class GameConfig
 {
-    public float stateGameStartTime;
-    public float stateGenreAssignAndLiarSelectTime;
-    public float stateKeywordDistributeTime;
-    public float stateMartEnterTime;
+    public float stateGameStartTime { get; set; }
+    public float stateGenreAssignAndLiarSelectTime{ get; set; }
+    public float stateKeywordDistributeTime{ get; set; }
+    public float stateMartEnterTime{ get; set; }
 
-    public float stateMartReturnTime;
-    public float stateShowItemAndSpeakTime;
-    public float stateSpeechEndTime;
+    public float stateMartReturnTime{ get; set; }
+    public float stateShowItemAndSpeakTime{ get; set; }
+    public float stateSpeechEndTime{ get; set; }
 
-    public float statePointAtSuspectTime;
-    public float statePointAtSuspectEndTime;
+    public float statePointAtSuspectTime{ get; set; }
+    public float statePointAtSuspectEndTime{ get; set; }
 
-    public float stateLiarOutButtonPressedTime;
+    public float stateLiarOutButtonPressedTime{ get; set; }
 
-    public float stateDebateTime; // 예외: Time 중복 방지를 위해 그대로 유지
-    public float stateDebateEndTime;
+    public float stateDebateTime{ get; set; }
+    public float stateDebateEndTime{ get; set; }
 
-    public float stateVoteTime;
-    public float stateVoteEndTime;
+    public float stateVoteTime{ get; set; }
+    public float stateVoteEndTime{ get; set; }
 
-    public float stateLiarConfirmedTime;
-    public float stateLiarKeywordGuessTime;
-    public float stateLiarKeywordGuessEndTime;
+    public float stateLiarConfirmedTime{ get; set; }
+    public float stateLiarKeywordGuessTime{ get; set; }
+    public float stateLiarKeywordGuessEndTime{ get; set; }
 
-    public float stateScoreTallyTime;
-    public float stateScoreTallyEndTime;
-    public float stateMartMoveTime;
+    public float stateScoreTallyTime{ get; set; }
+    public float stateScoreTallyEndTime{ get; set; }
+    public float stateMartMoveTime{ get; set; }
 
-    public float stateFinalResultTime;
-    public float stateFinalResultEndTime;
+    public float stateFinalResultTime{ get; set; }
+    public float stateFinalResultEndTime{ get; set; }
 
-    public int MaxRound;
-    public int MaxCycle;
+    public int MaxRound{ get; set; }
+    public int MaxCycle{ get; set; }
 }
 // 방 하나. 방에 있는 사람들을 들고 있다가
 // 메세지를 전달해 준다.
