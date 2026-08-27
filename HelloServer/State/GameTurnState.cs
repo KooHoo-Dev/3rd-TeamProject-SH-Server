@@ -28,6 +28,7 @@ public abstract class GameTurnState : IState
      timer.AutoReset = false;
      currentMsTime = (int)MaxMsTime;
      timer.Elapsed += OnTimedEvent;
+     timer.Start();
         Console.WriteLine($"[스테이트 머신] 현재 Enter 상태: {stateMachine.CurrentState}");
      
     }
