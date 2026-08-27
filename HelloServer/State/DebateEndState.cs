@@ -5,7 +5,8 @@ namespace HelloServer.State;
 
 public class DebateEndState: GameTurnState
 {
-    public DebateEndState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
+    private DebateEndStateMessage debateEndStateMessage = new DebateEndStateMessage();
+    public DebateEndState(StateMachine<IState> stateMachine, GameManager gameManager, float maxTime) : base(stateMachine, gameManager, maxTime)
     {
     }
 
@@ -17,7 +18,7 @@ public class DebateEndState: GameTurnState
 
     public override string GetGameStateString()
     {
-        return gameManager.allStateString.stateDebateEnd;
+        return debateEndStateMessage.Type;
     }
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {

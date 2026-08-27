@@ -5,12 +5,13 @@ namespace HelloServer.State;
 
 public class LiarKeywordGuessEndState : GameTurnState
 {
+    LiarConfirmedStateMessage liarConfirmedStateMessage = new LiarConfirmedStateMessage();
     public LiarKeywordGuessEndState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
     public override string GetGameStateString()
     {
-        return gameManager.allStateString.stateLiarKeywordGuessEnd;
+        return liarConfirmedStateMessage.Type;
     }
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {

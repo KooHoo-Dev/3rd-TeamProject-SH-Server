@@ -12,12 +12,11 @@ public abstract class GameTurnState : IState
     public int currentMsTime;
     public float MaxMsTime{get;set;}
 
-    public GameState GameStateStrings = new GameState();
-    public GameTurnState(StateMachine<IState> stateMachine,GameManager gameManager, float MaxMsTime)
+    public GameTurnState(StateMachine<IState> stateMachine,GameManager gameManager, float MaxTime)
     {
         this.stateMachine = stateMachine;
         this.gameManager = gameManager;
-        this.MaxMsTime = MaxMsTime;
+        this.MaxMsTime = MaxTime * 1000;
     }
 
 
@@ -29,7 +28,7 @@ public abstract class GameTurnState : IState
      currentMsTime = (int)MaxMsTime;
      timer.Elapsed += OnTimedEvent;
      timer.Start();
-        Console.WriteLine($"[스테이트 머신] 현재 Enter 상태: {stateMachine.CurrentState}");
+        Console.WriteLine($"[스테이트 머신] 현재 Enter 상태: {stateMachine.CurrentState}, 제한시간(ms): {MaxMsTime}");
      
     }
     public virtual string GetGameStateString()
@@ -46,8 +45,18 @@ public abstract class GameTurnState : IState
     protected virtual void OnTimedEvent(object sender, ElapsedEventArgs e)
     {
         currentMsTime += IntarvelMs;
-        Console.WriteLine($"[스테이트 머신] 현재 Time 상태: {e.SignalTime}");
+        Console.WriteLine($"[스테이트 머신] 현재 Timer 상태: {currentMsTime}");
         
 
+        
+    }
+
+    protected Task BroadcastAsync(object message, string exceptId = null)
+    {
+       return gameManager.currentRoom.BroadcastAsync(message, exceptId);
+    }
+    protected Task SendAsync(Room.Member member, object message)
+    {
+        return gameManager.currentRoom.SendAsync(member, message);
     }
 }

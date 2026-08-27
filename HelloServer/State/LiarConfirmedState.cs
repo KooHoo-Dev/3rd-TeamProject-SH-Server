@@ -5,12 +5,14 @@ namespace HelloServer.State;
 
 public class LiarConfirmedState : GameTurnState
 {
+    private LiarConfirmedStateMessage liarConfirmedStateMessage = new LiarConfirmedStateMessage();  
     public LiarConfirmedState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
+        
     }
     public override string GetGameStateString()
     {
-        return gameManager.allStateString.stateLiarConfirmed;
+        return liarConfirmedStateMessage.Type;
     }
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {

@@ -5,12 +5,13 @@ namespace HelloServer.State;
 
 public class PointAtSuspectState : GameTurnState
 {
+    private PointAtSuspectStateMessage pointAtSuspectStateMessage = new PointAtSuspectStateMessage();    
     public PointAtSuspectState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
     public override string GetGameStateString()
     {
-        return gameManager.allStateString.statePointAtSuspect;
+        return pointAtSuspectStateMessage.Type;
     }
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {

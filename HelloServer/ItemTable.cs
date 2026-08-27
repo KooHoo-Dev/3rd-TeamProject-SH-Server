@@ -4,8 +4,6 @@ using System.IO;
 using Jay.FileIO;
 
 
-namespace Study.MiniDefence
-{
     // WaveTable은 EnemyDef가 필요하기 때문에
     // 생성시 EnemyTable을 주입반드다.
     public class ItemTable
@@ -48,4 +46,3 @@ namespace Study.MiniDefence
             }
         }
     }
-}

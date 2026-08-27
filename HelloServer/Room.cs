@@ -2,7 +2,7 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using Study.MiniDefence;
+
 
 namespace HelloServer;
 public class GameConfig

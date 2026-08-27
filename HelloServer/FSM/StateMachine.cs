@@ -56,23 +56,10 @@ namespace Jay.FSM
             
             var prev = CurrentState;
 
-            // 보낼 메세지 조립 후 턴이 넘어갈 때마다 메세지 전송
-                ChangeGameStateMessage NewChangeGameStateMessage = new ChangeGameStateMessage();
-
-
+     
             prev?.Exit();
             CurrentState = next;
             next.Enter();
-            NewChangeGameStateMessage.Type = next.GetGameStateString();
-            // 밀리세컨드로 넘어갈 예정
-            NewChangeGameStateMessage.Timer = next.MaxMsTime;
-            NewChangeGameStateMessage.currentCategory = next.gameManager.currentCategory.ToString();
-            NewChangeGameStateMessage.CurrentCycle = next.gameManager.currentCycle;
-            NewChangeGameStateMessage.CurrentRound = next.gameManager.currentRound;
-            NewChangeGameStateMessage.currentOwnerID = next.gameManager.focausUser?.Id;
-
-            Console.WriteLine($"[상태 메세지] 바뀐 상태 : {next.GetType().Name} \n 보낸 메세지 : {NewChangeGameStateMessage.Type}");
-            next.gameManager.currentRoom.BroadcastAsync(NewChangeGameStateMessage);
             OnStateChanged?.Invoke(prev, next);
         }
 

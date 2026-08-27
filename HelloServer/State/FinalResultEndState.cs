@@ -5,13 +5,15 @@ namespace HelloServer.State;
 
 public class FinalResultEndState : GameTurnState
 {
-    public FinalResultEndState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
+    FinalResultEndStateMessage debateEndStateMessage = new FinalResultEndStateMessage();
+    public FinalResultEndState(StateMachine<IState> stateMachine, GameManager gameManager, float maxTime) : base(stateMachine, gameManager, maxTime)
     {
+        
     }
     
     public override string GetGameStateString()
     {
-        return gameManager.allStateString.stateFinalResultEnd;
+        return debateEndStateMessage.Type;
     }
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {

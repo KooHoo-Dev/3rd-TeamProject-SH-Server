@@ -1,6 +1,5 @@
 ﻿using HelloServer.State;
 using Jay.FSM;
-using Study.MiniDefence;
 
 namespace HelloServer;
 
@@ -10,7 +9,7 @@ public class GameManager
     StateMachine<IState> stateMachine;
 
     public bool IsGameRunning = false;
-    public GameState allStateString = new GameState();
+
     public Room currentRoom;
 
     public GameStartState startState;
@@ -41,7 +40,8 @@ public class GameManager
     public int currentRound = 0;
     public User[] users;
     public User focausUser = null;
-    public string CurrentGanre;
+    public GenreDef CurrentGanre;
+    public KeyWordDef CurrentKeyWord;
     public string currentNomalKeyword;
     public string currentLiarKeyword;
     public  GameManager(GameConfig gameConfig, Room currentRoom)
@@ -150,6 +150,6 @@ public class GameManager
     }
     public void GameEnd()
     {
-        
+        IsGameRunning = false;
     }
 }

@@ -5,12 +5,13 @@ namespace HelloServer.State;
 
 public class ScoreTallyState : GameTurnState
 {
+    ScoreTallyStateMessage scoreTallyStateMessage = new ScoreTallyStateMessage();  
     public ScoreTallyState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
     public override string GetGameStateString()
     {
-        return gameManager.allStateString.stateScoreTally;
+        return  scoreTallyStateMessage.Type;
     }
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {

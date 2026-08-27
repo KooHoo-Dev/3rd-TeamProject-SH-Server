@@ -5,18 +5,23 @@ namespace HelloServer.State;
 
 public class GameStartState : GameTurnState
 {
-    public GameStartState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
+    private GameStartStateMessage gameStartStateMessage = new GameStartStateMessage();
+    public GameStartState(StateMachine<IState> stateMachine, GameManager gameManager, float maxTime) : base(stateMachine, gameManager, maxTime)
     {
+        
     }
 
     public override void Enter()
     {
         base.Enter();
-        
+        gameStartStateMessage.CurrentCycle = 1;
+        gameStartStateMessage.CurrentRound = 1;
+        gameStartStateMessage.TimerMs = MaxMsTime;
+        BroadcastAsync(gameStartStateMessage);
     }
     public override string GetGameStateString()
     {
-        return gameManager.allStateString.stateGameStart;
+        return gameStartStateMessage.Type;
     }
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {

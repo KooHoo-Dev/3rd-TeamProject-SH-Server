@@ -5,12 +5,13 @@ namespace HelloServer.State;
 
 public class MartMoveState : GameTurnState
 {
+    MartMoveStateMessage martMoveStateMessage = new MartMoveStateMessage();
     public MartMoveState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
     public override string GetGameStateString()
     {
-        return gameManager.allStateString.stateMartMove;
+        return martMoveStateMessage.Type;
     }
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {

@@ -5,12 +5,13 @@ namespace HelloServer.State;
 
 public class VoteState : GameTurnState
 {
+    VoteStateMessage voteStateMessage = new VoteStateMessage();
     public VoteState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
     public override string GetGameStateString()
     {
-        return gameManager.allStateString.stateVote;
+        return voteStateMessage.Type;
     }
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {

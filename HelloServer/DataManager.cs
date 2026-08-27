@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Xml;
 
 
-namespace Study.MiniDefence
-{
     //[Facade Pattern] 데이터 표들이 들어가는 단일 창구
     // 데이터 종류별 테이블(Enemy, Wave, Unit)을 '보유'하고
     // 로딩 순서를 조율하는 역할
@@ -69,4 +67,3 @@ namespace Study.MiniDefence
             return keyWordDefs;
         }
     }
-}
