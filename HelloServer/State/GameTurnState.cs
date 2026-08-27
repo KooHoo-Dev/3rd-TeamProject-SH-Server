@@ -28,7 +28,7 @@ public abstract class GameTurnState : IState
             Console.WriteLine($"[조기 종료됨]; 게임매니저 == null :{gameManager == null}, 현재 방 == null : {gameManager?.currentRoom == null}");
         }
         timer = new System.Timers.Timer(IntarvelMs);
-     timer.AutoReset = false;
+     timer.AutoReset = true;
      currentMsTime = 0;
      timer.Elapsed += OnTimedEvent;
      timer.Start();
