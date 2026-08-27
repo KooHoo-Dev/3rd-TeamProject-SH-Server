@@ -17,7 +17,7 @@ namespace HelloServer
         public string Id{get;set;}
         public string NickName{get;set;}
         public int score{get;set;} // 점수 
-        
+        public bool IsLiar{get;set;} // 라이어 인가?
     }
 
     [Serializable]
@@ -29,7 +29,7 @@ namespace HelloServer
         
         // 추가 코드
         public float Z { get; set; } 
-        public bool IsLiar{get;set;}
+
         public string[] Items{get;set;}
     }
     
