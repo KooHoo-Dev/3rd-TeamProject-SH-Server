@@ -55,7 +55,7 @@ public class GameConfig
 public class Room
 {
 
-    public GameManager gameManager;
+    public  GameManager gameManager;
     // 접속자 한 명.
     public class Member
     {
@@ -228,6 +228,7 @@ public class Room
         newGameConfig.MaxCycle = GameConfig.MaxCycle;
         newGameConfig.MaxRound = GameConfig.MaxRound;
         gameStartOkMessage.newGameConfig = newGameConfig;
+
         await BroadcastAsync(gameStartOkMessage);
         // 게임 루프 시작
         gameManager.GameStart();

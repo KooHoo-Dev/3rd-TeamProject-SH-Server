@@ -12,7 +12,7 @@ public class DebateEndState: GameTurnState
     public override void Enter()
     {
         base.Enter();
-
+        
     }
 
     public override string GetGameStateString()
