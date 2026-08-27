@@ -98,7 +98,7 @@ public class GameManager
         
     }
 
-    public async void GameStart()
+    public async Task GameStart()
     {
         if(IsGameRunning) return;
        await Init();
