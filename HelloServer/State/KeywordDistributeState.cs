@@ -15,6 +15,18 @@ public class KeywordDistributeState : GameTurnState
     {
         base.Enter();
 
+        Random rnd = new Random();
+        List<KeyWordDef> list = DataManager.Instance.GetKeyWordDefsByGenre(gameManager.CurrentGanre.GenreName);
+        List<KeyWordDef> NewList = list.Union(gameManager.OldKeyWords).ToList();
+        gameManager.CurrentKeyWord = NewList[rnd.Next(NewList.Count)];
+        gameManager.OldKeyWords.Add(gameManager.CurrentKeyWord);
+        
+        keywordDistributeStateMessage.CurrentCycle = gameManager.currentCycle;
+        keywordDistributeStateMessage.CurrentRound = gameManager.currentRound;
+        keywordDistributeStateMessage.TimerMs = MaxMsTime;
+
+        keywordDistributeStateMessage.KeywordId = gameManager.CurrentKeyWord.KeywordId;
+        BroadcastAsync(keywordDistributeStateMessage);
     }
 
     public override string GetGameStateString()

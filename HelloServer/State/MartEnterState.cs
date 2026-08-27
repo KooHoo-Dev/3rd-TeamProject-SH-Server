@@ -9,6 +9,16 @@ public class MartEnterState : GameTurnState
     public MartEnterState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
+
+    public override void Enter()
+    {
+        base.Enter();
+        martEnterStateMessage.CurrentCycle = gameManager.currentCycle;
+        martEnterStateMessage.CurrentRound = gameManager.currentRound;
+        martEnterStateMessage.TimerMs = MaxMsTime;
+        BroadcastAsync(martEnterStateMessage);
+    }
+
     public override string GetGameStateString()
     {
         return martEnterStateMessage.Type;

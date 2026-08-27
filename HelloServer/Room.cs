@@ -104,7 +104,7 @@ public class Room
     private readonly SemaphoreSlim gate = new SemaphoreSlim(1, 1);
     private readonly string code; // 방번호
     private readonly int logMovesPerSecond; // 룸허브를 통해서 전달 받습니다. 
-
+    
     public bool IsEmpty => members.IsEmpty;
     public GameConfig GameConfig { get; }
     
@@ -182,6 +182,7 @@ public class Room
             else if(kind?.Type == "KeywordChat") await HandleKeywordChat(member, text);
             else if (kind?.Type == "Ready") await HandleReady(member, text);
             else if (kind?.Type == "게임 시작") await HandleGameStart();
+            else if(kind?.Type == "NonPoint")  await HandleNonPoint(member, text);
             
             // 모르는 정보는 그냥 흘려버립니다.
             // Tip
@@ -189,7 +190,14 @@ public class Room
             // 구간을 만들면 되겠죠?   
         }
     }
-    
+
+    private async Task HandleNonPoint(Member member,string text)
+    {
+        gameManager.SkipCount++;
+        NonPointMessage nonPointMessage = new NonPointMessage();
+        nonPointMessage.UserID = member.User.Id;
+        await BroadcastAsync(nonPointMessage);
+    }
     private async Task HandleReady(Member member, string text)
     {
        ReadyMessage readyMessage = JsonSerializer.Deserialize<ReadyMessage>(text);
@@ -250,11 +258,9 @@ public class Room
         // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
         string said = chat.Text?.Trim();
         Console.WriteLine($"[special][{code}] {chat.ID} : {said}");
-        // 예시 출력 : [5623] Jay : 안뇽
+
+        gameManager.ChangeSpeakerTrigger = true;
         
-        // 여기까지 처리됐으면
-        // (서버) -> (다른 클라이언트) 들에게 보낸다
-        // 받은 객체를 그대로 보낸다.
         await BroadcastAsync(chat);
     }
     private async Task HandleKeywordChat(Member member, string text)

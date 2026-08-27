@@ -13,6 +13,16 @@ public class PointAtSuspectState : GameTurnState
     {
         return pointAtSuspectStateMessage.Type;
     }
+
+    public override void Enter()
+    {
+        base.Enter();
+        pointAtSuspectStateMessage.CurrentCycle = gameManager.currentCycle;
+        pointAtSuspectStateMessage.CurrentRound = gameManager.currentRound;
+        pointAtSuspectStateMessage.TimerMs = MaxMsTime;
+        BroadcastAsync(pointAtSuspectStateMessage);
+    }
+
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {
         base.OnTimedEvent(sender, e);

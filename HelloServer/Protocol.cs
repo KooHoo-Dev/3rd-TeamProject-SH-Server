@@ -64,11 +64,11 @@ namespace HelloServer
         public bool IsSelectCancel{get;set;} // 선택 취소 여부 bool값
     }
 
-    // 투표 안함
+    // 빠른 스킵
     [Serializable]
-    public class NonVoteMessage
+    public class NonPointMessage
     {
-        public string Type{get;set;} = "NonVote";
+        public string Type{get;set;} = "NonPoint";
         public string UserID{get;set;} // 투표 안하는 유저 ID
     }
     
@@ -203,6 +203,8 @@ public class ShowItemAndSpeakStateMessage
     public int CurrentCycle { get; set; }
     public int CurrentRound { get; set; }
     public string CurrentOwnerID { get; set; } // 현재 발언 차례인 유저
+    
+    public string CurrentCategory { get; set; } // 현재 사이클의 아이템 카테고리
 }
 
 [Serializable]

@@ -40,11 +40,58 @@ public class GameManager
     public int currentCycle = 0;
     public int currentRound = 0;
     public User[] users;
-    public User focausUser = null;
+    public User focausUser;
     public GenreDef CurrentGanre;
     public KeyWordDef CurrentKeyWord;
+    public List<KeyWordDef> OldKeyWords;
     public string currentNomalKeyword;
     public string currentLiarKeyword;
+    public readonly SemaphoreSlim TriggerLock 
+        = new SemaphoreSlim(1, 1);
+
+    #region 비동기 함수에서 보내는 트리거들
+
+    public bool changeSpeakerTrigger = false;
+    public bool ChangeSpeakerTrigger
+    {
+        get
+        {
+            lock (TriggerLock)
+            {
+                return changeSpeakerTrigger;
+            }
+        }
+        set
+        {
+            lock (TriggerLock)
+            {
+                changeSpeakerTrigger = value;
+            }
+        }
+    }
+
+    public int skipCount = 0;
+    public int SkipCount
+    {
+        get
+        {
+            lock (TriggerLock)
+            {
+                return skipCount;
+            }
+        }
+        set
+        {
+            lock (TriggerLock)
+            {
+                skipCount = value;
+            }
+        }
+    }
+
+    
+    #endregion
+
     public  GameManager(GameConfig gameConfig, Room currentRoom)
     {
         
@@ -122,6 +169,11 @@ public class GameManager
             users[index] = member.User;
             index++;
         }
+        
+
+        User focausUser = new User();
+
+        OldKeyWords = new List<KeyWordDef>();
     }
 
     private CategoryType[] GetRandomCategories()
