@@ -22,6 +22,11 @@ public class PointAtSuspectState : GameTurnState
         pointAtSuspectStateMessage.CurrentRound = gameManager.currentRound;
         pointAtSuspectStateMessage.TimerMs = MaxMsTime;
         BroadcastAsync(pointAtSuspectStateMessage);
+
+        foreach ((string key, string value) in gameManager.PointInfo)
+        {
+            gameManager.PointInfo[key] = "";
+        }
     }
 
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
