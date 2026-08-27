@@ -82,6 +82,7 @@ public class RoomHub
             if (rooms.TryGetValue(code, out Entry entry) == false) return;
             entry.Users--;
             if (entry.Users > 0) return;
+            rooms[code].Room.timer.Dispose();
             rooms.Remove(code);
             Console.WriteLine($"[{code}] 아무도 없어서 방을 지움. 총 방의 개수 {rooms.Count}");
         }

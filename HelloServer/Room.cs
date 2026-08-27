@@ -56,6 +56,7 @@ public class Room
 {
 
     public  GameManager gameManager;
+    public System.Timers.Timer timer;
     // 접속자 한 명.
     public class Member
     {
