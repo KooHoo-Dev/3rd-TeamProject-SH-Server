@@ -38,7 +38,7 @@ public abstract class GameTurnState : IState
     }
     public virtual string GetGameStateString()
     {
-        return null;
+        return "null";
     }
 
     public virtual void Exit()
