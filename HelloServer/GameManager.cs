@@ -193,7 +193,7 @@ public class GameManager
             
         }
         Console.WriteLine($"테스트3번 위치");
-        AllCategories = GetRandomCategories();
+        SetRandomCategories();
         Console.WriteLine($"테스트4번 위치");
 
         currentCycle = 0;
@@ -205,7 +205,7 @@ public class GameManager
         OldKeyWords = new List<KeyWordDef>();
     }
 
-    private CategoryType[] GetRandomCategories()
+    private void SetRandomCategories()
     {
         CategoryType[] temp = new CategoryType[currentRoom.members.Count];
         Console.WriteLine($"테스트2.1번 위치");
@@ -240,10 +240,9 @@ public class GameManager
         AllCategories = new CategoryType[list.Count];
         for (int i = 0; i < list.Count; i++)
         {
-            temp[i] = (CategoryType)list[i];
+            AllCategories[i] = (CategoryType)list[i];
         }
         Console.WriteLine($"테스트2.4번 위치 및 AllCategories: {AllCategories.Length}");
-        return  temp;
 
     }
     public void GameEnd()
