@@ -176,19 +176,21 @@ public class GameManager
     private async Task Init()
     {
         IsGameRunning = true;
+        Console.WriteLine($"테스트1번 위치");
+        List<Room.Member> memberList = currentRoom.members.Values.ToList(); 
+        Console.WriteLine($"테스트2번 위치");
         AllCategories = GetRandomCategories();
+        Console.WriteLine($"테스트3번 위치");
         currentCycle = 0;
         currentRound = 0;
         currentCategory = AllCategories[0];
-        users = new User[currentRoom.members.Count];
-        int index = 0;
-        foreach (Room.Member member  in currentRoom.members.Values)
+        users = new User[memberList.Count];
+        for (int i = 0; i < memberList.Count; i++)
         {
-
-            users[index] = member.User;
-            index++;
+            users[i] = memberList[i].User;
         }
-        
+
+        Console.WriteLine($"테스트4번 위치");
 
         User focausUser = new User();
 
@@ -198,7 +200,7 @@ public class GameManager
     private CategoryType[] GetRandomCategories()
     {
         CategoryType[] temp = new CategoryType[currentRoom.members.Count];
-        
+        Console.WriteLine($"테스트2.1번 위치");
         Random randomObj = new Random();
 
         List<int> list = new List<int>();
@@ -212,7 +214,7 @@ public class GameManager
             if (list.Contains(randomValue) == false)
                 list.Add(randomValue);
         }
-
+        Console.WriteLine($"테스트2.2번 위치");
         foreach (User user in users)
         {
             PointInfo.TryAdd(user.Id, "");
