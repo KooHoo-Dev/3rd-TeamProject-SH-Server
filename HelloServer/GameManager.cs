@@ -48,7 +48,7 @@ public class GameManager
     public User[] users;
     public User focausUser;
 
-    public readonly ConcurrentQueue<VoteMessage> VoteQueue = new ConcurrentQueue<VoteMessage>();
+
 
     // 지목 유저의 변경은 오로지 지목 턴에만 변경 가능하도록
     private string mostFrequent;
@@ -74,6 +74,30 @@ public class GameManager
         = new SemaphoreSlim(1, 1);
 
     #region 비동기 함수에서 보내는 정보들
+    public readonly ConcurrentQueue<VoteMessage> VoteQueue = new ConcurrentQueue<VoteMessage>();
+
+
+    private string liarGuessKeyWord;
+
+    public string LiarGuessKeyWord
+    {
+
+        get
+        {
+            lock (gameLock)
+            {
+                return liarGuessKeyWord;
+            }
+        }
+        set
+        {
+            lock (gameLock)
+            {
+                liarGuessKeyWord = value;
+            }
+        }
+    }
+
 
     private bool changeSpeakerTrigger = false;
     public bool ChangeSpeakerTrigger

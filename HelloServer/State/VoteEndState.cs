@@ -27,7 +27,7 @@ public class VoteEndState : GameTurnState
             gameManager.VoteQueue.TryDequeue(out VoteMessage v);
             if (v == null)
             {
-                Console.WriteLine($"[투표 저장 정보 꺼내기 실패] 남은 Queue 개수: {count - i}");
+                Console.WriteLine($"[투표 저장 정보 꺼내기 실패]");
                 return;
             }
             else

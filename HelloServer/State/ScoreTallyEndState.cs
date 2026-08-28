@@ -9,6 +9,16 @@ public class ScoreTallyEndState : GameTurnState
     public ScoreTallyEndState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
+
+    public override void Enter()
+    {
+        base.Enter();
+        scoreTallyEndStateMessage.CurrentCycle = gameManager.currentCycle;
+        scoreTallyEndStateMessage.CurrentRound = gameManager.currentRound;
+        scoreTallyEndStateMessage.TimerMs = MaxMsTime;
+        BroadcastAsync(scoreTallyEndStateMessage);
+    }
+
     public override string GetGameStateString()
     {
         return scoreTallyEndStateMessage.Type;

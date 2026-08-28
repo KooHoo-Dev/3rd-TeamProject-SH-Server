@@ -205,7 +205,7 @@ public class Room
     {
         
         VoteMessage voteMessage = JsonSerializer.Deserialize<VoteMessage>(text);
-        
+        gameManager.VoteQueue.Enqueue(voteMessage);
         BroadcastAsync(voteMessage);
     }
 
@@ -306,11 +306,7 @@ public class Room
         // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
         string said = chat.Text?.Trim();
         Console.WriteLine($"[Keyword][{code}] {chat.Id} : {said}");
-        // 예시 출력 : [5623] Jay : 안뇽
-        
-        // 여기까지 처리됐으면
-        // (서버) -> (다른 클라이언트) 들에게 보낸다
-        // 받은 객체를 그대로 보낸다.
+        gameManager.LiarGuessKeyWord = said;
         await BroadcastAsync(chat);
     }
     // 이동 관련 메시지를 처리하는 함수

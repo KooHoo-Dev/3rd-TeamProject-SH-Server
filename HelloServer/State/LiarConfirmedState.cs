@@ -10,6 +10,17 @@ public class LiarConfirmedState : GameTurnState
     {
         
     }
+
+    public override void Enter()
+    {
+        base.Enter();
+        liarConfirmedStateMessage.CurrentCycle = gameManager.currentCycle;
+        liarConfirmedStateMessage.CurrentRound = gameManager.currentRound;
+        liarConfirmedStateMessage.CurrentOwnerID = gameManager.MostFrequent;
+        liarConfirmedStateMessage.TimerMs = MaxMsTime;
+        BroadcastAsync(liarConfirmedStateMessage);
+    }
+
     public override string GetGameStateString()
     {
         return liarConfirmedStateMessage.Type;
