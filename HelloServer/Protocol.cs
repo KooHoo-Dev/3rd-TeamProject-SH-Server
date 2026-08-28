@@ -293,7 +293,9 @@ namespace HelloServer
         public float TimerMs { get; set; }
         public int CurrentCycle { get; set; }
         public int CurrentRound { get; set; }
-        public string CurrentOwnerID { get; set; } // 투표 결과로 지목된 유저
+        public int LiarVoteCount { get; set; }
+        public int NotLiarVoteCount { get; set; }
+        public int IDonKnowVoteCount { get; set; }
     }
     
     // ===================== 라이어 확정 및 키워드 맞추기 단계 =====================

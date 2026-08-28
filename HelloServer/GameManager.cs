@@ -190,7 +190,7 @@ public class GameManager
             users[i] = memberList[i].User;
         }
 
-        Console.WriteLine($"테스트4번 위치");
+        Console.WriteLine($"테스트4번 위치 유저 개수 : {users.Length}");
 
         User focausUser = new User();
 
@@ -230,7 +230,7 @@ public class GameManager
         Console.WriteLine($"테스트2.2번 위치 및 리스트 갯수: {list.Count}");
         foreach (User user in users)
         {
-            PointInfo.TryAdd(user.Id, "");
+            //PointInfo.TryAdd(user.Id, "");
         }
         Console.WriteLine($"테스트2.3번 위치 및 PointInfo: {PointInfo.Count}");
         AllCategories = new CategoryType[list.Count];
