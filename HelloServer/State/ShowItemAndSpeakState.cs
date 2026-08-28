@@ -6,7 +6,8 @@ namespace HelloServer.State;
 public class ShowItemAndSpeakState : GameTurnState
 {
     ShowItemAndSpeakStateMessage showItemAndSpeakStateMessage = new ShowItemAndSpeakStateMessage();
- 
+
+    private int fristIndex = 0;
     public ShowItemAndSpeakState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -22,15 +23,19 @@ public class ShowItemAndSpeakState : GameTurnState
         showItemAndSpeakStateMessage.CurrentCycle = gameManager.currentCycle;
         showItemAndSpeakStateMessage.CurrentRound = gameManager.currentRound;
         showItemAndSpeakStateMessage.TimerMs = MaxMsTime;
+        
+        
         if (gameManager.currentSpeakedCount == 0)
         {
             Random rnd = new Random();
-            int rendIndex = rnd.Next(0, gameManager.users.Length);
-            gameManager.focausUser = gameManager.users[rendIndex];
+            fristIndex = rnd.Next(0, gameManager.users.Length);
+            gameManager.focausUser = gameManager.users[fristIndex];
+   
         }
         else
         {
-            gameManager.focausUser = gameManager.users[ gameManager.currentSpeakedCount % (gameManager.users.Length)];
+
+            gameManager.focausUser = gameManager.users[ (gameManager.currentSpeakedCount + fristIndex) % (gameManager.users.Length)];
         }
         showItemAndSpeakStateMessage.CurrentOwnerID = gameManager.focausUser.Id;
         showItemAndSpeakStateMessage.CurrentCategory = gameManager.currentCategory.ToString();
