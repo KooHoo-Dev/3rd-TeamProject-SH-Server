@@ -248,6 +248,7 @@ public class Room
 
     private async Task HandleGameStart()
     {
+        if(gameManager.IsGameRunning) return;
         GameStartOKMessage gameStartOkMessage = new GameStartOKMessage();
         NewGameConfig newGameConfig = new NewGameConfig();
         newGameConfig.MaxCycle = GameConfig.MaxCycle;
@@ -256,7 +257,7 @@ public class Room
 
         await BroadcastAsync(gameStartOkMessage);
         // 게임 루프 시작
-        gameManager.GameStart();
+      await  gameManager.GameStart();
         
     }
     
