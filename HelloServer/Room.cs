@@ -58,7 +58,9 @@ public class Room
 
     public  GameManager gameManager;
 
-    public System.Timers.Timer timer = new Timer();
+    public int IntarvelMs = 200;
+
+    public System.Timers.Timer timer;
     // 접속자 한 명.
     public class Member
     {
@@ -115,7 +117,7 @@ public class Room
         this.code = code;
         this.logMovesPerSecond = logMovesPerSecond;
         this.GameConfig = config;
-        
+        timer = new Timer(IntarvelMs);
         gameManager = new GameManager(config,this);
     }
 

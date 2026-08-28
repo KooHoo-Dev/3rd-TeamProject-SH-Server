@@ -8,7 +8,8 @@ public abstract class GameTurnState : IState
     public StateMachine<IState> stateMachine;
     public GameManager gameManager { get; set; }
     private System.Timers.Timer timer;
-    public int IntarvelMs = 200;
+
+    private int deltaMsTime;
     public int currentMsTime;
     public float MaxMsTime{get;set;}
 
@@ -17,6 +18,7 @@ public abstract class GameTurnState : IState
         this.stateMachine = stateMachine;
         this.gameManager = gameManager;
         this.MaxMsTime = MaxTime * 1000;
+        deltaMsTime = gameManager.currentRoom.IntarvelMs;
     }
 
 
@@ -51,7 +53,7 @@ public abstract class GameTurnState : IState
     }
     protected virtual void OnTimedEvent(object sender, ElapsedEventArgs e)
     {
-        currentMsTime += IntarvelMs;
+        currentMsTime += deltaMsTime;
         Console.WriteLine($"[스테이트 머신][{GetGameStateString()?? "null"}] 현재 Timer 상태: {currentMsTime}");
         
 
