@@ -209,21 +209,36 @@ public class GameManager
 
         for(int i = 0; i < currentRoom.GameConfig.MaxCycle; i++)
         {
-            randomValue = randomObj.Next(DataManager.Instance.ItemCategories.Count);
+            randomValue = randomObj.Next(0,DataManager.Instance.ItemCategories.Count);
 
-            if (list.Contains(randomValue) == false)
-                list.Add(randomValue);
+            int MaxCount = 10;
+            if (list.Contains(randomValue))
+            {
+                while (true)
+                {
+                    if (list.Contains(randomValue) == false || MaxCount < 0)
+                    {
+                        break;
+                    }
+                    randomValue = randomObj.Next(0,DataManager.Instance.ItemCategories.Count);
+                    MaxCount--;
+                }
+            }
+            list.Add(randomValue);
+            
         }
-        Console.WriteLine($"테스트2.2번 위치");
+        Console.WriteLine($"테스트2.2번 위치 및 리스트 갯수: {list.Count}");
         foreach (User user in users)
         {
             PointInfo.TryAdd(user.Id, "");
         }
+        Console.WriteLine($"테스트2.3번 위치 및 PointInfo: {PointInfo.Count}");
         AllCategories = new CategoryType[list.Count];
         for (int i = 0; i < list.Count; i++)
         {
             temp[i] = (CategoryType)list[i];
         }
+        Console.WriteLine($"테스트2.4번 위치 및 AllCategories: {AllCategories.Length}");
         return  temp;
 
     }
