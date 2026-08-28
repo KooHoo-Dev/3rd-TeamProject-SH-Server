@@ -50,7 +50,7 @@ public abstract class GameTurnState : IState
     protected virtual void OnTimedEvent(object sender, ElapsedEventArgs e)
     {
         currentMsTime += IntarvelMs;
-        Console.WriteLine($"[스테이트 머신][{GetGameStateString()}] 현재 Timer 상태: {currentMsTime}");
+        Console.WriteLine($"[스테이트 머신][{GetGameStateString()?? "null"}] 현재 Timer 상태: {currentMsTime}");
         
 
         

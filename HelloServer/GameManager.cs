@@ -42,6 +42,21 @@ public class GameManager
     public int currentRound = 0;
     public User[] users;
     public User focausUser;
+
+    // 지목 유저의 변경은 오로지 지목 턴에만 변경 가능하도록
+    private string mostFrequent;
+    public string MostFrequent
+    {
+        get {return mostFrequent;}
+        set
+        {
+            if (stateMachine.CurrentState == pointAtSuspectState)
+            {
+                mostFrequent = value;
+            }
+        }
+    }
+
     public GenreDef CurrentGanre;
     public KeyWordDef CurrentKeyWord;
     public KeyWordDef CurrentLiarKeyword;
