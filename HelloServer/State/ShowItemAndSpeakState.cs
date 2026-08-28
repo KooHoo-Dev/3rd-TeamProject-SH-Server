@@ -52,7 +52,9 @@ public class ShowItemAndSpeakState : GameTurnState
         base.OnTimedEvent(sender, e);
         if (currentMsTime > MaxMsTime || gameManager.ChangeSpeakerTrigger)
         {
+            currentSpeakedCount++;
             stateMachine.ChangeState<ShowItemAndSpeakState>();
+            
         }
     }
 
