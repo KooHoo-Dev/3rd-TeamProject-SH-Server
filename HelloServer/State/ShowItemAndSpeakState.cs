@@ -27,7 +27,7 @@ public class ShowItemAndSpeakState : GameTurnState
         }
         else
         {
-            gameManager.focausUser = gameManager.users[currentSpeakedCount % (gameManager.users.Length - 1)];
+            gameManager.focausUser = gameManager.users[currentSpeakedCount % (gameManager.users.Length)];
         }
         showItemAndSpeakStateMessage.CurrentOwnerID = gameManager.focausUser.Id;
         showItemAndSpeakStateMessage.CurrentCategory = gameManager.currentCategory.ToString();
