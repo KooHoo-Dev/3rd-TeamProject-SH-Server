@@ -178,19 +178,17 @@ public class GameManager
         IsGameRunning = true;
         Console.WriteLine($"테스트1번 위치");
         List<Room.Member> memberList = currentRoom.members.Values.ToList(); 
+        users = new User[memberList.Count];
+        for (int i = 0; i < memberList.Count; i++)
+        {
+            users[i] = memberList[i].User;
+        }
         Console.WriteLine($"테스트2번 위치");
         AllCategories = GetRandomCategories();
         Console.WriteLine($"테스트3번 위치");
         currentCycle = 0;
         currentRound = 0;
         currentCategory = AllCategories[0];
-        users = new User[memberList.Count];
-        for (int i = 0; i < memberList.Count; i++)
-        {
-            users[i] = memberList[i].User;
-        }
-
-        Console.WriteLine($"테스트4번 위치 유저 개수 : {users.Length}");
 
         User focausUser = new User();
 
@@ -230,7 +228,7 @@ public class GameManager
         Console.WriteLine($"테스트2.2번 위치 및 리스트 갯수: {list.Count}");
         foreach (User user in users)
         {
-            //PointInfo.TryAdd(user.Id, "");
+            PointInfo.TryAdd(user.Id, "");
         }
         Console.WriteLine($"테스트2.3번 위치 및 PointInfo: {PointInfo.Count}");
         AllCategories = new CategoryType[list.Count];
