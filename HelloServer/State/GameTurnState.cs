@@ -43,9 +43,11 @@ public abstract class GameTurnState : IState
 
     public virtual void Exit()
     {
+        currentMsTime = 0;
+        
      timer.Elapsed -= OnTimedEvent;
-     timer.Stop(); 
-     
+     timer.Stop();
+     timer = null;
     }
     protected virtual void OnTimedEvent(object sender, ElapsedEventArgs e)
     {
