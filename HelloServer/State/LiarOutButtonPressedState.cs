@@ -30,7 +30,7 @@ public class LiarOutButtonPressedState : GameTurnState
         base.OnTimedEvent(sender, e);
         if (currentMsTime > MaxMsTime)
         {
-            stateMachine.ChangeState<ShowItemAndSpeakState>();
+            stateMachine.ChangeState<LiarKeywordGuessState>();
         }
     }
 

@@ -206,7 +206,7 @@ public class Room
         
         VoteMessage voteMessage = JsonSerializer.Deserialize<VoteMessage>(text);
         gameManager.VoteQueue.Enqueue(voteMessage);
-        BroadcastAsync(voteMessage);
+       await BroadcastAsync(voteMessage);
     }
 
     private async Task HandleLiarButtonPressed(Member member, string text)
