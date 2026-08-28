@@ -183,9 +183,18 @@ public class GameManager
         {
             users[i] = memberList[i].User;
         }
-        Console.WriteLine($"테스트2번 위치");
-        AllCategories = GetRandomCategories();
+        
+        Console.WriteLine($"테스트2번 위치 및 리스트 갯수: {users.Length}");
+        for(int i = 0; i < users.Length; i++)
+        {
+           bool s = PointInfo.TryAdd(users[i]?.Id, "");
+        Console.WriteLine($"테스트2.2번 위치 {users[i]?.Id} 성공 여부: {s}");
+            
+        }
         Console.WriteLine($"테스트3번 위치");
+        AllCategories = GetRandomCategories();
+        Console.WriteLine($"테스트4번 위치");
+
         currentCycle = 0;
         currentRound = 0;
         currentCategory = AllCategories[0];
@@ -225,11 +234,7 @@ public class GameManager
             list.Add(randomValue);
             
         }
-        Console.WriteLine($"테스트2.2번 위치 및 리스트 갯수: {list.Count}");
-        foreach (User user in users)
-        {
-            PointInfo.TryAdd(user.Id, "");
-        }
+
         Console.WriteLine($"테스트2.3번 위치 및 PointInfo: {PointInfo.Count}");
         AllCategories = new CategoryType[list.Count];
         for (int i = 0; i < list.Count; i++)
