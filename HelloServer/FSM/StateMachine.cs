@@ -52,7 +52,8 @@ namespace Jay.FSM
                 return;
             }
 
-            if (ReferenceEquals(next, CurrentState)) return;
+            // 자기 자신 상태를 반복해서 진입 할 수 있도록 주석 처리함
+           // if (ReferenceEquals(next, CurrentState)) return;
             
             var prev = CurrentState;
 
