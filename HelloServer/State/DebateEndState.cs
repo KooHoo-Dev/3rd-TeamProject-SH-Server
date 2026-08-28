@@ -13,7 +13,10 @@ public class DebateEndState: GameTurnState
     public override void Enter()
     {
         base.Enter();
-        
+        debateEndStateMessage.CurrentRound = gameManager.currentRound;
+        debateEndStateMessage.TimerMs = MaxMsTime;
+        debateEndStateMessage.CurrentCycle =  gameManager.currentCycle;
+        BroadcastAsync(debateEndStateMessage);
     }
 
     public override string GetGameStateString()
@@ -25,7 +28,7 @@ public class DebateEndState: GameTurnState
         base.OnTimedEvent(sender, e);
         if (currentMsTime > MaxMsTime)
         {
-            stateMachine.ChangeState<DebateEndState>();
+            stateMachine.ChangeState<VoteState>();
         }
     }
 }

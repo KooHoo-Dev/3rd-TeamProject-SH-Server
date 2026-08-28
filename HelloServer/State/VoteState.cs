@@ -9,6 +9,16 @@ public class VoteState : GameTurnState
     public VoteState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
+
+    public override void Enter()
+    {
+        base.Enter();
+        voteStateMessage.CurrentRound = gameManager.currentRound;
+        voteStateMessage.TimerMs = MaxMsTime;
+        voteStateMessage.CurrentCycle = gameManager.currentCycle;
+        BroadcastAsync(voteStateMessage);
+    }
+
     public override string GetGameStateString()
     {
         return voteStateMessage.Type;
