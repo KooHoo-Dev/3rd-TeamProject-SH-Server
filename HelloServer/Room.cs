@@ -12,6 +12,7 @@ public class GameConfig
     public float stateGenreAssignAndLiarSelectTime{ get; set; }
     public float stateKeywordDistributeTime{ get; set; }
     public float stateMartEnterTime{ get; set; }
+    public float stateMartMoveTime{ get; set; }
 
     public float stateMartReturnTime{ get; set; }
     public float stateShowItemAndSpeakTime{ get; set; }
@@ -34,8 +35,7 @@ public class GameConfig
 
     public float stateScoreTallyTime{ get; set; }
     public float stateScoreTallyEndTime{ get; set; }
-    public float stateMartMoveTime{ get; set; }
-
+  
     public float stateFinalResultTime{ get; set; }
     public float stateFinalResultEndTime{ get; set; }
 
