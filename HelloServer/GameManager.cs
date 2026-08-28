@@ -107,7 +107,7 @@ public class GameManager
     }
 
     // Key :한 유저, Value : 지목을 받은 유저 (만약 없다면 빈 스트링)(모든 유저가 key값으로 있음)
-    public readonly ConcurrentDictionary<string, string> PointInfo;
+    public readonly ConcurrentDictionary<string, string> PointInfo = new ConcurrentDictionary<string, string>();
     
     #endregion
 
