@@ -188,7 +188,8 @@ public class Room
             else if (kind?.Type == "게임 시작") await HandleGameStart();
             else if(kind?.Type == "NonPoint")  await HandleNonPoint(member, text);
             else if(kind?.Type == "Select") await HandleSelectUser( member, text);
-            else if(kind?.Type == "라밍아웃 버튼 누름 상태") await HandleLiarButtonPressed(member, text);
+            else if(kind?.Type == "LiarSelfDisclose") await HandleLiarButtonPressed(member, text);
+            else if (kind?.Type == "Vote") await HandleVote(member, text);
             
             // 모르는 정보는 그냥 흘려버립니다.
             // Tip
@@ -197,9 +198,19 @@ public class Room
         }
     }
 
+    #region 게임 정보 Handle 함수들
+
+
+    private async Task HandleVote(Member member, string text)
+    {
+        
+        VoteMessage voteMessage = JsonSerializer.Deserialize<VoteMessage>(text);
+        
+        BroadcastAsync(voteMessage);
+    }
+
     private async Task HandleLiarButtonPressed(Member member, string text)
     {
-        LiarOutButtonPressedStateMessage liarOutButtonPressedStateMessage = JsonSerializer.Deserialize<LiarOutButtonPressedStateMessage>(text);
 
         if (member.playerState.IsLiar)
         {
@@ -331,7 +342,9 @@ public class Room
         // 받은 객체를 그대로 보낸다.
         await BroadcastAsync(chat);
     }
+    
 
+    #endregion
     #endregion
 
     #region 뿌리기
