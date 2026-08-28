@@ -293,9 +293,7 @@ namespace HelloServer
         public float TimerMs { get; set; }
         public int CurrentCycle { get; set; }
         public int CurrentRound { get; set; }
-        public int LiarVoteCount { get; set; }
-        public int NotLiarVoteCount { get; set; }
-        public int IDonKnowVoteCount { get; set; }
+
     }
     
     // ===================== 라이어 확정 및 키워드 맞추기 단계 =====================
@@ -464,6 +462,8 @@ namespace HelloServer
     {
         public string Type { get; set; } = "라밍아웃 버튼 누름 상태";
         public string ID { get; set; } // 버튼을 누른 유저
+        public float TimerMs { get; set; }
+
     }
 
     #endregion
