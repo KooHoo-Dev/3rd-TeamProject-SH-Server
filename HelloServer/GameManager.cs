@@ -187,8 +187,9 @@ public class GameManager
         Console.WriteLine($"테스트2번 위치 및 리스트 갯수: {users.Length}");
         for(int i = 0; i < users.Length; i++)
         {
+        Console.WriteLine($"테스트2.2번 위치 {users[i]?.Id}");
            bool s = PointInfo.TryAdd(users[i]?.Id, "");
-        Console.WriteLine($"테스트2.2번 위치 {users[i]?.Id} 성공 여부: {s}");
+        Console.WriteLine($"테스트2.3번 위치 {users[i]?.Id} 성공 여부: {s}");
             
         }
         Console.WriteLine($"테스트3번 위치");
