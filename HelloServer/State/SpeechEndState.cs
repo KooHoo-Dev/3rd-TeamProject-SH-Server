@@ -6,6 +6,7 @@ namespace HelloServer.State;
 public class SpeechEndState : GameTurnState
 {
     SpeechEndStateMessage speechEndStateMessage = new SpeechEndStateMessage();
+
     public SpeechEndState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -13,6 +14,7 @@ public class SpeechEndState : GameTurnState
     public override void Enter()
     {
         base.Enter();
+     
         speechEndStateMessage.CurrentCycle = gameManager.currentCycle;
         speechEndStateMessage.CurrentRound = gameManager.currentRound;
         speechEndStateMessage.TimerMs = MaxMsTime;
@@ -28,7 +30,13 @@ public class SpeechEndState : GameTurnState
         base.OnTimedEvent(sender, e);
         if (currentMsTime > MaxMsTime)
         {
-            stateMachine.ChangeState<PointAtSuspectState>();
+            stateMachine.ChangeState<ShowItemAndSpeakState>();
         }
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+            gameManager.currentSpeakedCount++;
     }
 }

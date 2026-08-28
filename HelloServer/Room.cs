@@ -188,11 +188,22 @@ public class Room
             else if (kind?.Type == "게임 시작") await HandleGameStart();
             else if(kind?.Type == "NonPoint")  await HandleNonPoint(member, text);
             else if(kind?.Type == "Select") await HandleSelectUser( member, text);
+            else if(kind?.Type == "라밍아웃 버튼 누름 상태") await HandleLiarButtonPressed(member, text);
             
             // 모르는 정보는 그냥 흘려버립니다.
             // Tip
             // : 여기 부분에 여러분이 넣고싶은 커스텀한 함수를 처리하는
             // 구간을 만들면 되겠죠?   
+        }
+    }
+
+    private async Task HandleLiarButtonPressed(Member member, string text)
+    {
+        LiarOutButtonPressedStateMessage liarOutButtonPressedStateMessage = JsonSerializer.Deserialize<LiarOutButtonPressedStateMessage>(text);
+
+        if (member.playerState.IsLiar)
+        {
+            gameManager.liarButtonPressedUserId = member.User.Id;
         }
     }
 

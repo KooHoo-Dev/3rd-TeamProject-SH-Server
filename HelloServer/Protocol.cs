@@ -456,7 +456,7 @@ namespace HelloServer
 
     #endregion
     
-    // 라밍아웃 처리
+    // 라밍아웃 처리(라이어가 라이어 버튼을 눌렀을 때 진입하는 상태)
     [Serializable]
     public class LiarOutButtonPressedStateMessage
     {

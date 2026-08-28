@@ -35,11 +35,16 @@ public class GameManager
     public ScoreTallyEndState scoreTallyEndState;
     public FinalResultState finalResultState;
     public FinalResultEndState finalResultEndState;
+    public LiarOutButtonPressedState  liarOutButtonPressedState;
     
     public CategoryType[] AllCategories;
     public CategoryType currentCategory;
     public int currentCycle = 0;
     public int currentRound = 0;
+    public int currentSpeakedCount = 0;
+    public int maxSpeakedCount = 0;
+    public string liarButtonPressedUserId;
+    
     public User[] users;
     public User focausUser;
 
@@ -63,43 +68,65 @@ public class GameManager
     public List<KeyWordDef> OldKeyWords;
    
 
-    public readonly SemaphoreSlim TriggerLock 
+    public readonly SemaphoreSlim gameLock 
         = new SemaphoreSlim(1, 1);
 
     #region 비동기 함수에서 보내는 정보들
 
-    public bool changeSpeakerTrigger = false;
+    private bool changeSpeakerTrigger = false;
     public bool ChangeSpeakerTrigger
     {
         get
         {
-            lock (TriggerLock)
+            lock (gameLock)
             {
                 return changeSpeakerTrigger;
             }
         }
         set
         {
-            lock (TriggerLock)
+            lock (gameLock)
             {
                 changeSpeakerTrigger = value;
             }
         }
     }
 
+    public string LiarButtonPressedUserId
+    {
+        get
+        {
+            lock (gameLock)
+            {
+                return liarButtonPressedUserId;
+            }
+
+        }
+        set{
+            lock (gameLock)
+            {
+                if (stateMachine.CurrentState == showItemAndSpeakState)
+                {
+                    liarButtonPressedUserId = value;
+                }
+                
+            }
+        }
+
+    }
     public int skipCount = 0;
     public int SkipCount
     {
         get
         {
-            lock (TriggerLock)
+            lock (gameLock)
             {
                 return skipCount;
             }
         }
         set
         {
-            lock (TriggerLock)
+            lock (gameLock)
             {
                 skipCount = value;
             }
@@ -141,6 +168,7 @@ public class GameManager
         scoreTallyEndState = new ScoreTallyEndState(stateMachine, this, gameConfig.stateScoreTallyEndTime);
         finalResultState = new FinalResultState(stateMachine, this, gameConfig.stateFinalResultTime);
         finalResultEndState = new FinalResultEndState(stateMachine, this, gameConfig.stateFinalResultTime);
+        liarOutButtonPressedState = new LiarOutButtonPressedState(stateMachine,this, gameConfig.stateLiarOutButtonPressedTime);
         
         stateMachine.Add(startState);
         stateMachine.Add(genreAssignAndLiarSelectState);
@@ -163,6 +191,7 @@ public class GameManager
         stateMachine.Add(scoreTallyEndState);
         stateMachine.Add(finalResultState);
         stateMachine.Add(finalResultEndState);
+        stateMachine.Add(liarOutButtonPressedState);
         
     }
 
@@ -199,7 +228,7 @@ public class GameManager
         currentCycle = 0;
         currentRound = 0;
         currentCategory = AllCategories[0];
-
+        maxSpeakedCount = users.Length;
         User focausUser = new User();
 
         OldKeyWords = new List<KeyWordDef>();
