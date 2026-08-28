@@ -15,6 +15,7 @@ public class KeywordDistributeState : GameTurnState
     {
         base.Enter();
 
+        gameManager.currentRound++;
         Random rnd = new Random();
         List<KeyWordDef> list = DataManager.Instance.GetKeyWordDefsByGenre(gameManager.CurrentGanre.GenreName);
         List<KeyWordDef> NewList = list.Union(gameManager.OldKeyWords).ToList();

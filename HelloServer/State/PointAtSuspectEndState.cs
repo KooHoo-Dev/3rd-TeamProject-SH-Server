@@ -40,7 +40,7 @@ public class PointAtSuspectEndState : GameTurnState
             if (string.IsNullOrEmpty(gameManager.MostFrequent) &&
                 gameManager.currentCycle != gameManager.currentRoom.GameConfig.MaxCycle)
             {
-                gameManager.currentCycle++;
+                
                 stateMachine.ChangeState<ShowItemAndSpeakState>();
             }
             else if (string.IsNullOrEmpty(gameManager.MostFrequent) &&

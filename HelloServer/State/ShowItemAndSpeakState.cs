@@ -15,6 +15,7 @@ public class ShowItemAndSpeakState : GameTurnState
     public override void Enter()
     {
         base.Enter();
+        gameManager.currentCycle++;
         maxSpeakedCount = gameManager.users.Length;
         showItemAndSpeakStateMessage.CurrentCycle = gameManager.currentCycle;
         showItemAndSpeakStateMessage.CurrentRound = gameManager.currentRound;

@@ -14,8 +14,10 @@ public class GameStartState : GameTurnState
     public override void Enter()
     {
         base.Enter();
-        gameStartStateMessage.CurrentCycle = 1;
-        gameStartStateMessage.CurrentRound = 1;
+        gameManager.currentRound = 0;
+        gameManager.currentCycle = 0;
+        gameStartStateMessage.CurrentCycle = 0;
+        gameStartStateMessage.CurrentRound = 0;
         gameStartStateMessage.TimerMs = MaxMsTime;
         BroadcastAsync(gameStartStateMessage);
     }
