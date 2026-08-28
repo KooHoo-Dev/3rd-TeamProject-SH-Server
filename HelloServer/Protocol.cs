@@ -3,8 +3,16 @@ using System.Collections.Generic;
 
 namespace HelloServer
 {
+    
     #region 공용 데이터 처리
 
+    [Serializable]
+    public enum SelectNum
+    {
+        Liar,
+        DontKnow,
+        NotLiar,
+    }
     #region 채팅 처리
 
     [Serializable]
@@ -323,6 +331,9 @@ namespace HelloServer
         public float TimerMs { get; set; }
         public int CurrentCycle { get; set; }
         public int CurrentRound { get; set; }
+        public string liarKeyword { get; set; }
+        public string nomalKeyword { get; set; }
+        public bool IsRightAnswer{ get; set; }
     }
 
     #endregion

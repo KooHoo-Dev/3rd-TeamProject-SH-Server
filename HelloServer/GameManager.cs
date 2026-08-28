@@ -48,6 +48,8 @@ public class GameManager
     public User[] users;
     public User focausUser;
 
+    public readonly ConcurrentQueue<VoteMessage> VoteQueue = new ConcurrentQueue<VoteMessage>();
+
     // 지목 유저의 변경은 오로지 지목 턴에만 변경 가능하도록
     private string mostFrequent;
     public string MostFrequent
