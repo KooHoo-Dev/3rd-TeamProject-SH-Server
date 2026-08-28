@@ -50,7 +50,8 @@ public class ShowItemAndSpeakState : GameTurnState
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {
         base.OnTimedEvent(sender, e);
-        if (currentMsTime > MaxMsTime || gameManager.ChangeSpeakerTrigger)
+        bool Trigger = false; //gameManager.ChangeSpeakerTrigger;
+        if (currentMsTime > MaxMsTime || Trigger)
         {
             currentSpeakedCount++;
             stateMachine.ChangeState<ShowItemAndSpeakState>();
