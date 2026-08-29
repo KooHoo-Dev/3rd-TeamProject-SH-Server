@@ -85,8 +85,10 @@ public class PointAtSuspectEndState : GameTurnState
                     ElectedUser = user;
                     break;
                 }
+                Console.WriteLine($"[지목 결정된 유저 계산 함수] 유저 : {user}, 투표 받은 수 {count}");
+                
             }
-            
+            Console.WriteLine($"[지목 결정된 유저 계산 함수] 최종 리턴 : {ElectedUser}");
         return ElectedUser;
     }
 }
