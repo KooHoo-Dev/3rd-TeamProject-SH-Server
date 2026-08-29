@@ -37,8 +37,10 @@ public class VoteEndState : GameTurnState
 
         }
 
-        for (int i = gameManager.users.Length - count - 1; i >= 0; i--)
+        // 자기 자신 제외 ( -1 더해줌)
+        for (int i = gameManager.users.Length - count - 1 - 1; i >= 0; i--)
         {
+
             resultList.Add(HelloServer.SelectNum.DontKnow.ToString());
         }
 
