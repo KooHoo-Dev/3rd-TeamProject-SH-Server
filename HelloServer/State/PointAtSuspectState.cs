@@ -34,14 +34,14 @@ public class PointAtSuspectState : GameTurnState
         base.OnTimedEvent(sender, e);
         int harf = (int)(gameManager.users.Length / 2);
 
-        int count = 0;
+        int voteCount = 0;
         ConcurrentDictionary<string, string> pointInfo = gameManager.PointInfo;
         foreach ((string pointer,string seleted) in pointInfo)
         {
             if(string.IsNullOrEmpty(seleted)) continue;
-            count++;
+            voteCount++;
         }
-        if (currentMsTime > MaxMsTime || gameManager.SkipCount >= harf || count >= harf)
+        if (currentMsTime > MaxMsTime || gameManager.SkipCount >= harf || voteCount > harf)
         { 
             stateMachine.ChangeState<PointAtSuspectEndState>();
         }
