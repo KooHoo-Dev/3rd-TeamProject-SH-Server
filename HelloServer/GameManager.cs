@@ -54,12 +54,19 @@ public class GameManager
     private string mostFrequent;
     public string MostFrequent
     {
-        get {return mostFrequent;}
+        get
+        {
+            lock (gameLock)
+            {
+                return mostFrequent;
+            }
+        }
         set
         {
-            if (stateMachine.CurrentState == pointAtSuspectState)
+            lock (gameLock)
             {
                 mostFrequent = value;
+                
             }
         }
     }
