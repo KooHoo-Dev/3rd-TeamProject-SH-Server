@@ -62,17 +62,17 @@ public class VoteEndState : GameTurnState
         if (currentMsTime > MaxMsTime)
         {
 
-            if (string.IsNullOrEmpty(result) &&
+            if (result != SelectNum.Liar.ToString() &&
                 voteEndStateMessage.CurrentCycle >= gameManager.currentRoom.GameConfig.MaxCycle)
             {
                 stateMachine.ChangeState<PointAtSuspectState>();
             }
-            else if(string.IsNullOrEmpty(result) &&
+            else if(result != SelectNum.Liar.ToString() &&
                     voteEndStateMessage.CurrentCycle < gameManager.currentRoom.GameConfig.MaxCycle)
             {
                 stateMachine.ChangeState<ShowItemAndSpeakState>();
             }
-            else if(string.IsNullOrEmpty(result) == false)
+            else if(result == SelectNum.Liar.ToString())
             {
                 stateMachine.ChangeState<LiarConfirmedState>();
             }
@@ -80,24 +80,46 @@ public class VoteEndState : GameTurnState
     }
     private string GetWinner(List<string> list)
     {
+        string result = "";
         // 데이터가 없으면 빈 값 반환
         if (list == null || list.Count == 0) return "";
 
-        // 득표수 기준으로 내림차순 정렬하여 상위 2개 그룹만 추출
-        var topGroups = list
-            .GroupBy(id => id)
-            .Select(g => new { ID = g.Key, Count = g.Count() })
-            .OrderByDescending(g => g.Count)
-            .Take(2)
-            .ToList();
-
-        // 투표자가 1명뿐이거나, 1위와 2위의 득표수가 다르면 1위 반환
-        if (topGroups.Count == 1 || topGroups[0].Count != topGroups[1].Count)
+        Dictionary<string, int> dict = new Dictionary<string, int>();
+        foreach (var VARIABLE in list)
         {
-            return topGroups[0].ID;
+            if (dict.ContainsKey(VARIABLE))
+            {
+                dict.Add(VARIABLE, 1);
+            }
+            else
+            {
+                dict[VARIABLE]++;
+            }
         }
 
+        
+        List<KeyValuePair<string, int>> orderedList = dict.OrderByDescending(x => x.Value).ToList();
+        
+        // 만약 라이어와 
+        if (orderedList.Count > 1 && orderedList[0].Value == orderedList[1].Value
+                                  && ((orderedList[0].Key == SelectNum.DontKnow.ToString() && orderedList[1].Key == SelectNum.Liar.ToString())
+                                      || orderedList[1].Key == SelectNum.DontKnow.ToString() && orderedList[0].Key == SelectNum.Liar.ToString()))
+        {
+            result = SelectNum.Liar.ToString();
+        }
+        else if (orderedList.Count > 1 && orderedList[0].Value == orderedList[1].Value)
+        {
+            result = "";
+        }
+        else if (orderedList[0].Key != SelectNum.NotLiar.ToString())
+        {
+            result = SelectNum.NotLiar.ToString();
+        }
+        else if (orderedList[0].Key != SelectNum.DontKnow.ToString())
+        {
+            result = SelectNum.DontKnow.ToString();
+        }
         // 동률인 경우 빈 값 반환
-        return "";
+        return result;
     }
 }
