@@ -26,7 +26,7 @@ public class PointAtSuspectEndState : GameTurnState
         ConcurrentDictionary<string, string> pointInfo = gameManager.PointInfo;
         List<string> list = pointInfo.Values.ToList();
         // 가장 많이 등장한 문자열 찾기(중복 혹은 없으면 "" 반환)
-        gameManager.MostFrequent = GetWinner(list);  
+        gameManager.MostFrequent = GetWinner();  
         Console.WriteLine($"[{gameManager.currentRoom.code}][최종 당선자] : {gameManager.MostFrequent}");
         pointAtSuspectEndStateMessage.CurrentOwnerID = gameManager.MostFrequent;
         BroadcastAsync(pointAtSuspectEndStateMessage);
@@ -56,30 +56,37 @@ public class PointAtSuspectEndState : GameTurnState
             }
         }
     }
-    private string GetWinner(List<string> votes)
+    private string GetWinner()
     {
-        // 데이터가 없으면 빈 값 반환
-        if (votes == null || votes.Count == 0) return "";
-        for (int i = 0; i < votes.Count; i++)
+
+        int harf = (int)(gameManager.users.Length / 2);
+
+        string ElectedUser = "";
+        ConcurrentDictionary<string, string> pointInfo = gameManager.PointInfo;
+        Dictionary<string, int> VoteCount = new Dictionary<string, int>();
+
+        foreach ((string pointer, string seleted) in pointInfo)
         {
-            Console.WriteLine($"[지목 유저 계산 전 리스트] {i} 번째 내용 : {votes[i]}");
+            if (string.IsNullOrEmpty(seleted)) continue;
+            if (VoteCount.ContainsKey(seleted) == false)
+            {
+                VoteCount.Add(seleted, 1);
+            }
+            else
+            {
+                VoteCount[seleted]++;
+            }
+        }
+
+        foreach ((string user, int count) in VoteCount)
+            {
+                if (count > harf)
+                {
+                    ElectedUser = user;
+                    break;
+                }
+            }
             
-        }
-        // 득표수 기준으로 내림차순 정렬하여 상위 2개 그룹만 추출
-        var topGroups = votes
-            .GroupBy(id => id)
-            .Select(g => new { ID = g.Key, Count = g.Count() })
-            .OrderByDescending(g => g.Count)
-            .Take(2)
-            .ToList();
-
-        // 투표자가 1명뿐이거나, 1위와 2위의 득표수가 다르면 1위 반환
-        if (topGroups.Count == 1 || topGroups[0].Count != topGroups[1].Count)
-        {
-            return topGroups[0].ID;
-        }
-
-        // 동률인 경우 빈 값 반환
-        return "";
+        return ElectedUser;
     }
 }

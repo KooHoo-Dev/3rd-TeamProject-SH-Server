@@ -41,7 +41,11 @@ public class VoteEndState : GameTurnState
         {
             resultList.Add(HelloServer.SelectNum.DontKnow.ToString());
         }
-        
+
+        for (int i = 0; i < resultList.Count; i++)
+        {
+            Console.WriteLine($"[최종 투표 리스트] {i}번째 : {resultList[i]}");
+        }
         string result = GetWinner(resultList);
         
     }
