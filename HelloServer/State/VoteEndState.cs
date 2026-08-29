@@ -49,7 +49,7 @@ public class VoteEndState : GameTurnState
             Console.WriteLine($"[최종 투표 리스트] {i}번째 : {resultList[i]}");
         }
         result = GetWinner(resultList);
-        
+        Console.WriteLine($"[최종 투표 result 타입] : {result}");
     }
 
     public override string GetGameStateString()
