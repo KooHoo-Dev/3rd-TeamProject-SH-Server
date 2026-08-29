@@ -70,6 +70,7 @@ public class Room
         // 원래는 벡터로 Position으로 묶어서 사용하는게 좋습니다.
         // 님들이 개발할때는 그렇게 하세여
         public float X;
+        public float Y;
         public float Z;
 
         public int MovesSinceLog;
@@ -319,7 +320,8 @@ public class Room
         MoveMessage move = JsonSerializer.Deserialize<MoveMessage>(text);
         // move 메시지의 내용을 member의 X,Y 내용에 카피해준다
         member.X = move.X;
-        member.Z = move.Y;
+        member.Y = move.Y;
+        member.Z = move.Z;
         member.MovesSinceLog++;
         
        // LogMove(member, move);
@@ -420,7 +422,8 @@ public class Room
             {
                 Id = member.User.Id,
                 X = member.X,
-                Y = member.Z,
+                Y = member.Y,
+                Z = member.Z,
             });
         }
 
