@@ -230,9 +230,12 @@ public class Room
     {
         SelectMessage selectMessage = JsonSerializer.Deserialize<SelectMessage>(text);
 
+        Console.WriteLine($"[실제 지목 메세지] 지목 당한 유저 {selectMessage.selectedID}");
         gameManager.PointInfo[member.User.Id] = selectMessage.IsSelectCancel ? "" : selectMessage.selectedID;
-            
-        
+        foreach (var VARIABLE in gameManager.PointInfo)
+        {
+            Console.WriteLine($"[지목 핸들] 지목 딕셔너리 {VARIABLE.Key} : {VARIABLE.Value}");
+        }
         
         await BroadcastAsync(selectMessage);
     }

@@ -60,7 +60,11 @@ public class PointAtSuspectEndState : GameTurnState
     {
         // 데이터가 없으면 빈 값 반환
         if (votes == null || votes.Count == 0) return "";
-
+        for (int i = 0; i < votes.Count; i++)
+        {
+            Console.WriteLine($"[지목 유저 계산 전 리스트] {i} 번째 내용 : {votes[i]}");
+            
+        }
         // 득표수 기준으로 내림차순 정렬하여 상위 2개 그룹만 추출
         var topGroups = votes
             .GroupBy(id => id)
