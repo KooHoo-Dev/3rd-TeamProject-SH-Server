@@ -87,7 +87,7 @@ public class VoteEndState : GameTurnState
         Dictionary<string, int> dict = new Dictionary<string, int>();
         foreach (var VARIABLE in list)
         {
-            if (dict.ContainsKey(VARIABLE))
+            if (dict.ContainsKey(VARIABLE) == false)
             {
                 dict.Add(VARIABLE, 1);
             }
