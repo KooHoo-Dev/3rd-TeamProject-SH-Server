@@ -30,6 +30,7 @@ public class FinalResultEndState : GameTurnState
         if (currentMsTime > MaxMsTime)
         {
              gameManager.GameEnd();
+
         }
     }
 }

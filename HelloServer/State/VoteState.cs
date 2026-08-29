@@ -26,7 +26,7 @@ public class VoteState : GameTurnState
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {
         base.OnTimedEvent(sender, e);
-        if (currentMsTime > MaxMsTime)
+        if (currentMsTime > MaxMsTime || gameManager.VoteQueue.Count == (gameManager.users.Length - 1))
         {
             stateMachine.ChangeState<VoteEndState>();
         }

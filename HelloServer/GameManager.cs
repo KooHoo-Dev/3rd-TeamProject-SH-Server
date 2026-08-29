@@ -200,7 +200,7 @@ public class GameManager
         scoreTallyState = new ScoreTallyState(stateMachine, this, gameConfig.stateScoreTallyTime);
         scoreTallyEndState = new ScoreTallyEndState(stateMachine, this, gameConfig.stateScoreTallyEndTime);
         finalResultState = new FinalResultState(stateMachine, this, gameConfig.stateFinalResultTime);
-        finalResultEndState = new FinalResultEndState(stateMachine, this, gameConfig.stateFinalResultTime);
+        finalResultEndState = new FinalResultEndState(stateMachine, this, gameConfig.stateFinalResultEndTime);
         liarOutButtonPressedState = new LiarOutButtonPressedState(stateMachine,this, gameConfig.stateLiarOutButtonPressedTime);
         
         stateMachine.Add(startState);
@@ -310,6 +310,7 @@ public class GameManager
     public void GameEnd()
     {
         IsGameRunning = false;
+        stateMachine.StopStateMachine();
         PointInfo.Clear();
     }
 }
