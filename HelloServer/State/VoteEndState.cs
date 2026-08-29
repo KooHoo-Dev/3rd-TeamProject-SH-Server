@@ -111,13 +111,17 @@ public class VoteEndState : GameTurnState
         {
             result = "";
         }
-        else if (orderedList[0].Key != SelectNum.NotLiar.ToString())
+        else if (orderedList[0].Key == SelectNum.NotLiar.ToString())
         {
             result = SelectNum.NotLiar.ToString();
         }
-        else if (orderedList[0].Key != SelectNum.DontKnow.ToString())
+        else if (orderedList[0].Key == SelectNum.DontKnow.ToString())
         {
             result = SelectNum.DontKnow.ToString();
+        }
+        else if (orderedList[0].Key == SelectNum.Liar.ToString())
+        {
+            result = SelectNum.Liar.ToString();
         }
         // 동률인 경우 빈 값 반환
         return result;
