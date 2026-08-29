@@ -350,7 +350,7 @@ public class Room
     {
         string json = JsonSerializer.Serialize(message, message.GetType());
         
-        Console.WriteLine($"[직렬화 체크][{code}] {json}");
+       // Console.WriteLine($"[직렬화 체크][{code}] {json}");
         // 보낼 json객체를 미리 생성하고,
         // 유저수에 맞게 보내는 작업을 처리한다.
         List<Task> sending = new List<Task>();
