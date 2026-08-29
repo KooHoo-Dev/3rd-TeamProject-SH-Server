@@ -106,7 +106,7 @@ public class Room
     // 들어오고 나가는 메시지 처리(일)을 한줄로 세우는 자물쇠 입니다.
     // lock블록이 await가 안먹어서 사용합니다.
     private readonly SemaphoreSlim gate = new SemaphoreSlim(1, 1);
-    private readonly string code; // 방번호
+    public readonly string code; // 방번호
     private readonly int logMovesPerSecond; // 룸허브를 통해서 전달 받습니다. 
     
     public bool IsEmpty => members.IsEmpty;
@@ -230,7 +230,7 @@ public class Room
     {
         SelectMessage selectMessage = JsonSerializer.Deserialize<SelectMessage>(text);
 
-        gameManager.PointInfo[member.User.Id] = selectMessage.IsSelectCancel ? "" : selectMessage.selectedID.ToString();
+        gameManager.PointInfo[member.User.Id] = selectMessage.IsSelectCancel ? "" : selectMessage.selectedID;
             
         
         
