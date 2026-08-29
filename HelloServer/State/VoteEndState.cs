@@ -46,7 +46,7 @@ public class VoteEndState : GameTurnState
         {
             Console.WriteLine($"[최종 투표 리스트] {i}번째 : {resultList[i]}");
         }
-        string result = GetWinner(resultList);
+        result = GetWinner(resultList);
         
     }
 
@@ -63,12 +63,12 @@ public class VoteEndState : GameTurnState
             if (string.IsNullOrEmpty(result) &&
                 voteEndStateMessage.CurrentCycle >= gameManager.currentRoom.GameConfig.MaxCycle)
             {
-                stateMachine.ChangeState<KeywordDistributeState>();
+                stateMachine.ChangeState<PointAtSuspectState>();
             }
             else if(string.IsNullOrEmpty(result) &&
                     voteEndStateMessage.CurrentCycle < gameManager.currentRoom.GameConfig.MaxCycle)
             {
-                stateMachine.ChangeState<PointAtSuspectState>();
+                stateMachine.ChangeState<ShowItemAndSpeakState>();
             }
             else if(string.IsNullOrEmpty(result) == false)
             {
