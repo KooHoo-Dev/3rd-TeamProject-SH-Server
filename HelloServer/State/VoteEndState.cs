@@ -68,7 +68,7 @@ public class VoteEndState : GameTurnState
             else if(string.IsNullOrEmpty(result) &&
                     voteEndStateMessage.CurrentCycle < gameManager.currentRoom.GameConfig.MaxCycle)
             {
-                stateMachine.ChangeState<PointAtSuspectEndState>();
+                stateMachine.ChangeState<PointAtSuspectState>();
             }
             else if(string.IsNullOrEmpty(result) == false)
             {
