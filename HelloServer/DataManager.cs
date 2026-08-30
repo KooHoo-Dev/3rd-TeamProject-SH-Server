@@ -14,7 +14,28 @@ using System.Xml;
     // 2. DataManager에 추가하면 되는 구조입니다.
     public class DataManager 
     {
-        public static DataManager Instance { get; } = new DataManager();
+        
+        private static DataManager instance { get; } = new DataManager();
+
+        private static readonly SemaphoreSlim SendLock 
+            = new SemaphoreSlim(1, 1);
+        public static DataManager Instance
+        {
+            get
+            {
+                SendLock.Wait();
+                try
+                {
+                    return instance;
+                }
+                finally
+                {
+                    SendLock.Release();
+                }
+                
+
+            }
+        }
 
         public GenreTable Genres { get; } = new GenreTable();
         public KeyWordTable Keywords { get; } = new KeyWordTable();
