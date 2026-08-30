@@ -26,9 +26,13 @@ public class ScoreTallyEndState : GameTurnState
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {
         base.OnTimedEvent(sender, e);
-        if (currentMsTime > MaxMsTime)
+        if (currentMsTime > MaxMsTime && gameManager.currentRound >= gameManager.currentRoom.GameConfig.MaxRound)
         {
             stateMachine.ChangeState<FinalResultState>();
+        }
+        else if (currentMsTime > MaxMsTime && gameManager.currentRound < gameManager.currentRoom.GameConfig.MaxRound)
+        {
+            stateMachine.ChangeState<KeywordDistributeState>();
         }
     }
 }

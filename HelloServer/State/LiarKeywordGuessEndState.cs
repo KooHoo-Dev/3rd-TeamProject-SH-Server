@@ -30,13 +30,11 @@ public class LiarKeywordGuessEndState : GameTurnState
     protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
     {
         base.OnTimedEvent(sender, e);
-        if (currentMsTime > MaxMsTime && gameManager.currentRound >= gameManager.currentRoom.GameConfig.MaxRound)
+
+
+        if (currentMsTime > MaxMsTime)
         {
             stateMachine.ChangeState<ScoreTallyState>();
-        }
-        else if (currentMsTime > MaxMsTime && gameManager.currentRound < gameManager.currentRoom.GameConfig.MaxRound)
-        {
-            stateMachine.ChangeState<KeywordDistributeState>();
         }
     }
 }

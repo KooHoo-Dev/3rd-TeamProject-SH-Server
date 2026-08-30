@@ -213,7 +213,7 @@ namespace HelloServer
         public int CurrentCycle { get; set; }
         public int CurrentRound { get; set; }
 
-        public int KeywordId { get; set; }
+        public int KeywordId { get; set; } // 라이어는 라이어 키워드, 나머지는 일반
     }
 
     #endregion
@@ -379,8 +379,17 @@ namespace HelloServer
         public float TimerMs { get; set; }
         public int CurrentCycle { get; set; }
         public int CurrentRound { get; set; }
+        public LiarOutButtonInfo[]  LiarOutButtonInfo { get; set; }
     }
 
+    
+    [Serializable]
+    public class LiarOutButtonInfo
+    {
+        public string userId{ get; set; }
+        public bool IsPressed { get; set; }
+    }
+    
     [Serializable]
     public class ScoreTallyEndStateMessage
     {
