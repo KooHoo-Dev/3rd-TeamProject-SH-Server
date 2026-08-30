@@ -44,8 +44,7 @@ public class Program
         // 앱의 구성에 값을 가져온다 "Room:LogMovesPerSecond" 키의 값을, 없다면 1을 넣는다
         int logMoves = app.Configuration.GetValue("Room:LogMovesPerSecond", 1);
 
-        DataManager dataManager = new DataManager();
-        dataManager.Load();
+        DataManager.Instance.Load();
         GameConfig gameConfig = app.Configuration.GetSection("GameConfig").Get<GameConfig>();
 
         
