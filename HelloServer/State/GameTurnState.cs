@@ -54,8 +54,15 @@ public abstract class GameTurnState : IState
     protected virtual void OnTimedEvent(object sender, ElapsedEventArgs e)
     {
         currentMsTime += deltaMsTime;
-        Console.WriteLine($"[스테이트 머신][{GetGameStateString()?? "null"}] 현재 Timer 상태: {currentMsTime}");
-        
+        Console.WriteLine($"[{gameManager?.currentRoom?.code}][스테이트 머신][{GetGameStateString()?? "null"}] 현재 Timer 상태: {currentMsTime}");
+        if (string.IsNullOrEmpty(gameManager?.currentRoom?.code))
+        {
+            Console.WriteLine($"[*현재 비 정상적으로 종료가 안된 상태*]");
+            timer.Elapsed -= OnTimedEvent;
+            timer.Stop();
+            timer.Dispose();
+            timer = null;
+        }
 
         
     }
