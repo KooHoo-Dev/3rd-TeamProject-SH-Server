@@ -17,7 +17,7 @@ public class RoomHub
         public Room Room;
         public int Users;
     }
-
+    
     private readonly Dictionary<string, Entry> rooms = new();
 
     private readonly int broadcastPerSecond;

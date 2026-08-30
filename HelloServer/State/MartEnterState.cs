@@ -16,6 +16,7 @@ public class MartEnterState : GameTurnState
         martEnterStateMessage.CurrentCycle = gameManager.currentCycle;
         martEnterStateMessage.CurrentRound = gameManager.currentRound;
         martEnterStateMessage.TimerMs = MaxMsTime;
+        
         BroadcastAsync(martEnterStateMessage);
     }
 

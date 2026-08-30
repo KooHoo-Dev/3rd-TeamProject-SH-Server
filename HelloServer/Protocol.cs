@@ -13,6 +13,14 @@ namespace HelloServer
         DontKnow,
         NotLiar,
     }
+
+    [Serializable]
+    public enum QuestId
+    {
+        ItemPickUp
+    }
+
+
     #region 채팅 처리
 
     [Serializable]
@@ -87,6 +95,15 @@ namespace HelloServer
         public int MaxCycle{get;set;}
     }
 
+    #region 퀘스트
+
+    [Serializable]
+    public class ItemPickUpQuest
+    {
+        public string ItemId { get; set; }
+    }
+
+        #endregion
     #region 기본 상태 처리
 
     [Serializable]
@@ -209,6 +226,9 @@ namespace HelloServer
         public float TimerMs { get; set; }
         public int CurrentCycle { get; set; }
         public int CurrentRound { get; set; }
+        // 퀘스트는 개인적으로만 이루어지고 결과가 state에 적용되기만 하면 되므로 따로 결과를 받거나 보내지 않음
+        // 만약 결과가 남들에게 보여줘야한다면 퀘스트 클리어 메세지에 ID담아서 클라에서 서버로 -> 다른 유저에게 뿌릴 에정
+        public string QuestId{get;set;}
     }
 
     [Serializable]
@@ -532,16 +552,7 @@ namespace HelloServer
         
     }
 
-    // 퀘스트는 개인적으로만 이루어지고 결과가 state에 적용되기만 하면 되므로 따로 결과를 받거나 보내지 않음
-    // 만약 상의 이후에 퀘스트 결과가 남들에게 보여져야 한다면 퀘스트 클리어 메세지 모두에게 보낼 듯
-    // 서버 -> 클라이언트임
-    [Serializable]
-    public class QuestMessage
-    {
-        public string Type{get;set;} = "Quest";
-        public string QuestId{get;set;}
-        
-    }
+
 
     // 퀘스트 정의 예시
     public interface IQuest<out T>
