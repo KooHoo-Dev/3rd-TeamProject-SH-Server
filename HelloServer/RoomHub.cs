@@ -80,7 +80,9 @@ public class RoomHub
         {
             // 예외 처리 한번 해준다
             if (rooms.TryGetValue(code, out Entry entry) == false) return;
+            
             entry.Users--;
+            
             if (entry.Users > 0) return;
             rooms[code].Room.timer.Dispose();
             rooms.Remove(code);

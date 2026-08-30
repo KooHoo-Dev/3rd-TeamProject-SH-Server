@@ -512,6 +512,17 @@ public class Room
 
         try
         {
+            if (member.IsHost && members.Count > 1)
+            {
+                foreach ( (string id,Member m) in members)
+                {
+                    if (m.IsHost == false)
+                    {
+                        m.IsHost = true;
+                        break;
+                    }
+                }
+            }
             members.TryRemove(member.User.Id, out _);
             // 퇴장한것을 알려줍니다.
             await BroadcastAsync(new LeaveMessage { Id = member.User.Id }, member.User.Id);
