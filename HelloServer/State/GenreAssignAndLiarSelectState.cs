@@ -16,7 +16,7 @@ public class GenreAssignAndLiarSelectState: GameTurnState
         base.Enter();
         
         Random rnd = new Random();
-        Console.WriteLine($"[장르 랜덤 숫자] 랜덤 테스트 : {rnd.Next(0, gameManager.users.Length)}");
+        Console.WriteLine($"[장르 랜덤 숫자] 랜덤 테스트 : {rnd.Next(0, DataManager.Instance.Genres.Count)}");
         
         GenreDef genreDef = DataManager.Instance.Genres.Get(rnd.Next(DataManager.Instance.Genres.Count));
         gameManager.CurrentGanre = genreDef;
