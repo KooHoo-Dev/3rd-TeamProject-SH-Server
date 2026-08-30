@@ -16,6 +16,12 @@ public class ScoreTallyState : GameTurnState
         scoreTallyStateMessage.CurrentCycle = gameManager.currentCycle;
         scoreTallyStateMessage.CurrentRound = gameManager.currentRound;
         scoreTallyStateMessage.TimerMs = MaxMsTime;
+        scoreTallyStateMessage.LiarOutButtonInfo = new string[gameManager.LiarOutButtonQueue.Count];
+        int count = gameManager.LiarOutButtonQueue.Count;
+        for (int i = 0; i < count; i++)
+        {
+             gameManager.LiarOutButtonQueue.TryDequeue(out scoreTallyStateMessage.LiarOutButtonInfo[i]);
+        }
         BroadcastAsync(scoreTallyStateMessage);
     }
 

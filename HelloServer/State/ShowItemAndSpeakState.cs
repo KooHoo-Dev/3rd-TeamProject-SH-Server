@@ -17,8 +17,7 @@ public class ShowItemAndSpeakState : GameTurnState
         base.Enter();
         if(gameManager.currentSpeakedCount == 0)
             gameManager.currentCycle++;
-        // 라이어 버튼 누른 유저 변수 초기화
-        gameManager.liarButtonPressedUserId = "";
+
         
         showItemAndSpeakStateMessage.CurrentCycle = gameManager.currentCycle;
         showItemAndSpeakStateMessage.CurrentRound = gameManager.currentRound;
@@ -59,7 +58,7 @@ public class ShowItemAndSpeakState : GameTurnState
     {
         base.OnTimedEvent(sender, e);
         bool trigger = gameManager.ChangeSpeakerTrigger;
-        if (string.IsNullOrEmpty(gameManager.liarButtonPressedUserId) == false)
+        if (string.IsNullOrEmpty(gameManager.LiarButtonPressedUserId) == false)
         {
             stateMachine.ChangeState<LiarOutButtonPressedState>();
         }

@@ -15,8 +15,8 @@ public class LiarOutButtonPressedState : GameTurnState
     {
         base.Enter();
 
-        liarOutButtonPressedStateMessage.ID = gameManager.liarButtonPressedUserId;
-        
+        liarOutButtonPressedStateMessage.ID = gameManager.LiarButtonPressedUserId;
+        gameManager.LiarButtonPressedUserId = "";
         liarOutButtonPressedStateMessage.TimerMs = MaxMsTime;
         BroadcastAsync(liarOutButtonPressedStateMessage);
     }

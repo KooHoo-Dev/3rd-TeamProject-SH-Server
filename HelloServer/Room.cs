@@ -190,7 +190,7 @@ public class Room
             else if (kind?.Type == "게임 시작") await HandleGameStart();
             else if(kind?.Type == "NonPoint")  await HandleNonPoint(member, text);
             else if(kind?.Type == "Select") await HandleSelectUser( member, text);
-            else if(kind?.Type == "LiarSelfDisclose") await HandleLiarButtonPressed(member, text);
+            else if(kind?.Type == "LiarSelfDisclose") HandleLiarButtonPressed(member, text);
             else if (kind?.Type == "Vote") await HandleVote(member, text);
             
             // 모르는 정보는 그냥 흘려버립니다.
@@ -211,12 +211,16 @@ public class Room
        await BroadcastAsync(voteMessage);
     }
 
-    private async Task HandleLiarButtonPressed(Member member, string text)
+    private void HandleLiarButtonPressed(Member member, string text)
     {
 
         if (member.playerState.IsLiar)
         {
-            gameManager.liarButtonPressedUserId = member.User.Id;
+            gameManager.LiarButtonPressedUserId = member.User.Id;
+        }
+        else
+        {
+            gameManager.LiarOutButtonQueue.Enqueue(member.User.Id);
         }
     }
 

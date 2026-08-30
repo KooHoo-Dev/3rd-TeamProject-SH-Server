@@ -43,7 +43,8 @@ public class GameManager
     public int currentRound = 0;
     public int currentSpeakedCount = 0;
     public int maxSpeakedCount = 0;
-    public string liarButtonPressedUserId;
+    // 라이어가 라이어 버튼을 눌렀을 경우 추가되는 필드
+    private string liarButtonPressedUserId;
     
     public User[] users;
     public User focausUser;
@@ -82,6 +83,9 @@ public class GameManager
 
     #region 비동기 함수에서 보내는 정보들
     public readonly ConcurrentQueue<VoteMessage> VoteQueue = new ConcurrentQueue<VoteMessage>();
+    
+    // 라이어 버튼을 누른 '일반 유저ID'가 담기는 버튼
+    public readonly ConcurrentQueue<string> LiarOutButtonQueue = new ConcurrentQueue<string>();
 
 
     private string liarGuessKeyWord;
@@ -231,6 +235,7 @@ public class GameManager
     public async Task GameStart()
     {
         if(IsGameRunning) return;
+        if(currentRoom.members.Count < 3) return;
        await Init();
         stateMachine.ChangeState<GameStartState>();
     }
