@@ -49,7 +49,7 @@ public abstract class GameTurnState : IState
         
         gameManager.currentRoom.timer.Elapsed -= OnTimedEvent;
         gameManager.currentRoom.timer.Stop();
-        gameManager.currentRoom.timer = null;
+
     }
     protected virtual void OnTimedEvent(object sender, ElapsedEventArgs e)
     {
