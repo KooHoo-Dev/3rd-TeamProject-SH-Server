@@ -21,6 +21,7 @@ public class GenreAssignAndLiarSelectState: GameTurnState
         
         
         User Liar = gameManager.users[rnd.Next(0, gameManager.users.Length)];
+        Console.WriteLine($"[라이어 선정 로직] 라이어 유저 : {Liar?.Id}");
         gameManager.currentRoom.members[Liar.Id].playerState.IsLiar = true;
         genreAssignAndLiarSelectStateMessage.CurrentOwnerID = Liar.Id;
         

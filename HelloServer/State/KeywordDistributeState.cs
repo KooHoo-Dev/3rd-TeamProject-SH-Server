@@ -20,6 +20,8 @@ public class KeywordDistributeState : GameTurnState
         List<KeyWordDef> list = DataManager.Instance.GetKeyWordDefsByGenre(gameManager.CurrentGanre.GenreName);
         List<KeyWordDef> NewList = list.Union(gameManager.OldKeyWords).ToList();
         gameManager.CurrentKeyWord = NewList[rnd.Next(NewList.Count)];
+        Console.WriteLine($"[키워드 선정 로직] 선정된 키워드 : {gameManager.CurrentKeyWord}");
+        
         gameManager.OldKeyWords.Add(gameManager.CurrentKeyWord);
         NewList.Remove(gameManager.CurrentKeyWord);
         keywordDistributeStateMessage.CurrentCycle = gameManager.currentCycle;
