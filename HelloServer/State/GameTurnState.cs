@@ -58,10 +58,7 @@ public abstract class GameTurnState : IState
         if (string.IsNullOrEmpty(gameManager?.currentRoom?.code))
         {
             Console.WriteLine($"[*현재 비 정상적으로 종료가 안된 상태*]");
-            gameManager.currentRoom.timer.Elapsed -= OnTimedEvent;
-            gameManager.currentRoom.timer.Stop();
-            gameManager.currentRoom.timer.Dispose();
-            gameManager.currentRoom.timer = null;
+
         }
 
         
