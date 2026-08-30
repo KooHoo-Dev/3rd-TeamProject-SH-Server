@@ -71,10 +71,10 @@ public class GameManager
         }
     }
 
-    public GenreDef CurrentGanre;
-    public KeyWordDef CurrentKeyWord;
-    public KeyWordDef CurrentLiarKeyword;
-    public List<KeyWordDef> OldKeyWords;
+    public GenreDef CurrentGanre = new GenreDef();
+    public KeyWordDef CurrentKeyWord = new KeyWordDef();
+    public KeyWordDef CurrentLiarKeyword = new KeyWordDef();
+    public List<KeyWordDef> OldKeyWords = new List<KeyWordDef>();
    
 
     public readonly SemaphoreSlim gameLock 
@@ -312,5 +312,9 @@ public class GameManager
         IsGameRunning = false;
         stateMachine.StopStateMachine();
         PointInfo.Clear();
+        CurrentGanre = new GenreDef();
+        CurrentKeyWord  = new KeyWordDef();
+        CurrentLiarKeyword = new KeyWordDef();
+        OldKeyWords.Clear();
     }
 }
