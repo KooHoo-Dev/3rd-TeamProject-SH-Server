@@ -7,7 +7,7 @@ public abstract class GameTurnState : IState
 {
     public StateMachine<IState> stateMachine;
     public GameManager gameManager { get; set; }
-    private System.Timers.Timer timer;
+
 
     private int deltaMsTime;
     public int currentMsTime;
@@ -30,11 +30,11 @@ public abstract class GameTurnState : IState
             Console.WriteLine($"[조기 종료됨]; 게임매니저 == null :{gameManager == null}, 현재 방 == null : {gameManager?.currentRoom == null}");
             return;
         }
-        timer = gameManager.currentRoom.timer;
-     timer.AutoReset = true;
+
+        gameManager.currentRoom.timer.AutoReset = true;
      currentMsTime = 0;
-     timer.Elapsed += OnTimedEvent;
-     timer.Start();
+     gameManager.currentRoom.timer.Elapsed += OnTimedEvent;
+     gameManager.currentRoom.timer.Start();
         Console.WriteLine($"[스테이트 머신] 현재 Enter 상태: {stateMachine.CurrentState}, 제한시간(ms): {MaxMsTime}");
      
     }
@@ -47,9 +47,9 @@ public abstract class GameTurnState : IState
     {
         currentMsTime = 0;
         
-     timer.Elapsed -= OnTimedEvent;
-     timer.Stop();
-     timer = null;
+        gameManager.currentRoom.timer.Elapsed -= OnTimedEvent;
+        gameManager.currentRoom.timer.Stop();
+        gameManager.currentRoom.timer = null;
     }
     protected virtual void OnTimedEvent(object sender, ElapsedEventArgs e)
     {
@@ -58,10 +58,10 @@ public abstract class GameTurnState : IState
         if (string.IsNullOrEmpty(gameManager?.currentRoom?.code))
         {
             Console.WriteLine($"[*현재 비 정상적으로 종료가 안된 상태*]");
-            timer.Elapsed -= OnTimedEvent;
-            timer.Stop();
-            timer.Dispose();
-            timer = null;
+            gameManager.currentRoom.timer.Elapsed -= OnTimedEvent;
+            gameManager.currentRoom.timer.Stop();
+            gameManager.currentRoom.timer.Dispose();
+            gameManager.currentRoom.timer = null;
         }
 
         
