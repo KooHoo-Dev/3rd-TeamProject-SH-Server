@@ -62,7 +62,7 @@ public class RoomHub
             {
                 
                 entry = new Entry()
-                    {Room = new Room(code, logMovesPerSecond, DefulatConfig), Users = 0};
+                    {Room = new Room(code, logMovesPerSecond, DefulatConfig, 100), Users = 0};
                 rooms.Add(code, entry);
                 
                 Console.WriteLine($"[{code}] 방을 열었다. 총 방의 개수 : {rooms.Count}");

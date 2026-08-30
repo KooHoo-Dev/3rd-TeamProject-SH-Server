@@ -113,12 +113,13 @@ public class Room
     public bool IsEmpty => members.IsEmpty;
     public GameConfig GameConfig { get; }
     
-    public Room(string code, int logMovesPerSecond, GameConfig config)
+    public Room(string code, int logMovesPerSecond, GameConfig config, int intarvelMs)
     {
         this.code = code;
         this.logMovesPerSecond = logMovesPerSecond;
         this.GameConfig = config;
-        timer = new Timer(IntarvelMs);
+        IntarvelMs = intarvelMs;
+        timer = new Timer(intarvelMs);
         gameManager = new GameManager(config,this);
     }
 

@@ -97,12 +97,13 @@ namespace HelloServer
 
     #region 퀘스트
 
+    // 서버에서 클리어 판정(PlayerState를 보고 판단)과 시기를 정해 알아서 뿌려준다.
     [Serializable]
-    public class ItemPickUpQuest
+    public class ItemPickUpQuestSuccessMessage
     {
-        public string ItemId { get; set; }
+        public string Type { get; set; } = "itemPickUpQuestSuccess";
+        public string Id{get;set;} // 클리어 한 유저의 Id
     }
-
         #endregion
     #region 기본 상태 처리
 
