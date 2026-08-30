@@ -58,7 +58,7 @@ public class Room
 
     public  GameManager gameManager;
 
-    public int IntarvelMs = 200;
+    public int IntarvelMs = 100;
 
     public System.Timers.Timer timer;
     // 접속자 한 명.
