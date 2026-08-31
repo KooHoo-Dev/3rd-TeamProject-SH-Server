@@ -254,7 +254,15 @@ public class GameManager
         {
             users[i] = memberList[i].User;
         }
-        
+
+        for (int i = 0; i < currentRoom.members.Count; i++)
+        {
+
+            currentRoom.members[users[i].Id].score = 0;
+            currentRoom.members[users[i].Id].IsReady = false;
+            
+        }
+
         Console.WriteLine($"테스트2번 위치 및 리스트 갯수: {users.Length}");
         for(int i = 0; i < users.Length; i++)
         {

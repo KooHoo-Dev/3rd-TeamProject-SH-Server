@@ -78,6 +78,7 @@ public class PointAtSuspectEndState : GameTurnState
             }
         }
 
+        int TiedCount = 0;
         foreach ((string user, int count) in VoteCount)
             {
                 Console.WriteLine($"[지목 결정된 유저 계산 함수] 유저 : {user}, 투표 받은 수 {count}");
@@ -87,8 +88,19 @@ public class PointAtSuspectEndState : GameTurnState
                     ElectedUser = user;
                     break;
                 }
+                else if (count == harf)
+                {
+                    ElectedUser = user;
+                    TiedCount++;
+                }
                 
             }
+
+        // 반반 투표가 나오면 무효
+        if (TiedCount > 1)
+        {
+            ElectedUser = "";
+        }
             Console.WriteLine($"[지목 결정된 유저 계산 함수] 최종 리턴 : {ElectedUser}");
         return ElectedUser;
     }

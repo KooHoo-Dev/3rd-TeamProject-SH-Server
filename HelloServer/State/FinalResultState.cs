@@ -22,14 +22,23 @@ public class FinalResultState : GameTurnState
         for (int i = 0; i < gameManager.currentRoom.members.Count; i++)
         {
 
-            if (gameManager.currentRoom.members[gameManager.users[i].Id].playerState.score > maxScore)
+            if (gameManager.currentRoom.members[gameManager.users[i].Id].score > maxScore)
             {
-                maxScore = gameManager.currentRoom.members[gameManager.users[i].Id].playerState.score;
+                maxScore = gameManager.currentRoom.members[gameManager.users[i].Id].score;
                 winerId = gameManager.users[i].Id;
             }
         }
+        finalResultStateMessage.CurrentOwnerID.Add(winerId);
+        
+        for (int i = 0; i < gameManager.currentRoom.members.Count; i++)
+        {
 
-        finalResultStateMessage.CurrentOwnerID = winerId;
+            if (gameManager.users[i].Id != winerId && gameManager.currentRoom.members[gameManager.users[i].Id].score == maxScore )
+            {
+                finalResultStateMessage.CurrentOwnerID.Add(gameManager.users[i].Id);
+
+            }
+        }
         BroadcastAsync(finalResultStateMessage);
     }
 
