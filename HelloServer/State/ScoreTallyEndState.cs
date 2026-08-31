@@ -13,6 +13,9 @@ public class ScoreTallyEndState : GameTurnState
     public override void Enter()
     {
         base.Enter();
+        gameManager.LiarGuessKeyWord = "";
+        gameManager.PressedLiarId = "";
+        gameManager.LiarOutButtonQueue.Clear();
         scoreTallyEndStateMessage.CurrentCycle = gameManager.currentCycle;
         scoreTallyEndStateMessage.CurrentRound = gameManager.currentRound;
         scoreTallyEndStateMessage.TimerMs = MaxMsTime;
@@ -32,7 +35,7 @@ public class ScoreTallyEndState : GameTurnState
         }
         else if (currentMsTime > MaxMsTime && gameManager.currentRound < gameManager.currentRoom.GameConfig.MaxRound)
         {
-            stateMachine.ChangeState<KeywordDistributeState>();
+            stateMachine.ChangeState<GenreAssignAndLiarSelectState>();
         }
     }
 }

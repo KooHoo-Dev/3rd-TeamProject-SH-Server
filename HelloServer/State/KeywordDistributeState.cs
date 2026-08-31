@@ -15,12 +15,12 @@ public class KeywordDistributeState : GameTurnState
     {
         base.Enter();
 
-        gameManager.currentRound++;
+        
         Random rnd = new Random();
         List<KeyWordDef> list = DataManager.Instance.GetKeyWordDefsByGenre(gameManager.CurrentGanre.GenreName);
         List<KeyWordDef> NewList = list.Union(gameManager.OldKeyWords).ToList();
         gameManager.CurrentKeyWord = NewList[rnd.Next(NewList.Count)];
-        Console.WriteLine($"[키워드 선정 로직] 선정된 키워드 : {gameManager.CurrentKeyWord.KeywordName}");
+        Console.WriteLine($"[키워드 선정 로직] 선정된 키워드 : {gameManager.CurrentKeyWord.KeywordName}, 리스트 갯수 {NewList.Count}");
         
         gameManager.OldKeyWords.Add(gameManager.CurrentKeyWord);
         NewList.Remove(gameManager.CurrentKeyWord);
