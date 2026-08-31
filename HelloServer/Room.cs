@@ -205,6 +205,7 @@ public class Room
 
     private async Task HandleVote(Member member, string text)
     {
+        if(gameManager.currentTurnState != gameManager.voteState) return;
         
         VoteMessage voteMessage = JsonSerializer.Deserialize<VoteMessage>(text);
         gameManager.VoteQueue.Enqueue(voteMessage);
@@ -214,6 +215,8 @@ public class Room
     private void HandleLiarButtonPressed(Member member, string text)
     {
 
+        if(gameManager.currentTurnState != gameManager.showItemAndSpeakState) return;
+        
         if (member.playerState.IsLiar)
         {
             gameManager.LiarButtonPressedUserId = member.User.Id;
@@ -226,6 +229,8 @@ public class Room
 
     private async Task HandleNonPoint(Member member,string text)
     {
+        if(gameManager.currentTurnState != gameManager.pointAtSuspectState) return;
+        
         gameManager.SkipCount++;
         NonPointMessage nonPointMessage = new NonPointMessage();
         nonPointMessage.UserID = member.User.Id;
@@ -234,6 +239,8 @@ public class Room
 
     private async Task HandleSelectUser(Member member, string text)
     {
+        if(gameManager.currentTurnState != gameManager.pointAtSuspectState) return;
+        
         SelectMessage selectMessage = JsonSerializer.Deserialize<SelectMessage>(text);
 
         Console.WriteLine($"[실제 지목 메세지] 지목 당한 유저 {selectMessage.selectedID}");
@@ -296,6 +303,7 @@ public class Room
     
     private async Task HandleSpecialChat(Member member, string text)
     {
+        if(gameManager.currentTurnState != gameManager.showItemAndSpeakState) return;
         // 먼저 Chat메시지를 읽어 준다
         SpecialChatMessage chat = JsonSerializer.Deserialize<SpecialChatMessage>(text);
         // 온 메시지에서 사용자가 말한 부분만 읽어준다.
@@ -309,6 +317,8 @@ public class Room
     }
     private async Task HandleKeywordChat(Member member, string text)
     {
+        if(gameManager.currentTurnState != gameManager.liarKeywordGuessState) return;
+        
         // 먼저 Chat메시지를 읽어 준다
         KeywordChatMessage chat = JsonSerializer.Deserialize<KeywordChatMessage>(text);
         // 온 메시지에서 사용자가 말한 부분만 읽어준다.
@@ -321,6 +331,8 @@ public class Room
     // 이동 관련 메시지를 처리하는 함수
     private void HandleMove(Member member, string text)
     {
+        if(gameManager.currentTurnState != gameManager.martMoveState) return;
+        
         // 메시지를 읽어준다
         MoveMessage move = JsonSerializer.Deserialize<MoveMessage>(text);
         // move 메시지의 내용을 member의 X,Y 내용에 카피해준다

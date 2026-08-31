@@ -9,6 +9,8 @@ public class GameManager
     
     StateMachine<IState> stateMachine;
 
+    public IState currentTurnState => stateMachine.CurrentState;
+
     public bool IsGameRunning = false;
 
     public Room currentRoom;
