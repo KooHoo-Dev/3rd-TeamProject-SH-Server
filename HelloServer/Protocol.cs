@@ -257,6 +257,7 @@ namespace HelloServer
         public float TimerMs { get; set; }
         public int CurrentCycle { get; set; }
         public int CurrentRound { get; set; }
+        public UserScoreInfo[] userScoreInfo {get;set;}
     }
 
     #endregion
