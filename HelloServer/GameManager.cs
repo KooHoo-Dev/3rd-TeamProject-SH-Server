@@ -144,10 +144,8 @@ public class GameManager
         set{
             lock (gameLock)
             {
-                if (stateMachine.CurrentState == showItemAndSpeakState)
-                {
+
                     liarButtonPressedUserId = value;
-                }
                 
             }
         }
@@ -234,15 +232,19 @@ public class GameManager
         
     }
 
-    public async Task GameStart()
+    public void GameStart()
     {
         if(IsGameRunning) return;
-        if(currentRoom.members.Count < 3) return;
-       await Init();
+        // if(currentRoom.members.Count < 3)
+        // {
+        //     Console.WriteLine($"[총 유저가 3명 미만] 총 유저 수 : {currentRoom.members.Count}");
+        //     return;
+        // };
+        Init();
         stateMachine.ChangeState<GameStartState>();
     }
 
-    private async Task Init()
+    private void Init()
     {
         IsGameRunning = true;
         Console.WriteLine($"테스트1번 위치");

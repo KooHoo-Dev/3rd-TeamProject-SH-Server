@@ -297,7 +297,7 @@ public class Room
 
         await BroadcastAsync(gameStartOkMessage);
         // 게임 루프 시작
-        await  gameManager.GameStart();
+        gameManager.GameStart();
         
     }
     

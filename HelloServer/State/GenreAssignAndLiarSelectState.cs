@@ -23,9 +23,15 @@ public class GenreAssignAndLiarSelectState: GameTurnState
         GenreDef genreDef = DataManager.Instance.Genres.Get(rnd.Next(DataManager.Instance.Genres.Count));
         gameManager.CurrentGanre = genreDef;
         Console.WriteLine($"[장르 선정 로직] 현재 장르 : {genreDef?.GenreName}");
-        
-        
-        User Liar = gameManager.users[rnd.Next(0, gameManager.users.Length)];
+
+        foreach (var VARIABLE in gameManager.currentRoom.members.Values)
+        {
+            VARIABLE.playerState.IsLiar = false;
+        }
+
+        int rendIndex = rnd.Next(0, gameManager.users.Length);
+        Console.WriteLine($"[라이어 유저 랜덤 인덱스] 인덱스 : {rendIndex}, 전체 게임 유저 수 {gameManager.users.Length}");
+        User Liar = gameManager.users[rendIndex];
         Console.WriteLine($"[라이어 선정 로직] 라이어 유저 : {Liar?.Id}");
         gameManager.currentRoom.members[Liar.Id].playerState.IsLiar = true;
         genreAssignAndLiarSelectStateMessage.CurrentOwnerID = Liar.Id;
