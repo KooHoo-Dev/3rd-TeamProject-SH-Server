@@ -58,7 +58,7 @@ public class ShowItemAndSpeakState : GameTurnState
     {
         base.OnTimedEvent(sender, e);
         bool trigger = gameManager.ChangeSpeakerTrigger;
-        if (string.IsNullOrEmpty(gameManager.LiarButtonPressedUserId) == false)
+        if (string.IsNullOrEmpty(gameManager.PressedLiarId) == false)
         {
             stateMachine.ChangeState<LiarOutButtonPressedState>();
         }

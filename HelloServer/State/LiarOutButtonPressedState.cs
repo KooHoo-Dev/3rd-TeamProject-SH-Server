@@ -15,9 +15,9 @@ public class LiarOutButtonPressedState : GameTurnState
     {
         base.Enter();
 
-        liarOutButtonPressedStateMessage.ID = gameManager.LiarButtonPressedUserId;
-        gameManager.LiarButtonPressedUserId = "";
-        Console.WriteLine($"[라밍아웃 초기화] 변수 내용 :{gameManager.LiarButtonPressedUserId}");
+        liarOutButtonPressedStateMessage.ID = gameManager.PressedLiarId;
+        
+        Console.WriteLine($"[라밍아웃 초기화] 변수 내용 :{gameManager.PressedLiarId}");
         liarOutButtonPressedStateMessage.TimerMs = MaxMsTime;
         BroadcastAsync(liarOutButtonPressedStateMessage);
     }

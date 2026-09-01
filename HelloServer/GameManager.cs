@@ -88,6 +88,8 @@ public class GameManager
     
     // 라이어 버튼을 누른 '일반 유저ID'가 담기는 버튼
     public readonly ConcurrentQueue<string> LiarOutButtonQueue = new ConcurrentQueue<string>();
+    
+
 
 
     private string liarGuessKeyWord;
@@ -131,7 +133,7 @@ public class GameManager
         }
     }
 
-    public string LiarButtonPressedUserId
+    public string PressedLiarId
     {
         get
         {

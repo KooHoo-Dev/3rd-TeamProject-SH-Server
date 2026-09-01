@@ -41,6 +41,12 @@ public class GameConfig
 
     public int MaxRound{ get; set; }
     public int MaxCycle{ get; set; }
+    
+    public int VoteScoreChangeAmount { get; set; }
+    public int KeywordGuessScoreChangeAmount{ get; set; }
+    public int LiarButtonScoreChangeAmount { get; set; }
+    public int QuestScoreChangeAmount { get; set; }
+    
 }
 // 방 하나. 방에 있는 사람들을 들고 있다가
 // 메세지를 전달해 준다.
@@ -220,7 +226,7 @@ public class Room
         
         if (member.playerState.IsLiar)
         {
-            gameManager.LiarButtonPressedUserId = member.User.Id;
+            gameManager.PressedLiarId = member.User.Id;
         }
         else
         {

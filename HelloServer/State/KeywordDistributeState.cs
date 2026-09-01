@@ -15,12 +15,12 @@ public class KeywordDistributeState : GameTurnState
     {
         base.Enter();
 
-        gameManager.currentRound++;
+        
         Random rnd = new Random();
         List<KeyWordDef> list = DataManager.Instance.GetKeyWordDefsByGenre(gameManager.CurrentGanre.GenreName);
         List<KeyWordDef> NewList = list.Union(gameManager.OldKeyWords).ToList();
         gameManager.CurrentKeyWord = NewList[rnd.Next(NewList.Count)];
-        Console.WriteLine($"[키워드 선정 로직] 선정된 키워드 : {gameManager.CurrentKeyWord.KeywordName}");
+        Console.WriteLine($"[키워드 선정 로직] 선정된 키워드 : {gameManager.CurrentKeyWord.KeywordName}, 리스트 갯수 {NewList.Count}");
         
         gameManager.OldKeyWords.Add(gameManager.CurrentKeyWord);
         NewList.Remove(gameManager.CurrentKeyWord);
@@ -36,16 +36,13 @@ public class KeywordDistributeState : GameTurnState
             if (gameManager.currentRoom.members[gameManager.users[i].Id].playerState.IsLiar)
             {
                 KeywordDistributeStateMessage LiarMessage = new  KeywordDistributeStateMessage();
-                List<KeyWordDef> Liarlist = DataManager.Instance.GetKeyWordDefsByGenre(gameManager.CurrentGanre.GenreName);
-                List<KeyWordDef> LiarNewList = Liarlist.Union(gameManager.OldKeyWords).ToList();
-                gameManager.CurrentLiarKeyword = LiarNewList[rnd.Next(LiarNewList.Count)];
+                gameManager.CurrentLiarKeyword = NewList[rnd.Next(NewList.Count)];
                 gameManager.OldKeyWords.Add(gameManager.CurrentLiarKeyword);
-                LiarNewList.Remove(gameManager.CurrentKeyWord);
                 LiarMessage.CurrentCycle = gameManager.currentCycle;
                 LiarMessage.CurrentRound = gameManager.currentRound;
                 LiarMessage.TimerMs = MaxMsTime;
 
-                LiarMessage.KeywordId = gameManager.CurrentKeyWord.KeywordId;
+                LiarMessage.KeywordId = gameManager.CurrentLiarKeyword.KeywordId;
                 SendAsync(gameManager.currentRoom.members[gameManager.users[i].Id], LiarMessage);
             }
             else

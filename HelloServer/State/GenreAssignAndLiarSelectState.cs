@@ -14,10 +14,10 @@ public class GenreAssignAndLiarSelectState: GameTurnState
     public override void Enter()
     {
         base.Enter();
-        
+        gameManager.currentRound++;
         Random rnd = new Random();
         var dm = DataManager.Instance;
-        Console.WriteLine($"[진단] DataManager 인스턴스 해시: {dm.GetHashCode()}, IsReady: {dm.IsReady}, Genres.Count: {dm.Genres.Count}");
+      
         Console.WriteLine($"[장르 랜덤 숫자] 랜덤 테스트 : {rnd.Next(0, DataManager.Instance.Genres.Count)}");
         
         GenreDef genreDef = DataManager.Instance.Genres.Get(rnd.Next(DataManager.Instance.Genres.Count));
