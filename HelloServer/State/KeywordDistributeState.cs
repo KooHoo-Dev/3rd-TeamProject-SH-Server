@@ -22,8 +22,8 @@ public class KeywordDistributeState : GameTurnState
         // OldKeyWords의 ID 목록을 해시셋(HashSet)으로 만들어 검색 속도를 높입니다.
         var oldIds = new HashSet<int>(gameManager.OldKeyWords.Select(x => x.KeywordId));
 
-        // list 중에서 oldIds에 포함되지 않은 ID를 가진 객체만 필터링합니다.
-        List<KeyWordDef> NewList = list.Where(x => !oldIds.Contains(x.KeywordId)).ToList();
+        // list에서 OldKeyWords에 포함된 항목을 제외합니다.
+        List<KeyWordDef> NewList = list.Except(gameManager.OldKeyWords).ToList();
         gameManager.CurrentKeyWord = NewList[rnd.Next(NewList.Count)];
         gameManager.OldKeyWords.Add(gameManager.CurrentKeyWord);
         
@@ -32,30 +32,41 @@ public class KeywordDistributeState : GameTurnState
         {
             Console.WriteLine($"[키워드 선정 로직] 갱신된 {i}번째 리스트 : {NewList[i].KeywordName}");
         }
-        for (int i = 0; i < NewList.Count; i++)
+        for (int i = 0; i < gameManager.OldKeyWords.Count; i++)
         {
             Console.WriteLine($"[키워드 선정 로직] 올드 {i}번째 리스트 : {gameManager.OldKeyWords[i].KeywordName}");
         }
-        NewList.Remove(gameManager.CurrentKeyWord);
+
+        if (NewList.Contains(gameManager.CurrentKeyWord))
+        {
+            Console.WriteLine($"[키워드 선정 로직] 삭제 로직 이전");
+            NewList.Remove(gameManager.CurrentKeyWord);
+            
+        }
+
         keywordDistributeStateMessage.CurrentCycle = gameManager.currentCycle;
         keywordDistributeStateMessage.CurrentRound = gameManager.currentRound;
         keywordDistributeStateMessage.TimerMs = MaxMsTime;
 
         keywordDistributeStateMessage.KeywordId = gameManager.CurrentKeyWord.KeywordId;
-        
+
         for (int i = 0; i < gameManager.users.Length; i++)
         {
             
             if (gameManager.currentRoom.members[gameManager.users[i].Id].playerState.IsLiar)
             {
+                Console.WriteLine($"[라이어 키워드 선정 로직] 선정된 키워드 : 1, 리스트 갯수 {NewList.Count}");
+                
                 KeywordDistributeStateMessage LiarMessage = new  KeywordDistributeStateMessage();
                 gameManager.CurrentLiarKeyword = NewList[rnd.Next(NewList.Count)];
+                
                 gameManager.OldKeyWords.Add(gameManager.CurrentLiarKeyword);
                 LiarMessage.CurrentCycle = gameManager.currentCycle;
                 LiarMessage.CurrentRound = gameManager.currentRound;
                 LiarMessage.TimerMs = MaxMsTime;
 
                 LiarMessage.KeywordId = gameManager.CurrentLiarKeyword.KeywordId;
+                Console.WriteLine($"[라이어 키워드 선정 로직] 선정된 키워드 : 2 : { gameManager.CurrentLiarKeyword.KeywordName}, 리스트 갯수 {NewList.Count}");
                 SendAsync(gameManager.currentRoom.members[gameManager.users[i].Id], LiarMessage);
             }
             else
