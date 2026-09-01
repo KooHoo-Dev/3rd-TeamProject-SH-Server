@@ -18,7 +18,12 @@ public class KeywordDistributeState : GameTurnState
         
         Random rnd = new Random();
         List<KeyWordDef> list = DataManager.Instance.GetKeyWordDefsByGenre(gameManager.CurrentGanre.GenreName);
-        List<KeyWordDef> NewList = list.Union(gameManager.OldKeyWords).ToList();
+        // 중복되는 모든 값 리스트에서 제거
+        List<KeyWordDef> NewList = list.Concat(gameManager.OldKeyWords)
+            .GroupBy(x => x)
+            .Where(g => g.Count() == 1)
+            .Select(g => g.Key)
+            .ToList();
         gameManager.CurrentKeyWord = NewList[rnd.Next(NewList.Count)];
         Console.WriteLine($"[키워드 선정 로직] 선정된 키워드 : {gameManager.CurrentKeyWord.KeywordName}, 리스트 갯수 {NewList.Count}");
         
@@ -57,9 +62,9 @@ public class KeywordDistributeState : GameTurnState
     {
         return keywordDistributeStateMessage.Type;
     }
-    protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
+    protected override void Tick(object sender, ElapsedEventArgs e)
     {
-        base.OnTimedEvent(sender, e);
+        base.Tick(sender, e);
         if (currentMsTime > MaxMsTime)
         {
             stateMachine.ChangeState<MartEnterState>();

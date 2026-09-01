@@ -30,9 +30,9 @@ public class LiarKeywordGuessEndState : GameTurnState
     {
         return liarKeywordGuessEndStateMessage.Type;
     }
-    protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
+    protected override void Tick(object sender, ElapsedEventArgs e)
     {
-        base.OnTimedEvent(sender, e);
+        base.Tick(sender, e);
 
 
         if (currentMsTime > MaxMsTime)

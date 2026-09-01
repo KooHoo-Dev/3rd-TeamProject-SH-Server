@@ -33,7 +33,7 @@ public abstract class GameTurnState : IState
 
         gameManager.currentRoom.timer.AutoReset = true;
      currentMsTime = 0;
-     gameManager.currentRoom.timer.Elapsed += OnTimedEvent;
+     gameManager.currentRoom.timer.Elapsed += Tick;
      gameManager.currentRoom.timer.Start();
         Console.WriteLine($"[스테이트 머신] 현재 Enter 상태: {stateMachine.CurrentState}, 제한시간(ms): {MaxMsTime}");
      
@@ -47,11 +47,11 @@ public abstract class GameTurnState : IState
     {
         currentMsTime = 0;
         
-        gameManager.currentRoom.timer.Elapsed -= OnTimedEvent;
+        gameManager.currentRoom.timer.Elapsed -= Tick;
         gameManager.currentRoom.timer.Stop();
 
     }
-    protected virtual void OnTimedEvent(object sender, ElapsedEventArgs e)
+    protected virtual void Tick(object sender, ElapsedEventArgs e)
     {
         currentMsTime += deltaMsTime;
         if(currentMsTime % 1000 == 0)

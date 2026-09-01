@@ -187,7 +187,11 @@ public class Room
             // Unity와 C#에서 사용하는 직렬화 클래스가 다른것에 유의하세여
             // (타입이랑 매개변수로 텍스트만 넘기면 알아서 잘 처리해줍니다)
             TypeOnly kind = JsonSerializer.Deserialize<TypeOnly>(text);
-            Console.WriteLine($"[Type] 들어온 타입 : {kind?.Type}");
+            if (kind?.Type != "move")
+            {
+                Console.WriteLine($"[Type] 들어온 타입 : {kind?.Type}");
+                
+            }
             if(kind?.Type == "move") HandleMove(member, text);
             else if(kind?.Type == "chat") await HandleChatAsync(member, text);
             else if(kind?.Type == "normalChat") await HandleChatAsync(member, text);

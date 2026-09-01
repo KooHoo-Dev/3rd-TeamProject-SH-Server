@@ -54,9 +54,9 @@ public class ShowItemAndSpeakState : GameTurnState
     {
         return showItemAndSpeakStateMessage.Type;
     }
-    protected override void OnTimedEvent(object sender, ElapsedEventArgs e)
+    protected override void Tick(object sender, ElapsedEventArgs e)
     {
-        base.OnTimedEvent(sender, e);
+        base.Tick(sender, e);
         bool trigger = gameManager.ChangeSpeakerTrigger;
         if (string.IsNullOrEmpty(gameManager.PressedLiarId) == false)
         {
