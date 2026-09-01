@@ -28,6 +28,8 @@ public class FinalResultState : GameTurnState
                 winerId = gameManager.users[i].Id;
             }
         }
+
+        finalResultStateMessage.CurrentOwnerID = new List<string>();
         finalResultStateMessage.CurrentOwnerID.Add(winerId);
         
         for (int i = 0; i < gameManager.currentRoom.members.Count; i++)
