@@ -1,6 +1,6 @@
 ﻿namespace HelloServer;
 
-public class NetworkManager
+public static class NetworkManager
 {
-    
+   // public static 
 }
