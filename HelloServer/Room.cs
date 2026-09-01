@@ -70,7 +70,7 @@ public class Room
     // 접속자 한 명.
     public class Member
     {
-        public User User;
+        public Protocol.User User;
         public WebSocket Socket;
 
         // 원래는 벡터로 Position으로 묶어서 사용하는게 좋습니다.
@@ -87,7 +87,7 @@ public class Room
 
         public bool IsHost = false;
 
-        public PlayerState playerState = new PlayerState();
+        public Protocol.PlayerState playerState = new Protocol.PlayerState();
         // DateTime?
         // : 날짜랑 시간을 표현하고 조작할 때 사용하는 구조체 입니다.
         //  DateTime.Now : 현재 지역 시간을 나타낼 수 있ㅅ브니다
@@ -186,7 +186,7 @@ public class Room
             // C#에서 Json의 직렬화, 역직렬화를 담당하는 클래스 입니다.
             // Unity와 C#에서 사용하는 직렬화 클래스가 다른것에 유의하세여
             // (타입이랑 매개변수로 텍스트만 넘기면 알아서 잘 처리해줍니다)
-            TypeOnly kind = JsonSerializer.Deserialize<TypeOnly>(text);
+            Protocol.TypeOnly kind = JsonSerializer.Deserialize<Protocol.TypeOnly>(text);
             if (kind?.Type != "move")
             {
                 Console.WriteLine($"[Type] 들어온 타입 : {kind?.Type}");
@@ -218,7 +218,7 @@ public class Room
     {
         if(gameManager.currentTurnState != gameManager.voteState) return;
         
-        VoteMessage voteMessage = JsonSerializer.Deserialize<VoteMessage>(text);
+        Protocol.VoteMessage voteMessage = JsonSerializer.Deserialize<Protocol.VoteMessage>(text);
         gameManager.VoteQueue.Enqueue(voteMessage);
        await BroadcastAsync(voteMessage);
     }
@@ -243,7 +243,7 @@ public class Room
         if(gameManager.currentTurnState != gameManager.pointAtSuspectState) return;
         
         gameManager.SkipCount++;
-        NonPointMessage nonPointMessage = new NonPointMessage();
+        Protocol.NonPointMessage nonPointMessage = new Protocol.NonPointMessage();
         nonPointMessage.UserID = member.User.Id;
         await BroadcastAsync(nonPointMessage);
     }
@@ -252,7 +252,7 @@ public class Room
     {
         if(gameManager.currentTurnState != gameManager.pointAtSuspectState) return;
         
-        SelectMessage selectMessage = JsonSerializer.Deserialize<SelectMessage>(text);
+        Protocol.SelectMessage selectMessage = JsonSerializer.Deserialize<Protocol.SelectMessage>(text);
 
         Console.WriteLine($"[실제 지목 메세지] 지목 당한 유저 {selectMessage.selectedID}");
         gameManager.PointInfo[member.User.Id] = selectMessage.IsSelectCancel ? "" : selectMessage.selectedID;
@@ -265,7 +265,7 @@ public class Room
     }
     private async Task HandleReady(Member member, string text)
     {
-       ReadyMessage readyMessage = JsonSerializer.Deserialize<ReadyMessage>(text);
+       Protocol.ReadyMessage readyMessage = JsonSerializer.Deserialize<Protocol.ReadyMessage>(text);
        bool isReady = members[readyMessage.ID].IsReady;
        members[readyMessage.ID].IsReady = isReady;
        Console.WriteLine($"[{code}] {readyMessage.ID} : 준비 버튼을 눌렀다!");
@@ -288,7 +288,7 @@ public class Room
                if (m.IsHost)
                {
 
-                  await SendAsync(m, new AllReadyMessage());
+                  await SendAsync(m, new Protocol.AllReadyMessage());
 
                }
            }
@@ -300,8 +300,8 @@ public class Room
     private async Task HandleGameStart()
     {
         if(gameManager.IsGameRunning) return;
-        GameStartOKMessage gameStartOkMessage = new GameStartOKMessage();
-        NewGameConfig newGameConfig = new NewGameConfig();
+        Protocol.GameStartOKMessage gameStartOkMessage = new Protocol.GameStartOKMessage();
+        Protocol.NewGameConfig newGameConfig = new Protocol.NewGameConfig();
         newGameConfig.MaxCycle = GameConfig.MaxCycle;
         newGameConfig.MaxRound = GameConfig.MaxRound;
         gameStartOkMessage.newGameConfig = newGameConfig;
@@ -316,7 +316,7 @@ public class Room
     {
         if(gameManager.currentTurnState != gameManager.showItemAndSpeakState) return;
         // 먼저 Chat메시지를 읽어 준다
-        SpecialChatMessage chat = JsonSerializer.Deserialize<SpecialChatMessage>(text);
+        Protocol.ChatMessage chat = JsonSerializer.Deserialize<Protocol.ChatMessage>(text);
         // 온 메시지에서 사용자가 말한 부분만 읽어준다.
         // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
         string said = chat.Text?.Trim();
@@ -331,11 +331,11 @@ public class Room
         if(gameManager.currentTurnState != gameManager.liarKeywordGuessState) return;
         
         // 먼저 Chat메시지를 읽어 준다
-        KeywordChatMessage chat = JsonSerializer.Deserialize<KeywordChatMessage>(text);
+        Protocol.ChatMessage chat = JsonSerializer.Deserialize<Protocol.ChatMessage>(text);
         // 온 메시지에서 사용자가 말한 부분만 읽어준다.
         // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
         string said = chat.Text?.Trim();
-        Console.WriteLine($"[Keyword][{code}] {chat.Id} : {said}");
+        Console.WriteLine($"[Keyword][{code}] {chat.ID} : {said}");
         gameManager.LiarGuessKeyWord = said;
         await BroadcastAsync(chat);
     }
@@ -345,7 +345,7 @@ public class Room
         if(gameManager.currentTurnState != gameManager.martMoveState) return;
         
         // 메시지를 읽어준다
-        MoveMessage move = JsonSerializer.Deserialize<MoveMessage>(text);
+        Protocol.MoveMessage move = JsonSerializer.Deserialize<Protocol.MoveMessage>(text);
         // move 메시지의 내용을 member의 X,Y 내용에 카피해준다
         member.X = move.X;
         member.Y = move.Y;
@@ -359,7 +359,7 @@ public class Room
     private async Task HandleChatAsync(Member member, string text)
     {
         // 먼저 Chat메시지를 읽어 준다
-        ChatMessage chat = JsonSerializer.Deserialize<ChatMessage>(text);
+        Protocol.ChatMessage chat = JsonSerializer.Deserialize<Protocol.ChatMessage>(text);
         // 온 메시지에서 사용자가 말한 부분만 읽어준다.
         // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
         string said = chat.Text?.Trim();
@@ -442,11 +442,11 @@ public class Room
         if (members.IsEmpty) return;
         
         // 사람마다 위치 데이터 객체 하나씩 만든다.
-        List<PlayerState> states = new List<PlayerState>();
+        List<Protocol.PlayerState> states = new List<Protocol.PlayerState>();
 
         foreach (Member member in members.Values)
         {
-            states.Add(new PlayerState()
+            states.Add(new Protocol.PlayerState()
             {
                 Id = member.User.Id,
                 X = member.X,
@@ -456,7 +456,7 @@ public class Room
         }
 
         // states를 배열로 바꿔서 뿌린다(Broadcast)
-        await BroadcastAsync(new StateMessage() { States = states.ToArray() });
+        await BroadcastAsync(new Protocol.StateMessage() { States = states.ToArray() });
     }
     
     #endregion
@@ -473,7 +473,7 @@ public class Room
         if (string.IsNullOrEmpty(first)) return null;
         
         // 타입을 꺼내준다
-        TypeOnly kind = JsonSerializer.Deserialize<TypeOnly>(first);
+        Protocol.TypeOnly kind = JsonSerializer.Deserialize<Protocol.TypeOnly>(first);
         // hello인지 확인해준다
         if (kind?.Type != "hello") 
         {
@@ -482,12 +482,12 @@ public class Room
         }
         
         // 아래서 부터는 정상처리
-        HelloMessage hello = JsonSerializer.Deserialize<HelloMessage>(first);
+        Protocol.HelloMessage hello = JsonSerializer.Deserialize<Protocol.HelloMessage>(first);
         // 메시지와 매개변수를 조합해서 Member객체를 생성한다.
         Member member = new Member();
         member.Socket = socket;
         member.LastLogAt = DateTime.Now; // 들어온 시각으로 맞춰 둔다.
-        member.User = new User();
+        member.User = new Protocol.User();
         member.User.Id = id;
         member.User.NickName = hello.NickName.Trim();
         
@@ -503,13 +503,13 @@ public class Room
             // welcome 메시지를 이용해서
             // 현재 방 사람들을 접속한 유저에게 전송하고,
             // join 메시지를 다른 사람들에게 보내준다
-            List<User> already = new List<User>();
+            List<Protocol.User> already = new List<Protocol.User>();
 
             foreach (Member other in members.Values)
                 already.Add(other.User);
 
             // welcome 메시지를 전송
-            WelcomeMessage welcome = new WelcomeMessage();
+            Protocol.WelcomeMessage welcome = new Protocol.WelcomeMessage();
             welcome.RoomCode = code; // 서버 방정보를 보낸다
             welcome.User = member.User; // 서버에서 생성한 유저 정보를 접속자에게 보낸다
             welcome.Users = already.ToArray(); // 현재 방에 있는 유저들 정보를 보낸다
@@ -517,7 +517,7 @@ public class Room
             if (members.IsEmpty) member.IsHost = true; // 가장 처음 접속하면 호스트 취급한다.
             members[member.User.Id] = member;
             // join 메시지를 뿌린다. 접속자인 member 에게는 보내지 않는다
-            await BroadcastAsync(new JoinMessage { User = member.User }, member.User.Id);
+            await BroadcastAsync(new Protocol.JoinMessage { User = member.User }, member.User.Id);
 
         }
         finally
@@ -552,7 +552,7 @@ public class Room
             }
             members.TryRemove(member.User.Id, out _);
             // 퇴장한것을 알려줍니다.
-            await BroadcastAsync(new LeaveMessage { Id = member.User.Id }, member.User.Id);
+            await BroadcastAsync(new Protocol.LeaveMessage { Id = member.User.Id }, member.User.Id);
         }
         finally
         {
@@ -600,7 +600,7 @@ public class Room
     // 받을 때마다 찍지 않고 간격을 두는 이유?
     // : 오는 것을 다 찍으면 콘솔이 위치로만 채워져 정작 중요한 들어옴,나감이 안 보인다.
     //  대신 그동안 몇 번 받았는지 출력해줌.
-    private void LogMove(Member member, MoveMessage move)
+    private void LogMove(Member member, Protocol.MoveMessage move)
     {
         if (logMovesPerSecond <= 0) return;
 

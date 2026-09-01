@@ -1,11 +1,12 @@
 ﻿using System.Timers;
 using Jay.FSM;
+using NetworkManager;
 
 namespace HelloServer.State;
 
 public class LiarKeywordGuessState : GameTurnState
 {
-    private LiarKeywordGuessStateMessage liarKeywordGuessStateMessage = new LiarKeywordGuessStateMessage();
+
     public LiarKeywordGuessState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -13,16 +14,11 @@ public class LiarKeywordGuessState : GameTurnState
     public override void Enter()
     {
         base.Enter();
-        liarKeywordGuessStateMessage.CurrentCycle = gameManager.currentCycle;
-        liarKeywordGuessStateMessage.CurrentRound = gameManager.currentRound;
-        liarKeywordGuessStateMessage.TimerMs = MaxMsTime;
-        BroadcastAsync(liarKeywordGuessStateMessage);
+
+        BroadcastAsync(TurnMessageFactory.LiarKeywordGuess(MaxMsTime, gameManager.currentCycle, gameManager.currentRound));
     }
 
-    public override string GetGameStateString()
-    {
-        return liarKeywordGuessStateMessage.Type;
-    }
+
     protected override void Tick(object sender, ElapsedEventArgs e)
     {
         base.Tick(sender, e);

@@ -1,11 +1,12 @@
 ﻿using System.Timers;
 using Jay.FSM;
+using NetworkManager;
 
 namespace HelloServer.State;
 
 public class VoteEndState : GameTurnState
 {
-    VoteEndStateMessage voteEndStateMessage = new VoteEndStateMessage();
+
 
     private string result = "";
     public VoteEndState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
@@ -15,16 +16,14 @@ public class VoteEndState : GameTurnState
     public override void Enter()
     {
         base.Enter();
-        voteEndStateMessage.CurrentCycle = gameManager.currentCycle;
-        voteEndStateMessage.CurrentRound = gameManager.currentRound;
-        voteEndStateMessage.TimerMs = MaxMsTime;
-        BroadcastAsync(voteEndStateMessage);
+
+        BroadcastAsync(TurnMessageFactory.VoteEnd(MaxMsTime,gameManager.currentCycle,gameManager.currentRound));
         int count = gameManager.VoteQueue.Count;
 
         List<string> resultList = new List<string>();
         for (int i = 0; i < count; i++)
         {
-            gameManager.VoteQueue.TryDequeue(out VoteMessage v);
+            gameManager.VoteQueue.TryDequeue(out Protocol.VoteMessage v);
             if (v == null)
             {
                 Console.WriteLine($"[투표 저장 정보 꺼내기 실패]");
@@ -41,7 +40,7 @@ public class VoteEndState : GameTurnState
         for (int i = gameManager.users.Length - count - 1 - 1; i >= 0; i--)
         {
 
-            resultList.Add(HelloServer.SelectNum.DontKnow.ToString());
+            resultList.Add(Protocol.SelectNum.DontKnow.ToString());
         }
 
         for (int i = 0; i < resultList.Count; i++)
@@ -52,27 +51,24 @@ public class VoteEndState : GameTurnState
         Console.WriteLine($"[최종 투표 result 타입] : {result}");
     }
 
-    public override string GetGameStateString()
-    {
-        return voteEndStateMessage.Type;
-    }
+
     protected override void Tick(object sender, ElapsedEventArgs e)
     {
         base.Tick(sender, e);
         if (currentMsTime > MaxMsTime)
         {
 
-            if (result != SelectNum.Liar.ToString() &&
-                voteEndStateMessage.CurrentCycle >= gameManager.currentRoom.GameConfig.MaxCycle)
+            if (result != Protocol.SelectNum.Liar.ToString() &&
+                gameManager.currentCycle >= gameManager.currentRoom.GameConfig.MaxCycle)
             {
                 stateMachine.ChangeState<PointAtSuspectState>();
             }
-            else if(result != SelectNum.Liar.ToString() &&
-                    voteEndStateMessage.CurrentCycle < gameManager.currentRoom.GameConfig.MaxCycle)
+            else if(result != Protocol.SelectNum.Liar.ToString() &&
+                    gameManager.currentCycle < gameManager.currentRoom.GameConfig.MaxCycle)
             {
                 stateMachine.ChangeState<ShowItemAndSpeakState>();
             }
-            else if(result == SelectNum.Liar.ToString())
+            else if(result == Protocol.SelectNum.Liar.ToString())
             {
                 stateMachine.ChangeState<LiarConfirmedState>();
             }
@@ -102,26 +98,26 @@ public class VoteEndState : GameTurnState
         
         // 만약 라이어와 
         if (orderedList.Count > 1 && orderedList[0].Value == orderedList[1].Value
-                                  && ((orderedList[0].Key == SelectNum.DontKnow.ToString() && orderedList[1].Key == SelectNum.Liar.ToString())
-                                      || orderedList[1].Key == SelectNum.DontKnow.ToString() && orderedList[0].Key == SelectNum.Liar.ToString()))
+                                  && ((orderedList[0].Key == Protocol.SelectNum.DontKnow.ToString() && orderedList[1].Key == Protocol.SelectNum.Liar.ToString())
+                                      || orderedList[1].Key == Protocol.SelectNum.DontKnow.ToString() && orderedList[0].Key == Protocol.SelectNum.Liar.ToString()))
         {
-            result = SelectNum.Liar.ToString();
+            result = Protocol.SelectNum.Liar.ToString();
         }
         else if (orderedList.Count > 1 && orderedList[0].Value == orderedList[1].Value)
         {
             result = "";
         }
-        else if (orderedList[0].Key == SelectNum.NotLiar.ToString())
+        else if (orderedList[0].Key == Protocol.SelectNum.NotLiar.ToString())
         {
-            result = SelectNum.NotLiar.ToString();
+            result = Protocol.SelectNum.NotLiar.ToString();
         }
-        else if (orderedList[0].Key == SelectNum.DontKnow.ToString())
+        else if (orderedList[0].Key == Protocol.SelectNum.DontKnow.ToString())
         {
-            result = SelectNum.DontKnow.ToString();
+            result = Protocol.SelectNum.DontKnow.ToString();
         }
-        else if (orderedList[0].Key == SelectNum.Liar.ToString())
+        else if (orderedList[0].Key == Protocol.SelectNum.Liar.ToString())
         {
-            result = SelectNum.Liar.ToString();
+            result = Protocol.SelectNum.Liar.ToString();
         }
         // 동률인 경우 빈 값 반환
         return result;

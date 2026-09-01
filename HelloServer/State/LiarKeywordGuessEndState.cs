@@ -1,11 +1,12 @@
 ﻿using System.Timers;
 using Jay.FSM;
+using NetworkManager;
 
 namespace HelloServer.State;
 
 public class LiarKeywordGuessEndState : GameTurnState
 {
-    LiarKeywordGuessEndStateMessage liarKeywordGuessEndStateMessage = new LiarKeywordGuessEndStateMessage();
+
     public LiarKeywordGuessEndState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -13,23 +14,16 @@ public class LiarKeywordGuessEndState : GameTurnState
     public override void Enter()
     {
         base.Enter();
-        liarKeywordGuessEndStateMessage.CurrentRound = gameManager.currentRound;
-        liarKeywordGuessEndStateMessage.CurrentCycle = gameManager.currentCycle;
-        liarKeywordGuessEndStateMessage.TimerMs = MaxMsTime;
-        liarKeywordGuessEndStateMessage.IsRightAnswer = gameManager.CurrentKeyWord.KeywordName  == gameManager.LiarGuessKeyWord;
-        liarKeywordGuessEndStateMessage.liarKeyword = gameManager.CurrentLiarKeyword.KeywordName;
-        liarKeywordGuessEndStateMessage.nomalKeyword = gameManager.CurrentKeyWord.KeywordName;
-        
-        liarKeywordGuessEndStateMessage.userScoreInfo = CalculateScoreAndApply();
-        
-        BroadcastAsync(liarKeywordGuessEndStateMessage);
+
+        var msg = TurnMessageFactory.LiarKeywordGuessEnd(MaxMsTime, gameManager.currentCycle, gameManager.currentRound
+            , gameManager.CurrentLiarKeyword.KeywordName, gameManager.CurrentKeyWord.KeywordName,
+            gameManager.CurrentKeyWord.KeywordName == gameManager.LiarGuessKeyWord,
+            CalculateScoreAndApply());
+        BroadcastAsync(msg);
         
     }
 
-    public override string GetGameStateString()
-    {
-        return liarKeywordGuessEndStateMessage.Type;
-    }
+
     protected override void Tick(object sender, ElapsedEventArgs e)
     {
         base.Tick(sender, e);
@@ -42,15 +36,15 @@ public class LiarKeywordGuessEndState : GameTurnState
     }
 
     // 시민이 라이어를 맞춘 여부와, 라이어가 키워드를 맞춘 여부에 따라 점수 분배
-    private UserScoreInfo[] CalculateScoreAndApply()
+    private Protocol.UserScoreInfo[] CalculateScoreAndApply()
     {
         int voteScoreChangeAmount = gameManager.currentRoom.GameConfig.VoteScoreChangeAmount;
         int keywordGuessScoreChangeAmount = gameManager.currentRoom.GameConfig.KeywordGuessScoreChangeAmount;
-        UserScoreInfo[] resultInfo = new UserScoreInfo[gameManager.users.Length];
+        Protocol.UserScoreInfo[] resultInfo = new Protocol.UserScoreInfo[gameManager.users.Length];
         int counter = 0;
         foreach (var VARIABLE in gameManager.currentRoom.members.Values)
         {
-            UserScoreInfo scoreInfo = new UserScoreInfo();
+            Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
             if (VARIABLE.playerState.IsLiar)
             {
                 VARIABLE.score +=

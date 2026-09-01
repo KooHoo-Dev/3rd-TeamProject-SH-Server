@@ -1,140 +1,9 @@
-﻿
-using System.Text.Json;
-using HelloServer;
-public class NewProtocol
+﻿/*﻿﻿using System;
+using System.Collections.Generic;
+
+namespace HelloServer
 {
-    public enum TurnMessageType
-    {
-        // ===== 게임 시작 처리 =====
-        GameStartState,                  // 게임 시작 상태
-        GameStartOK,                     // 게임 시작 확인
-        GenreAssignAndLiarSelectState,   // 장르 배분 및 라이어 선정 상태
-        KeywordDistributeState,          // 키워드 뿌리기 상태
- 
-        // ===== 마트 처리 =====
-        MartEnterState,                  // 마트 진입 상태
-        MartMoveState,                   // 마트 이동 상태
-        MartReturnState,                 // 마트에서 복귀 상태
- 
-        // ===== 턴 처리: 발언 =====
-        ShowItemAndSpeakState,           // 물건 보여주고 발언 상태
-        SpeechEndState,                  // 발언 종료 상태
- 
-        // ===== 턴 처리: 지목 =====
-        PointAtSuspectState,             // 지목 상태
-        PointAtSuspectEndState,          // 지목 종료 상태
- 
-        // ===== 턴 처리: 변론 =====
-        DebateTimeState,                 // 변론 시간 상태
-        DebateEndState,                  // 변론 종료 상태
- 
-        // ===== 턴 처리: 투표 =====
-        VoteState,                       // 투표 상태
-        VoteEndState,                    // 투표 종료 상태
- 
-        // ===== 라이어 확정 및 키워드 맞추기 =====
-        LiarConfirmedState,              // 라이어 확정 상태
-        LiarKeywordGuessState,           // 라이어의 키워드 맞춤 상태
-        LiarKeywordGuessEndState,        // 키워드 맞춤 종료 상태
- 
-        // ===== 점수 집계 / 라운드 종료 =====
-        ScoreTallyState,                 // 점수 집계 상태
-        ScoreTallyEndState,              // 점수 집계 종료 상태
-        FinalResultState,                // 최종 결과 상태
-        FinalResultEndState,             // 최종 결과 종료 상태
-    }
-    [Serializable]
-    public class TurnMessage
-    {
-        public TurnMessageType Type { get; set; }
-        public float TimerMs { get; set; }      // 모든 타임은 MS로 들어옴
-        public int CurrentCycle { get; set; }
-        public int CurrentRound { get; set; }
- 
-        // 타입별로 달라지는 나머지 필드 (없을 수도, JSON 객체 하나일 수도 있음)
-        public string Parameter { get; set; }
- 
-        /// <summary>Parameter를 원하는 Payload 타입으로 역직렬화. 없으면 null.</summary>
-        public T GetPayload<T>() where T : class
-        {
-            if (string.IsNullOrEmpty(Parameter)) return null;
-            return JsonSerializer.Deserialize<T>(Parameter);
-        }
-    }
- 
-    // ============================================================
-    // 타입별 Payload 클래스들
-    // (파라미터가 없는 타입은 별도 Payload 없이 Parameter == null로 처리)
-    // ============================================================
- 
-    [Serializable]
-    public class GameStartOKPayload
-    {
-        public NewGameConfig newGameConfig { get; set; }
-    }
- 
-    [Serializable]
-    public class GenreAssignAndLiarSelectPayload
-    {
-        public int GenreId { get; set; }              // 장르
-        public string CurrentOwnerID { get; set; }    // 선정된 라이어
-    }
- 
-    [Serializable]
-    public class KeywordDistributePayload
-    {
-        public int KeywordId { get; set; }            // 라이어는 라이어 키워드, 나머지는 일반
-    }
- 
-    [Serializable]
-    public class MartEnterPayload
-    {
-        public string QuestId { get; set; }
-    }
- 
-    [Serializable]
-    public class MartReturnPayload
-    {
-        public UserScoreInfo[] userScoreInfo { get; set; }
-    }
- 
-    [Serializable]
-    public class ShowItemAndSpeakPayload
-    {
-        public string CurrentOwnerID { get; set; }    // 현재 발언 차례인 유저
-        public string CurrentCategory { get; set; }   // 현재 사이클의 아이템 카테고리
-    }
- 
-    /// <summary>
-    /// "누구 한 명"만 필요한 상태들(지목 종료, 라이어 확정)이 공용으로 쓰는 Payload.
-    /// </summary>
-    [Serializable]
-    public class OwnerIdPayload
-    {
-        public string CurrentOwnerID { get; set; }
-    }
- 
-    [Serializable]
-    public class LiarKeywordGuessEndPayload
-    {
-        public string liarKeyword { get; set; }
-        public string nomalKeyword { get; set; }
-        public bool IsRightAnswer { get; set; }
-        public UserScoreInfo[] userScoreInfo { get; set; }
-    }
- 
-    [Serializable]
-    public class ScoreTallyPayload
-    {
-        public string[] LiarOutButtonInfo { get; set; }   // 라이어가 아닌데 버튼 누른 유저들
-        public UserScoreInfo[] userScoreInfo { get; set; }
-    }
- 
-    [Serializable]
-    public class FinalResultPayload
-    {
-        public string[] CurrentOwnerIDs { get; set; }     // 최종 승자 ID (동률 시 여러 명)
-    }    
+    
     #region 공용 데이터 처리
 
     [Serializable]
@@ -210,7 +79,8 @@ public class NewProtocol
     #endregion
     
     #endregion
-
+    
+    #region 서버 -> 클라이언트
     
     [Serializable]
     public class TypeOnly
@@ -316,6 +186,16 @@ public class NewProtocol
     #endregion
 
     #region 게임 시작 처리
+    
+    [Serializable]
+    public class GameStartStateMessage
+    {
+        public string Type { get; set; } = "게임 시작 상태";
+        public float TimerMs { get; set; } // 모든 타임은 MS로 들어옴
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+    }
+    
     [Serializable]
     public class GameStartOKMessage
     {
@@ -323,7 +203,235 @@ public class NewProtocol
         public NewGameConfig newGameConfig{get;set;}
     }
 
-   
+    [Serializable]
+    public class GenreAssignAndLiarSelectStateMessage
+    {
+        public string Type { get; set; } = "장르 배분 및 라이어 선정 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+        public int GenreId { get; set; } // 장르
+        public string CurrentOwnerID { get; set; } // 선정된 라이어
+    }
+
+    [Serializable]
+    public class KeywordDistributeStateMessage
+    {
+        public string Type { get; set; } = "키워드 뿌리기 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+
+        public int KeywordId { get; set; } // 라이어는 라이어 키워드, 나머지는 일반
+    }
+
+    #endregion
+
+    #region 마트 처리
+
+    [Serializable]
+    public class MartEnterStateMessage
+    {
+        public string Type { get; set; } = "마트 진입 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+        // 퀘스트는 개인적으로만 이루어지고 결과가 state에 적용되기만 하면 되므로 따로 결과를 받거나 보내지 않음
+        // 만약 결과가 남들에게 보여줘야한다면 퀘스트 클리어 메세지에 ID담아서 클라에서 서버로 -> 다른 유저에게 뿌릴 에정
+        public string QuestId{get;set;}
+    }
+
+    [Serializable]
+    public class MartMoveStateMessage // 마트에 존재하는 상태
+    {
+        public string Type { get; set; } = "마트 이동 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+    }
+    
+    [Serializable]
+    public class MartReturnStateMessage
+    {
+        public string Type { get; set; } = "마트에서 복귀 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+        public UserScoreInfo[] userScoreInfo {get;set;}
+    }
+
+    #endregion
+
+    #region 턴 처리
+
+    // ===================== 발언 단계 =====================
+    [Serializable]
+    public class ShowItemAndSpeakStateMessage
+    {
+        public string Type { get; set; } = "물건 보여주고 발언 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+        public string CurrentOwnerID { get; set; } // 현재 발언 차례인 유저
+
+        public string CurrentCategory { get; set; } // 현재 사이클의 아이템 카테고리
+    }
+    
+    [Serializable]
+    public class SpeechEndStateMessage
+    {
+        public string Type { get; set; } = "발언 종료 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+    }
+
+    // ===================== 지목 단계 =====================
+    [Serializable]
+    public class PointAtSuspectStateMessage
+    {
+        public string Type { get; set; } = "지목 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+    }
+
+    [Serializable]
+    public class PointAtSuspectEndStateMessage
+    {
+        public string Type { get; set; } = "지목 종료 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+        public string CurrentOwnerID { get; set; } // 최다 득표(지목)된 유저(동율이거나 없으면 빈 값)
+    }
+    
+    // ===================== 변론 단계 =====================
+    [Serializable]
+    public class DebateTimeStateMessage
+    {
+        public string Type { get; set; } = "변론 시간 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+    }
+
+    [Serializable]
+    public class DebateEndStateMessage
+    {
+        public string Type { get; set; } = "변론 종료 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+    }
+    
+    // ===================== 투표 단계 =====================
+    [Serializable]
+    public class VoteStateMessage
+    {
+        public string Type { get; set; } = "투표 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+    }
+
+    [Serializable]
+    public class VoteEndStateMessage
+    {
+        public string Type { get; set; } = "투표 종료 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+
+
+    }
+    
+    // ===================== 라이어 확정 및 키워드 맞추기 단계 =====================
+    [Serializable]
+    public class LiarConfirmedStateMessage
+    {
+        public string Type { get; set; } = "라이어 확정 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+        public string CurrentOwnerID { get; set; } // 확정된 라이어 ID
+    }
+
+    [Serializable]
+    public class LiarKeywordGuessStateMessage
+    {
+        public string Type { get; set; } = "라이어의 키워드 맞춤 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+    }
+
+    [Serializable]
+    public class LiarKeywordGuessEndStateMessage
+    {
+        public string Type { get; set; } = "키워드 맞춤 종료 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+        public string liarKeyword { get; set; }
+        public string nomalKeyword { get; set; }
+        public bool IsRightAnswer{ get; set; }
+        
+        public UserScoreInfo[]  userScoreInfo{get;set;}
+    }
+
+    #endregion
+
+    #region 점수 집계/ 라운드 종료 처리
+
+    // ===================== 점수 집계 단계 =====================
+    [Serializable]
+    public class ScoreTallyStateMessage
+    {
+        public string Type { get; set; } = "점수 집계 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+        // 라이어가 아닌데 버튼 누른 유저들
+        public string[]  LiarOutButtonInfo { get; set; }
+        
+        public UserScoreInfo[]  userScoreInfo{get;set;}
+
+    }
+    
+
+    
+    [Serializable]
+    public class ScoreTallyEndStateMessage
+    {
+        public string Type { get; set; } = "점수 집계 종료 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+    }
+
+    // ===================== 최종 결과 단계 =====================
+    [Serializable]
+    public class FinalResultStateMessage
+    {
+        public string Type { get; set; } = "최종 결과 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+        public List<string> CurrentOwnerID { get; set; } // 최종 승자 ID (필요 시) 동률 시 같이 담아서 보냄
+    }
+
+    [Serializable]
+    public class FinalResultEndStateMessage
+    {
+        public string Type { get; set; } = "최종 결과 종료 상태";
+        public float TimerMs { get; set; }
+        public int CurrentCycle { get; set; }
+        public int CurrentRound { get; set; }
+    }
+
+    #endregion
+
     // (특수)라밍아웃 처리
     [Serializable]
     public class LiarSelfDisclose
@@ -491,5 +599,4 @@ public class NewProtocol
     }
 
     #endregion
-
-}
+}*/

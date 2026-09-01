@@ -48,12 +48,11 @@ public class GameManager
     // 라이어가 라이어 버튼을 눌렀을 경우 추가되는 필드
     private string liarButtonPressedUserId;
     
-    public User[] users;
-    public User focausUser;
+    public Protocol.User[] users;
+    public Protocol.User focausUser;
 
 
 
-    // 지목 유저의 변경은 오로지 지목 턴에만 변경 가능하도록
     private string mostFrequent;
     public string MostFrequent
     {
@@ -84,13 +83,31 @@ public class GameManager
         = new SemaphoreSlim(1, 1);
 
     #region 비동기 함수에서 보내는 정보들
-    public readonly ConcurrentQueue<VoteMessage> VoteQueue = new ConcurrentQueue<VoteMessage>();
+    public readonly ConcurrentQueue<Protocol.VoteMessage> VoteQueue = new ConcurrentQueue<Protocol.VoteMessage>();
     
     // 라이어 버튼을 누른 '일반 유저ID'가 담기는 버튼
     public readonly ConcurrentQueue<string> LiarOutButtonQueue = new ConcurrentQueue<string>();
-    
 
 
+    private string liarId;
+
+    public string LiarId
+    {
+        get
+        {
+            lock (gameLock)
+            {
+                return liarId;
+            }
+        }
+        set
+        {
+            lock (gameLock)
+            {
+                liarId = value;
+            }
+        }
+    }
 
     private string liarGuessKeyWord;
 
@@ -174,7 +191,8 @@ public class GameManager
 
     // Key :한 유저, Value : 지목을 받은 유저 (만약 없다면 빈 스트링)(모든 유저가 key값으로 있음)
     public readonly ConcurrentDictionary<string, string> PointInfo = new ConcurrentDictionary<string, string>();
-    
+    // Key :한 유저, Value : 목표 아이템ID (만약 없다면 빈 스트링)(모든 유저가 key값으로 있음)
+    public readonly ConcurrentDictionary<string, string> QuestInfo = new ConcurrentDictionary<string, string>();
     #endregion
 
     public  GameManager(GameConfig gameConfig, Room currentRoom)
@@ -251,7 +269,7 @@ public class GameManager
         IsGameRunning = true;
         Console.WriteLine($"테스트1번 위치");
         List<Room.Member> memberList = currentRoom.members.Values.ToList(); 
-        users = new User[memberList.Count];
+        users = new Protocol.User[memberList.Count];
         for (int i = 0; i < memberList.Count; i++)
         {
             users[i] = memberList[i].User;
@@ -281,7 +299,7 @@ public class GameManager
         currentRound = 0;
         currentCategory = AllCategories[0];
         maxSpeakedCount = users.Length;
-        User focausUser = new User();
+        Protocol.User focausUser = new Protocol.User();
 
         OldKeyWords = new List<KeyWordDef>();
     }

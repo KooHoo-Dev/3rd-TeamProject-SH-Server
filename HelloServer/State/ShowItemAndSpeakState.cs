@@ -1,11 +1,12 @@
 ﻿using System.Timers;
 using Jay.FSM;
+using NetworkManager;
 
 namespace HelloServer.State;
 
 public class ShowItemAndSpeakState : GameTurnState
 {
-    ShowItemAndSpeakStateMessage showItemAndSpeakStateMessage = new ShowItemAndSpeakStateMessage();
+
 
     private int fristIndex = 0;
     public ShowItemAndSpeakState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
@@ -17,12 +18,6 @@ public class ShowItemAndSpeakState : GameTurnState
         base.Enter();
         if(gameManager.currentSpeakedCount == 0)
             gameManager.currentCycle++;
-
-        
-        showItemAndSpeakStateMessage.CurrentCycle = gameManager.currentCycle;
-        showItemAndSpeakStateMessage.CurrentRound = gameManager.currentRound;
-        showItemAndSpeakStateMessage.TimerMs = MaxMsTime;
-        
         
         if (gameManager.currentSpeakedCount == 0)
         {
@@ -36,9 +31,7 @@ public class ShowItemAndSpeakState : GameTurnState
 
             gameManager.focausUser = gameManager.users[ (gameManager.currentSpeakedCount + fristIndex) % (gameManager.users.Length)];
         }
-        showItemAndSpeakStateMessage.CurrentOwnerID = gameManager.focausUser.Id;
-        showItemAndSpeakStateMessage.CurrentCategory = gameManager.currentCategory.ToString();
-        Console.WriteLine($"[발언 상태] {showItemAndSpeakStateMessage.ToString()}");
+
         if (gameManager.currentSpeakedCount >= gameManager.maxSpeakedCount)
         {
             gameManager.currentSpeakedCount = 0;
@@ -46,14 +39,11 @@ public class ShowItemAndSpeakState : GameTurnState
         }
         else
         {
-            BroadcastAsync(showItemAndSpeakStateMessage);
+            BroadcastAsync(TurnMessageFactory.ShowItemAndSpeak(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.focausUser.Id,gameManager.currentCategory.ToString()));
         }
     }
 
-    public override string GetGameStateString()
-    {
-        return showItemAndSpeakStateMessage.Type;
-    }
+
     protected override void Tick(object sender, ElapsedEventArgs e)
     {
         base.Tick(sender, e);

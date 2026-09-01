@@ -1,11 +1,12 @@
 ﻿using System.Timers;
 using Jay.FSM;
+using NetworkManager;
 
 namespace HelloServer.State;
 
 public class ScoreTallyEndState : GameTurnState
 {
-    private ScoreTallyEndStateMessage scoreTallyEndStateMessage = new ScoreTallyEndStateMessage();
+
     public ScoreTallyEndState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -16,16 +17,11 @@ public class ScoreTallyEndState : GameTurnState
         gameManager.LiarGuessKeyWord = "";
         gameManager.PressedLiarId = "";
         gameManager.LiarOutButtonQueue.Clear();
-        scoreTallyEndStateMessage.CurrentCycle = gameManager.currentCycle;
-        scoreTallyEndStateMessage.CurrentRound = gameManager.currentRound;
-        scoreTallyEndStateMessage.TimerMs = MaxMsTime;
-        BroadcastAsync(scoreTallyEndStateMessage);
+
+        BroadcastAsync(TurnMessageFactory.ScoreTallyEnd(MaxMsTime,gameManager.currentCycle,gameManager.currentRound));
     }
 
-    public override string GetGameStateString()
-    {
-        return scoreTallyEndStateMessage.Type;
-    }
+
     protected override void Tick(object sender, ElapsedEventArgs e)
     {
         base.Tick(sender, e);

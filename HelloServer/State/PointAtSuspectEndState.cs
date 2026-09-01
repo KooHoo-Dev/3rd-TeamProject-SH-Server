@@ -1,35 +1,28 @@
 ﻿using System.Collections.Concurrent;
 using System.Timers;
 using Jay.FSM;
+using NetworkManager;
 
 namespace HelloServer.State;
 
 public class PointAtSuspectEndState : GameTurnState
 {
-    private PointAtSuspectEndStateMessage pointAtSuspectEndStateMessage = new PointAtSuspectEndStateMessage();
-
     
     public PointAtSuspectEndState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
-    public override string GetGameStateString()
-    {
-        return pointAtSuspectEndStateMessage.Type;
-    }
+
 
     public override void Enter()
     {
         base.Enter();
-        pointAtSuspectEndStateMessage.CurrentCycle = gameManager.currentCycle;
-        pointAtSuspectEndStateMessage.CurrentRound = gameManager.currentRound;
-        pointAtSuspectEndStateMessage.TimerMs = MaxMsTime;
+
         ConcurrentDictionary<string, string> pointInfo = gameManager.PointInfo;
         List<string> list = pointInfo.Values.ToList();
         // 가장 많이 등장한 문자열 찾기(중복 혹은 없으면 "" 반환)
         gameManager.MostFrequent = GetWinner();  
         Console.WriteLine($"[{gameManager.currentRoom.code}][최종 당선자] : {gameManager.MostFrequent}");
-        pointAtSuspectEndStateMessage.CurrentOwnerID = gameManager.MostFrequent;
-        BroadcastAsync(pointAtSuspectEndStateMessage);
+        BroadcastAsync(TurnMessageFactory.PointAtSuspectEnd(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.MostFrequent));
 
     }
 

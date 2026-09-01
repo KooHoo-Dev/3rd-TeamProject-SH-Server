@@ -1,11 +1,12 @@
 ﻿using System.Timers;
 using Jay.FSM;
+using NetworkManager;
 
 namespace HelloServer.State;
 
 public class ScoreTallyState : GameTurnState
 {
-    ScoreTallyStateMessage scoreTallyStateMessage = new ScoreTallyStateMessage();  
+
     public ScoreTallyState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -13,19 +14,11 @@ public class ScoreTallyState : GameTurnState
     public override void Enter()
     {
         base.Enter();
-        scoreTallyStateMessage.CurrentCycle = gameManager.currentCycle;
-        scoreTallyStateMessage.CurrentRound = gameManager.currentRound;
-        scoreTallyStateMessage.TimerMs = MaxMsTime;
-        scoreTallyStateMessage.LiarOutButtonInfo = gameManager.LiarOutButtonQueue.ToArray();
-        
-        scoreTallyStateMessage.userScoreInfo = CalculateScoreAndApply();
-        BroadcastAsync(scoreTallyStateMessage);
+
+        BroadcastAsync(TurnMessageFactory.ScoreTally(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.LiarOutButtonQueue.ToArray(),CalculateScoreAndApply()));
     }
 
-    public override string GetGameStateString()
-    {
-        return  scoreTallyStateMessage.Type;
-    }
+
     protected override void Tick(object sender, ElapsedEventArgs e)
     {
         base.Tick(sender, e);
@@ -35,18 +28,18 @@ public class ScoreTallyState : GameTurnState
         }
     }
     // 라이어 자진공개 버튼을 누른 여부에 따라 점수 분배
-    private UserScoreInfo[] CalculateScoreAndApply()
+    private Protocol.UserScoreInfo[] CalculateScoreAndApply()
     {
         int liarButtonScoreChangeAmount = gameManager.currentRoom.GameConfig.LiarButtonScoreChangeAmount;
 
-        UserScoreInfo[] resultInfo = new UserScoreInfo[gameManager.users.Length];
+        Protocol.UserScoreInfo[] resultInfo = new Protocol.UserScoreInfo[gameManager.users.Length];
         string[] pressedNormalUsers = gameManager.LiarOutButtonQueue.ToArray();
         int counter = 0;
         foreach (var VARIABLE in gameManager.currentRoom.members.Values)
         {
             Console.WriteLine($"[라밍아웃 점수 계산 이전] 유저 아이디 : {VARIABLE.User.Id}, 유저 점수 {VARIABLE.score}");
             
-            UserScoreInfo scoreInfo = new UserScoreInfo();
+            Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
             if (VARIABLE.playerState.IsLiar)
             {
                 if (string.IsNullOrEmpty(gameManager.PressedLiarId) == false

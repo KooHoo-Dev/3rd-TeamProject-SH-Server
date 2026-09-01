@@ -1,11 +1,12 @@
 ﻿using System.Timers;
 using Jay.FSM;
+using NetworkManager;
 
 namespace HelloServer.State;
 
 public class LiarOutButtonPressedState : GameTurnState
 {
-    LiarOutButtonPressedStateMessage liarOutButtonPressedStateMessage = new LiarOutButtonPressedStateMessage();
+
 
     public LiarOutButtonPressedState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
@@ -14,18 +15,14 @@ public class LiarOutButtonPressedState : GameTurnState
     public override void Enter()
     {
         base.Enter();
-
-        liarOutButtonPressedStateMessage.ID = gameManager.PressedLiarId;
+        
         
         Console.WriteLine($"[라밍아웃 초기화] 변수 내용 :{gameManager.PressedLiarId}");
-        liarOutButtonPressedStateMessage.TimerMs = MaxMsTime;
-        BroadcastAsync(liarOutButtonPressedStateMessage);
+
+        BroadcastAsync(TurnMessageFactory.LiarOutButtonPressed(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.PressedLiarId));
     }
 
-    public override string GetGameStateString()
-    {
-        return liarOutButtonPressedStateMessage.Type;
-    }
+
     protected override void Tick(object sender, ElapsedEventArgs e)
     {
         base.Tick(sender, e);

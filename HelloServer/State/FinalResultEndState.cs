@@ -1,11 +1,12 @@
 ﻿using System.Timers;
 using Jay.FSM;
+using NetworkManager;
 
 namespace HelloServer.State;
 
 public class FinalResultEndState : GameTurnState
 {
-    FinalResultEndStateMessage finalResultEndStateMessage = new FinalResultEndStateMessage();
+ 
     public FinalResultEndState(StateMachine<IState> stateMachine, GameManager gameManager, float maxTime) : base(stateMachine, gameManager, maxTime)
     {
         
@@ -14,16 +15,11 @@ public class FinalResultEndState : GameTurnState
     public override void Enter()
     {
         base.Enter();
-        finalResultEndStateMessage.CurrentCycle = gameManager.currentCycle;
-        finalResultEndStateMessage.CurrentRound = gameManager.currentRound;
-        finalResultEndStateMessage.TimerMs = MaxMsTime;
-        BroadcastAsync(finalResultEndStateMessage);
+
+        BroadcastAsync(TurnMessageFactory.FinalResultEnd(MaxMsTime,gameManager.currentCycle,gameManager.currentRound));
     }
 
-    public override string GetGameStateString()
-    {
-        return finalResultEndStateMessage.Type;
-    }
+ 
     protected override void Tick(object sender, ElapsedEventArgs e)
     {
         base.Tick(sender, e);

@@ -38,9 +38,9 @@ public abstract class GameTurnState : IState
         Console.WriteLine($"[스테이트 머신] 현재 Enter 상태: {stateMachine.CurrentState}, 제한시간(ms): {MaxMsTime}");
      
     }
-    public virtual string GetGameStateString()
+    public string GetGameStateString()
     {
-        return "null";
+        return $"{stateMachine.CurrentState?.ToString() ?? "null"}";
     }
 
     public virtual void Exit()

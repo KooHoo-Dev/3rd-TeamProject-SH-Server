@@ -1,11 +1,12 @@
 ﻿using System.Timers;
 using Jay.FSM;
+using NetworkManager;
 
 namespace HelloServer.State;
 
 public class DebateEndState: GameTurnState
 {
-    private DebateEndStateMessage debateEndStateMessage = new DebateEndStateMessage();
+
     public DebateEndState(StateMachine<IState> stateMachine, GameManager gameManager, float maxTime) : base(stateMachine, gameManager, maxTime)
     {
     }
@@ -13,16 +14,11 @@ public class DebateEndState: GameTurnState
     public override void Enter()
     {
         base.Enter();
-        debateEndStateMessage.CurrentRound = gameManager.currentRound;
-        debateEndStateMessage.TimerMs = MaxMsTime;
-        debateEndStateMessage.CurrentCycle =  gameManager.currentCycle;
-        BroadcastAsync(debateEndStateMessage);
+
+        BroadcastAsync(TurnMessageFactory.DebateEnd(MaxMsTime,gameManager.currentCycle,gameManager.currentRound));
     }
 
-    public override string GetGameStateString()
-    {
-        return debateEndStateMessage.Type;
-    }
+
     protected override void Tick(object sender, ElapsedEventArgs e)
     {
         base.Tick(sender, e);

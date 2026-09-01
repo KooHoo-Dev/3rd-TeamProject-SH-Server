@@ -1,14 +1,15 @@
 ﻿using System.Timers;
 using Jay.FSM;
+using NetworkManager;
 
 namespace HelloServer.State;
 
 public class KeywordDistributeState : GameTurnState
 {
-    private KeywordDistributeStateMessage keywordDistributeStateMessage;   
+
     public KeywordDistributeState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
-        keywordDistributeStateMessage = new KeywordDistributeStateMessage();
+
     }
 
     public override void Enter()
@@ -44,11 +45,8 @@ public class KeywordDistributeState : GameTurnState
             
         }
 
-        keywordDistributeStateMessage.CurrentCycle = gameManager.currentCycle;
-        keywordDistributeStateMessage.CurrentRound = gameManager.currentRound;
-        keywordDistributeStateMessage.TimerMs = MaxMsTime;
+        Protocol.TurnMessage msg = TurnMessageFactory.KeywordDistribute(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.CurrentKeyWord.KeywordId);
 
-        keywordDistributeStateMessage.KeywordId = gameManager.CurrentKeyWord.KeywordId;
 
         for (int i = 0; i < gameManager.users.Length; i++)
         {
@@ -57,29 +55,20 @@ public class KeywordDistributeState : GameTurnState
             {
                 Console.WriteLine($"[라이어 키워드 선정 로직] 선정된 키워드 : 1, 리스트 갯수 {NewList.Count}");
                 
-                KeywordDistributeStateMessage LiarMessage = new  KeywordDistributeStateMessage();
+
                 gameManager.CurrentLiarKeyword = NewList[rnd.Next(NewList.Count)];
                 
                 gameManager.OldKeyWords.Add(gameManager.CurrentLiarKeyword);
-                LiarMessage.CurrentCycle = gameManager.currentCycle;
-                LiarMessage.CurrentRound = gameManager.currentRound;
-                LiarMessage.TimerMs = MaxMsTime;
 
-                LiarMessage.KeywordId = gameManager.CurrentLiarKeyword.KeywordId;
-                Console.WriteLine($"[라이어 키워드 선정 로직] 선정된 키워드 : 2 : { gameManager.CurrentLiarKeyword.KeywordName}, 리스트 갯수 {NewList.Count}");
-                SendAsync(gameManager.currentRoom.members[gameManager.users[i].Id], LiarMessage);
+                Protocol.TurnMessage liarMsg = TurnMessageFactory.KeywordDistribute(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.CurrentKeyWord.KeywordId);
+                SendAsync(gameManager.currentRoom.members[gameManager.users[i].Id], liarMsg);
             }
             else
             {
-                SendAsync(gameManager.currentRoom.members[gameManager.users[i].Id], keywordDistributeStateMessage);
+                SendAsync(gameManager.currentRoom.members[gameManager.users[i].Id], msg);
             }
         }
         
-    }
-
-    public override string GetGameStateString()
-    {
-        return keywordDistributeStateMessage.Type;
     }
     protected override void Tick(object sender, ElapsedEventArgs e)
     {
