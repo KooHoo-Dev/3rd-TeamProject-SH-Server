@@ -16,21 +16,17 @@ public class MartEnterState : GameTurnState
         base.Enter();
         Random random = new Random();
         int randomIndex = random.Next(gameManager.AllCategories.Length);
-        Console.WriteLine($"[마트 엔터 디버그] 1번");
         
         Dictionary<CategoryType, List<string>> AllItemIds = new Dictionary<CategoryType, List<string>>();
-        Console.WriteLine($"[마트 엔터 디버그] 2번");
   
         for (int i = 0; i < gameManager.AllCategories.Length; i++)
         {
-        Console.WriteLine($"[마트 엔터 디버그] 3번");
             
             List<ItemDef> ItemIist = DataManager.Instance.GetItemDefsByCategory(gameManager.AllCategories[randomIndex]);
             int MaxItemCount = Math.Min(ItemIist.Count, gameManager.currentRoom.GameConfig.MaxCategoryItemCount);
             List<string> ResultItemList = new List<string>();
             for (int j = 0; j < MaxItemCount; j++)
             {
-            Console.WriteLine($"[마트 엔터 디버그] 4번");
                 
                 int index = random.Next(ItemIist.Count);
                 ResultItemList.Add(ItemIist[index].ItemId.ToString());
@@ -44,7 +40,6 @@ public class MartEnterState : GameTurnState
         int counter = 0;
         foreach (var VARIABLE in AllItemIds)
         {
-            Console.WriteLine($"[마트 엔터 디버그] 5번");
             
             sendArrays[counter] = new Protocol.CategoryItemArray();
             sendArrays[counter].Category = VARIABLE.Key;
@@ -57,6 +52,8 @@ public class MartEnterState : GameTurnState
         
        foreach (var VARIABLE in gameManager.UserGameInfos.Values)
        {
+           
+           VARIABLE.ItemIds = new string[gameManager.AllCategories.Length];
             randomIndex = random.Next(gameManager.AllCategories.Length);
             List<string> list = AllItemIds[gameManager.AllCategories[randomIndex]];
 

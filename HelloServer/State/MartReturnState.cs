@@ -38,9 +38,11 @@ public class MartReturnState : GameTurnState
     private bool IsSuccessQuest(string UserId)
     {
             bool Sueccess = false;
+            Console.WriteLine($"[퀘스트 판별 함수] 퀘스트Info의 개수 :  {gameManager.QuestInfo?.Count}, 유저 Id :{UserId}");
 
             for (int i = 0; i < gameManager.currentRoom.GameConfig.MaxCycle; i++)
             {
+                
                 if (gameManager.UserGameInfos[UserId].ItemIds[i] == gameManager.QuestInfo[UserId])
                 {
                     Sueccess = true;
