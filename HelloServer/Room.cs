@@ -199,6 +199,8 @@ public class Room
             else if(kind?.Type == "Select") await HandleSelectUser( member, text);
             else if(kind?.Type == "LiarSelfDisclose") HandleLiarButtonPressed(member, text);
             else if (kind?.Type == "Vote") await HandleVote(member, text);
+            else if(kind?.Type == "userInteraction") await HandleInteraction(member, text);
+            else if(kind?.Type == "PushAnimation") await HandlePushAnimation(member, text);
             
             // 모르는 정보는 그냥 흘려버립니다.
             // Tip
@@ -209,14 +211,50 @@ public class Room
 
     #region 게임 정보 Handle 함수들
 
+    private async Task HandlePushAnimation(Member member, string text)
+    {
+        if(gameManager.currentTurnState != gameManager.martMoveState) return;
+        Protocol.PushAnimationMessage pushAnimationMessage = JsonSerializer.Deserialize<Protocol.PushAnimationMessage>(text);
 
+       await BroadcastAsync(pushAnimationMessage, member.User.Id);
+    }
+    // 키값이 건드려진 대상의 ID, 벨류가 건드린 ID
+    private readonly ConcurrentDictionary<string, string> _itemOwners = new();
+    private async Task HandleInteraction(Member member, string text)
+    {
+        if(gameManager.currentTurnState != gameManager.martMoveState) return;
+        
+        Protocol.UserInteractionMessage interactionMessage = JsonSerializer.Deserialize<Protocol.UserInteractionMessage>(text);
+
+        switch (interactionMessage.InteractionType)
+        {
+            case Protocol.InteractionType.ItemHoldQuery:
+            {
+                bool won = _itemOwners.TryAdd(interactionMessage.receivedId, interactionMessage.senderId);
+                if (won == false)
+                {
+                    return;
+                }
+                interactionMessage.InteractionType = Protocol.InteractionType.ItemHoldAnswer;
+                
+                break;
+            }
+            case Protocol.InteractionType.ItemPutInBagQuery:
+            {
+                interactionMessage.InteractionType = Protocol.InteractionType.ItemPutInBagAnswer;
+                break;
+            }
+        }
+
+       await BroadcastAsync(interactionMessage);
+    }
     private async Task HandleVote(Member member, string text)
     {
         if(gameManager.currentTurnState != gameManager.voteState) return;
         
         Protocol.VoteMessage voteMessage = JsonSerializer.Deserialize<Protocol.VoteMessage>(text);
         gameManager.VoteQueue.Enqueue(voteMessage);
-       await BroadcastAsync(voteMessage);
+       await BroadcastAsync(voteMessage, member.User.Id);
     }
 
     private void HandleLiarButtonPressed(Member member, string text)
@@ -241,7 +279,7 @@ public class Room
         gameManager.SkipCount++;
         Protocol.NonPointMessage nonPointMessage = new Protocol.NonPointMessage();
         nonPointMessage.UserID = member.User.Id;
-        await BroadcastAsync(nonPointMessage);
+        await BroadcastAsync(nonPointMessage, member.User.Id);
     }
 
     private async Task HandleSelectUser(Member member, string text)
@@ -257,7 +295,7 @@ public class Room
             Console.WriteLine($"[지목 핸들] 지목 딕셔너리 {VARIABLE.Key} : {VARIABLE.Value}");
         }
         
-        await BroadcastAsync(selectMessage);
+        await BroadcastAsync(selectMessage, member.User.Id);
     }
     private async Task HandleReady(Member member, string text)
     {
@@ -275,7 +313,7 @@ public class Room
            }
        }
        
-       await BroadcastAsync(readyMessage);
+       await BroadcastAsync(readyMessage, member.User.Id);
        if (isAllReeay)
        {
 
