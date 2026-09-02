@@ -109,6 +109,7 @@ public class LiarKeywordGuessEndState : GameTurnState
                         Protocol.SelectNum.NotLiar => -(int)(voteScoreChangeAmount / 2) == 0
                             ? -1
                             : -(int)(voteScoreChangeAmount / 2),
+                        _=> 111111
                     };
                 }
                 else
@@ -119,7 +120,8 @@ public class LiarKeywordGuessEndState : GameTurnState
                             ? -1
                             : -(int)(voteScoreChangeAmount / 2),
                         Protocol.SelectNum.DontKnow => 0,
-                        Protocol.SelectNum.NotLiar => voteScoreChangeAmount
+                        Protocol.SelectNum.NotLiar => voteScoreChangeAmount,
+                        _=> 2222222
                     };
                 }
                 VARIABLE.Value.score += scoreAmount;
