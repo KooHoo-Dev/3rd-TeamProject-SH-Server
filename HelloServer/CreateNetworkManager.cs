@@ -55,17 +55,17 @@ namespace NetworkManager
                 new Protocol.KeywordDistributeParameter { KeywordId = keywordId });
 
         // ===== 마트 처리 =====
-        public static Protocol.TurnMessage MartEnter(float timerMs, int cycle, int round, string questId)
+        public static Protocol.TurnMessage MartEnter(float timerMs, int cycle, int round, string targetItemId)
             => Create(Protocol.TurnMessageType.MartEnterState, timerMs, cycle, round,
-                new Protocol.MartEnterParameter { QuestId = questId });
+                new Protocol.MartEnterParameter { TargetItemId = targetItemId });
 
         public static Protocol.TurnMessage MartMove(float timerMs, int cycle, int round)
             => CreateSimple(Protocol.TurnMessageType.MartMoveState, timerMs, cycle, round);
 
         public static Protocol.TurnMessage MartReturn(float timerMs, int cycle, int round,
-            Protocol.UserScoreInfo[] scores)
+            bool isSuccess)
             => Create(Protocol.TurnMessageType.MartReturnState, timerMs, cycle, round,
-                new Protocol.MartReturnParameter { userScoreInfo = scores });
+                new Protocol.MartReturnParameter { IsSuccess = isSuccess });
 
         // ===== 턴 처리: 발언 =====
         public static Protocol.TurnMessage ShowItemAndSpeak(float timerMs, int cycle, int round, string ownerId,

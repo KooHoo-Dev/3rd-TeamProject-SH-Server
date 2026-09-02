@@ -14,7 +14,7 @@ public class GameManager
         public string[] ItemIds;
         public string HoldingItem;
         public int score;
-
+        public bool IsQuestSuccess;
         public bool IsPushedState; // 현재 밀쳐진 상태인가?
         public UserInfo(Protocol.User user, int score)
         {

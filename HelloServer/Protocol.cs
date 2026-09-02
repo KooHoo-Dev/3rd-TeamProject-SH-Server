@@ -106,13 +106,13 @@ namespace HelloServer
         [Serializable]
         public class MartEnterParameter
         {
-            public string QuestId { get; set; }
+            public string TargetItemId { get; set; }
         }
 
         [Serializable]
         public class MartReturnParameter
         {
-            public UserScoreInfo[] userScoreInfo { get; set; }
+            public bool IsSuccess { get; set; }
         }
 
         [Serializable]
@@ -462,42 +462,15 @@ namespace HelloServer
         #region 마트 부분
 
 
-        // 서버 -> 클라
+
+
         [Serializable]
-        public class QuestMessaage
-        {
-            public string Type { get; set; } = "quest";
-            public string ItemId{get;set;}
-        }
-
-        // 클라 -> 서버
-        public class QuestResult
-        {
-            public string Type { get; set; } = "questResult";
-            public string UserID { get; set; }
-            public string Parameter { get; set; }
-            public T GetParameter<T>() where T : class
-            {
-                if (string.IsNullOrEmpty(Parameter)) return null;
-                return JsonSerializer.Deserialize<T>(Parameter);
-            }
-        }
-
         public class PushAnimationMessage
         {
             public string Type { get; set; } = "PushAnimation";
             public string UserID { get; set; }
         }
-        // 퀘스트 정의 예시
-        public interface IQuest<out T>
-        {
-            public string QuestId { get; set; }
-            public bool IsSuccess { get; set; }
-            public bool IsFailed { get; set; }
-            public T GetReward();
 
-            public void CheckQuestStatus();
-        }
 
 
         #endregion

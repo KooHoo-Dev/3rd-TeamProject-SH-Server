@@ -31,7 +31,7 @@ public static class NetworkManager
     public static Action<float, int, int> OnMartMoveState;
 
     // userScoreInfo
-    public static Action<float, int, int, Protocol.UserScoreInfo[]> OnMartReturnState;
+    public static Action<float, int, int, bool> OnMartReturnState;
 
     // CurrentFocusID, CurrentCategory
     public static Action<float, int, int, string, string> OnShowItemAndSpeakState;
@@ -120,7 +120,7 @@ public static class NetworkManager
             case Protocol.TurnMessageType.MartEnterState:
             {
                 var p = Parse<Protocol.MartEnterParameter>(msg.Parameter);
-                OnMartEnterState?.Invoke(msg.TimerMs, msg.CurrentCycle, msg.CurrentRound, p.QuestId);
+                OnMartEnterState?.Invoke(msg.TimerMs, msg.CurrentCycle, msg.CurrentRound, p.TargetItemId);
                 break;
             }
 
@@ -131,7 +131,7 @@ public static class NetworkManager
             case Protocol.TurnMessageType.MartReturnState:
             {
                 var p = Parse<Protocol.MartReturnParameter>(msg.Parameter);
-                OnMartReturnState?.Invoke(msg.TimerMs, msg.CurrentCycle, msg.CurrentRound, p.userScoreInfo);
+                OnMartReturnState?.Invoke(msg.TimerMs, msg.CurrentCycle, msg.CurrentRound, p.IsSuccess);
                 break;
             }
 

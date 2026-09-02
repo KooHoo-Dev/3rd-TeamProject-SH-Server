@@ -16,7 +16,11 @@ public class MartReturnState : GameTurnState
         base.Enter();
 
         Protocol.UserScoreInfo[] scoreInfos = new Protocol.UserScoreInfo[gameManager.UserGameInfos.Count];
-        BroadcastAsync(TurnMessageFactory.MartReturn(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,CalculateQuest()));
+        foreach (var VARIABLE in gameManager.currentRoom.members.Values)
+        {
+            SendAsync(VARIABLE,TurnMessageFactory.MartReturn(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,IsSuccessQuest()));
+            
+        }
     }
     
     protected override void Tick(object sender, ElapsedEventArgs e)
@@ -29,30 +33,29 @@ public class MartReturnState : GameTurnState
     }
 
     // 아직 미 구현
-    private Protocol.UserScoreInfo[] CalculateQuest()
+    private bool IsSuccessQuest()
     {
-        Protocol.UserScoreInfo[]  scoreInfos = new Protocol.UserScoreInfo[gameManager.UserGameInfos.Count];
+            bool Sueccess = false;
+        
         int counter = 0;
         foreach (var VARIABLE in gameManager.UserGameInfos)
         {
-            Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
 
-            bool Sueccess = false;
             for (int i = 0; i < gameManager.currentRoom.GameConfig.MaxCycle; i++)
             {
                 if (VARIABLE.Value.ItemIds[i] == gameManager.QuestInfo[VARIABLE.Key])
                 {
                     Sueccess = true;
+                    VARIABLE.Value.IsQuestSuccess = true;
                     break;
                 }
             }
 
             VARIABLE.Value.score += gameManager.currentRoom.GameConfig.QuestScoreChangeAmount;
-
-            scoreInfos[counter] = scoreInfo;
+            
             counter++;
         }
-        return scoreInfos;
+        return Sueccess;
         
     }
 }

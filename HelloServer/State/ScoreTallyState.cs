@@ -79,7 +79,23 @@ public class ScoreTallyState : GameTurnState
             resultInfo[counter] = scoreInfo;
             counter++;
             Console.WriteLine($"[라밍아웃 점수 계산 이후] 유저 아이디 : {scoreInfo.UserId}, 유저 점수 {scoreInfo.UserScore}");
+            
         }
+
+        
+        foreach (var VARIABLE in gameManager.UserGameInfos)
+        {
+
+                if (VARIABLE.Value.IsQuestSuccess)
+                {
+
+                    VARIABLE.Value.score += gameManager.currentRoom.GameConfig.QuestScoreChangeAmount;
+                    break;
+                }
+            Console.WriteLine($"[퀘스트 점수 계산 이후] 유저 아이디 : {VARIABLE.Key}, 유저 점수 {VARIABLE.Value.score}");
+
+        }
+        
         return  resultInfo;
     }
 }
