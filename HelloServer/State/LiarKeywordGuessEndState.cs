@@ -90,6 +90,10 @@ public class LiarKeywordGuessEndState : GameTurnState
                     (gameManager.MostFrequent == VARIABLE.Key)
                         ? voteScoreChangeAmount
                         : -(int)(voteScoreChangeAmount / 2)  == 0 ? -1 : -(int)(voteScoreChangeAmount / 2) ;;
+                if (gameManager.MostFrequent == VARIABLE.Key)
+                {
+                    
+                }
             }
 
             if(VARIABLE.Value.score < 0) VARIABLE.Value.score = 0;

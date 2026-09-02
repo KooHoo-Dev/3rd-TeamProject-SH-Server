@@ -41,6 +41,7 @@ public class GameConfig
 
     public int MaxRound{ get; set; }
     public int MaxCycle{ get; set; }
+    public int MaxCategoryItemCount{ get; set; }
     
     public int VoteScoreChangeAmount { get; set; }
     public int KeywordGuessScoreChangeAmount{ get; set; }

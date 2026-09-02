@@ -106,7 +106,9 @@ namespace HelloServer
         [Serializable]
         public class MartEnterParameter
         {
+            public CategoryItemArray[] AllCategoryItemArrays{ get; set; }
             public string TargetItemId { get; set; }
+            
         }
 
         [Serializable]
@@ -285,6 +287,12 @@ namespace HelloServer
             public int MaxCycle { get; set; }
         }
 
+        [Serializable]
+        public class CategoryItemArray
+        {
+            public CategoryType Category { get; set; }
+            public string[] ItemIds { get; set; }
+        }
 
         #region 기본 상태 처리
 

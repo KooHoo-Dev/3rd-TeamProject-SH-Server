@@ -296,13 +296,14 @@ public class GameManager
         {
             UserGameInfos.TryAdd(memberList[i].User.Id, new UserInfo(memberList[i].User,0));
         }
-
-
+        PointInfo.Clear();
+        QuestInfo.Clear();
         foreach (var VARIABLE in UserGameInfos)
         {
             currentRoom.members[VARIABLE.Key].IsReady = false;
             bool s = PointInfo.TryAdd(VARIABLE.Key, "");
-        Console.WriteLine($"테스트2.3번 위치 {VARIABLE.Key} 성공 여부: {s}");
+            bool q = QuestInfo.TryAdd(VARIABLE.Key, "");
+        Console.WriteLine($"테스트2.3번 위치 {VARIABLE.Key} 성공 여부: {s}, {q}");
             
             
         }
@@ -355,6 +356,7 @@ public class GameManager
         }
 
         Console.WriteLine($"테스트2.3번 위치 및 PointInfo: {PointInfo.Count}");
+        
         AllCategories = new CategoryType[list.Count];
         for (int i = 0; i < list.Count; i++)
         {

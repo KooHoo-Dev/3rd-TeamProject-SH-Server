@@ -55,9 +55,9 @@ namespace NetworkManager
                 new Protocol.KeywordDistributeParameter { KeywordId = keywordId });
 
         // ===== 마트 처리 =====
-        public static Protocol.TurnMessage MartEnter(float timerMs, int cycle, int round, string targetItemId)
+        public static Protocol.TurnMessage MartEnter(float timerMs, int cycle, int round, string targetItemId,Protocol.CategoryItemArray[] categories)
             => Create(Protocol.TurnMessageType.MartEnterState, timerMs, cycle, round,
-                new Protocol.MartEnterParameter { TargetItemId = targetItemId });
+                new Protocol.MartEnterParameter { TargetItemId = targetItemId, AllCategoryItemArrays =  categories });
 
         public static Protocol.TurnMessage MartMove(float timerMs, int cycle, int round)
             => CreateSimple(Protocol.TurnMessageType.MartMoveState, timerMs, cycle, round);

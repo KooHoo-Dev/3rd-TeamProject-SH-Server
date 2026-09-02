@@ -26,7 +26,7 @@ public static class NetworkManager
     public static Action<float, int, int, int> OnKeywordDistributeState;
 
     // QuestId
-    public static Action<float, int, int, string> OnMartEnterState;
+    public static Action<float, int, int, string, Protocol.CategoryItemArray[]> OnMartEnterState;
 
     public static Action<float, int, int> OnMartMoveState;
 
@@ -120,7 +120,7 @@ public static class NetworkManager
             case Protocol.TurnMessageType.MartEnterState:
             {
                 var p = Parse<Protocol.MartEnterParameter>(msg.Parameter);
-                OnMartEnterState?.Invoke(msg.TimerMs, msg.CurrentCycle, msg.CurrentRound, p.TargetItemId);
+                OnMartEnterState?.Invoke(msg.TimerMs, msg.CurrentCycle, msg.CurrentRound, p.TargetItemId,p.AllCategoryItemArrays);
                 break;
             }
 
