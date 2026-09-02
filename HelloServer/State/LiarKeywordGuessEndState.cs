@@ -40,41 +40,40 @@ public class LiarKeywordGuessEndState : GameTurnState
     {
         int voteScoreChangeAmount = gameManager.currentRoom.GameConfig.VoteScoreChangeAmount;
         int keywordGuessScoreChangeAmount = gameManager.currentRoom.GameConfig.KeywordGuessScoreChangeAmount;
-        Protocol.UserScoreInfo[] resultInfo = new Protocol.UserScoreInfo[gameManager.users.Length];
+        Protocol.UserScoreInfo[] resultInfo = new Protocol.UserScoreInfo[gameManager.UserGameInfos.Count];
         int counter = 0;
-        foreach (var VARIABLE in gameManager.currentRoom.members.Values)
+        foreach (var VARIABLE in gameManager.UserGameInfos)
         {
             Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
-            if (VARIABLE.playerState.IsLiar)
+            if (VARIABLE.Value.IsLiar)
             {
-                VARIABLE.score +=
+                VARIABLE.Value.score +=
                     (gameManager.CurrentKeyWord.KeywordName == gameManager.LiarGuessKeyWord)
                         ? keywordGuessScoreChangeAmount
                         : 0;
-                Console.WriteLine($"[투표 및 키워드 점수 계산 이전] 일반 유저 아이디 : {VARIABLE.User.Id}, 유저 점수 {VARIABLE.score}");
+                Console.WriteLine($"[투표 및 키워드 점수 계산 이전] 일반 유저 아이디 : {VARIABLE.Key}, 유저 점수 {VARIABLE.Value.score}");
                 
                 Console.WriteLine($"[라이어 키워드 맞춤 여부] 맟췄는가? :{gameManager.CurrentKeyWord.KeywordName == gameManager.LiarGuessKeyWord}");
                 // 라밍아웃 버튼으로 투표가 스킵된 경우, 투표 점수 집계 안함
                 if(string.IsNullOrEmpty(gameManager.PressedLiarId) == false)
                 {
                     
-                    if(VARIABLE.score < 0) VARIABLE.score = 0;
-                    scoreInfo.UserId = VARIABLE.User.Id;
-                    scoreInfo.UserScore = VARIABLE.score;
+                    if(VARIABLE.Value.score < 0) VARIABLE.Value.score = 0;
+             
                     resultInfo[counter] = scoreInfo;
                     counter++;
                     continue;
                 }
-                VARIABLE.score +=
-                    (gameManager.MostFrequent == VARIABLE.User.Id)
+                VARIABLE.Value.score +=
+                    (gameManager.MostFrequent == VARIABLE.Key)
                         ? 0
                         : voteScoreChangeAmount;
             }
             else
             {
-            Console.WriteLine($"[투표 및 키워드 점수 계산 이전] 일반 유저 아이디 : {VARIABLE.User.Id}, 유저 점수 {VARIABLE.score}");
+            Console.WriteLine($"[투표 및 키워드 점수 계산 이전] 일반 유저 아이디 : {VARIABLE.Key}, 유저 점수 {VARIABLE.Value.score}");
                 
-                VARIABLE.score +=
+            VARIABLE.Value.score +=
                     (gameManager.CurrentKeyWord.KeywordName == gameManager.LiarGuessKeyWord)
                         ? 0
                         : (int)(keywordGuessScoreChangeAmount / 2)  == 0 ? 1 : (int)(keywordGuessScoreChangeAmount / 2) ;
@@ -82,22 +81,19 @@ public class LiarKeywordGuessEndState : GameTurnState
                 if(string.IsNullOrEmpty(gameManager.PressedLiarId) == false)
                 {
                     
-                    if(VARIABLE.score < 0) VARIABLE.score = 0;
-                    scoreInfo.UserId = VARIABLE.User.Id;
-                    scoreInfo.UserScore = VARIABLE.score;
+                    if(VARIABLE.Value.score < 0) VARIABLE.Value.score = 0;
                     resultInfo[counter] = scoreInfo;
                     counter++;
                     continue;
                 }
-                VARIABLE.score +=
-                    (gameManager.MostFrequent == VARIABLE.User.Id)
+                VARIABLE.Value.score +=
+                    (gameManager.MostFrequent == VARIABLE.Key)
                         ? voteScoreChangeAmount
                         : -(int)(voteScoreChangeAmount / 2)  == 0 ? -1 : -(int)(voteScoreChangeAmount / 2) ;;
             }
 
-            if(VARIABLE.score < 0) VARIABLE.score = 0;
-            scoreInfo.UserId = VARIABLE.User.Id;
-            scoreInfo.UserScore = VARIABLE.score;
+            if(VARIABLE.Value.score < 0) VARIABLE.Value.score = 0;
+
             resultInfo[counter] = scoreInfo;
             counter++;
             Console.WriteLine($"[투표 및 키워드 점수 계산 이후] 유저 아이디 : {scoreInfo.UserId}, 유저 점수 {scoreInfo.UserScore}");

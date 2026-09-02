@@ -15,7 +15,7 @@ public class MartReturnState : GameTurnState
     {
         base.Enter();
 
-        Protocol.UserScoreInfo[] scoreInfos = new Protocol.UserScoreInfo[gameManager.users.Length];
+        Protocol.UserScoreInfo[] scoreInfos = new Protocol.UserScoreInfo[gameManager.UserGameInfos.Count];
         BroadcastAsync(TurnMessageFactory.MartReturn(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,CalculateQuest()));
     }
     
@@ -31,25 +31,24 @@ public class MartReturnState : GameTurnState
     // 아직 미 구현
     private Protocol.UserScoreInfo[] CalculateQuest()
     {
-        Protocol.UserScoreInfo[]  scoreInfos = new Protocol.UserScoreInfo[gameManager.users.Length];
+        Protocol.UserScoreInfo[]  scoreInfos = new Protocol.UserScoreInfo[gameManager.UserGameInfos.Count];
         int counter = 0;
-        foreach (var VARIABLE in gameManager.currentRoom.members.Values)
+        foreach (var VARIABLE in gameManager.UserGameInfos)
         {
             Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
 
             bool Sueccess = false;
             for (int i = 0; i < gameManager.currentRoom.GameConfig.MaxCycle; i++)
             {
-                if (VARIABLE.playerState.ItemIds[i] == gameManager.QuestInfo[VARIABLE.User.Id])
+                if (VARIABLE.Value.ItemIds[i] == gameManager.QuestInfo[VARIABLE.Key])
                 {
                     Sueccess = true;
                     break;
                 }
             }
 
-            VARIABLE.score += gameManager.currentRoom.GameConfig.QuestScoreChangeAmount;
-            scoreInfo.UserId = VARIABLE.User.Id;
-            scoreInfo.UserScore = VARIABLE.score;
+            VARIABLE.Value.score += gameManager.currentRoom.GameConfig.QuestScoreChangeAmount;
+
             scoreInfos[counter] = scoreInfo;
             counter++;
         }

@@ -52,7 +52,7 @@ public class PointAtSuspectEndState : GameTurnState
     private string GetWinner()
     {
 
-        int harf = (int)(gameManager.users.Length / 2);
+        int harf = (int)(gameManager.UserGameInfos.Count / 2);
 
         string ElectedUser = "";
         ConcurrentDictionary<string, string> pointInfo = gameManager.PointInfo;

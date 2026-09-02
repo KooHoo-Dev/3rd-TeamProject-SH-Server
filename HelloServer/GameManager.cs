@@ -6,7 +6,29 @@ namespace HelloServer;
 
 public class GameManager
 {
-    
+
+    public class UserInfo
+    {
+        public Protocol.User user;
+        public bool IsLiar;
+        public string[] ItemIds;
+        public string HoldingItem;
+        public int score;
+
+        public bool IsPushedState; // 현재 밀쳐진 상태인가?
+        public UserInfo(Protocol.User user, int score)
+        {
+            this.user = user;
+            this.score = score;
+
+            
+        }
+
+        public UserInfo()
+        {
+            
+        }
+    }
     StateMachine<IState> stateMachine;
 
     public IState currentTurnState => stateMachine.CurrentState;
@@ -48,7 +70,7 @@ public class GameManager
     // 라이어가 라이어 버튼을 눌렀을 경우 추가되는 필드
     private string liarButtonPressedUserId;
     
-    public Protocol.User[] users;
+    public ConcurrentDictionary<string,UserInfo> UserGameInfos;
     public Protocol.User focausUser;
 
 
@@ -268,29 +290,26 @@ public class GameManager
     {
         IsGameRunning = true;
         Console.WriteLine($"테스트1번 위치");
-        List<Room.Member> memberList = currentRoom.members.Values.ToList(); 
-        users = new Protocol.User[memberList.Count];
+        List<Room.Member> memberList = currentRoom.members.Values.ToList();
+        UserGameInfos = new ConcurrentDictionary<string, UserInfo>();
         for (int i = 0; i < memberList.Count; i++)
         {
-            users[i] = memberList[i].User;
+            UserGameInfos.TryAdd(memberList[i].User.Id, new UserInfo(memberList[i].User,0));
         }
 
-        for (int i = 0; i < currentRoom.members.Count; i++)
-        {
 
-            currentRoom.members[users[i].Id].score = 0;
-            currentRoom.members[users[i].Id].IsReady = false;
+        foreach (var VARIABLE in UserGameInfos)
+        {
+            currentRoom.members[VARIABLE.Key].IsReady = false;
+            bool s = PointInfo.TryAdd(VARIABLE.Key, "");
+        Console.WriteLine($"테스트2.3번 위치 {VARIABLE.Key} 성공 여부: {s}");
+            
             
         }
-
-        Console.WriteLine($"테스트2번 위치 및 리스트 갯수: {users.Length}");
-        for(int i = 0; i < users.Length; i++)
-        {
-        Console.WriteLine($"테스트2.2번 위치 {users[i]?.Id}");
-           bool s = PointInfo.TryAdd(users[i]?.Id, "");
-        Console.WriteLine($"테스트2.3번 위치 {users[i]?.Id} 성공 여부: {s}");
+        
             
-        }
+        
+
         Console.WriteLine($"테스트3번 위치");
         SetRandomCategories();
         Console.WriteLine($"테스트4번 위치");
@@ -298,7 +317,7 @@ public class GameManager
         currentCycle = 0;
         currentRound = 0;
         currentCategory = AllCategories[0];
-        maxSpeakedCount = users.Length;
+        maxSpeakedCount = UserGameInfos.Count;
         Protocol.User focausUser = new Protocol.User();
 
         OldKeyWords = new List<KeyWordDef>();

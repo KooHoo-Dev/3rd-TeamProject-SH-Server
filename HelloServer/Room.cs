@@ -81,8 +81,6 @@ public class Room
 
         public int MovesSinceLog;
 
-        public int score;
-
         public bool IsReady = false;
 
         public bool IsHost = false;

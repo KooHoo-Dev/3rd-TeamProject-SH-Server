@@ -22,14 +22,32 @@ public class ShowItemAndSpeakState : GameTurnState
         if (gameManager.currentSpeakedCount == 0)
         {
             Random rnd = new Random();
-            fristIndex = rnd.Next(0, gameManager.users.Length);
-            gameManager.focausUser = gameManager.users[fristIndex];
+            fristIndex = rnd.Next(0, gameManager.UserGameInfos.Count);
+            int counter = 0;
+            foreach (var VARIABLE in gameManager.UserGameInfos)
+            {
+                if (counter == fristIndex)
+                {
+                gameManager.focausUser = VARIABLE.Value.user;
+                    
+                }
+                counter++;
+            }
    
         }
         else
         {
-
-            gameManager.focausUser = gameManager.users[ (gameManager.currentSpeakedCount + fristIndex) % (gameManager.users.Length)];
+            int counter = 0;
+            
+            foreach (var VARIABLE in gameManager.UserGameInfos)
+            {
+                if (counter == (gameManager.currentSpeakedCount + fristIndex) % (gameManager.UserGameInfos.Count))
+                {
+                    gameManager.focausUser = VARIABLE.Value.user;
+                    
+                }
+                counter++;
+            }
         }
 
         if (gameManager.currentSpeakedCount >= gameManager.maxSpeakedCount)

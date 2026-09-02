@@ -79,14 +79,14 @@ public static class NetworkManager
     // ===== UserInteractionMessage 이벤트 (IsValid, senderId, receivedId) =====
     // ============================================================
 
-    public static Action<bool, string, string> OnPushQuery;
-    public static Action<bool, string, string> OnPushAnswer;
-    public static Action<bool, string, string> OnItemHoldQuery;
-    public static Action<bool, string, string> OnItemHoldAnswer;
-    public static Action<bool, string, string> OnItemDropQuery;
-    public static Action<bool, string, string> OnItemDropAnswer;
-    public static Action<bool, string, string> OnItemPutInBagQuery;
-    public static Action<bool, string, string> OnItemPutInBagAnswer;
+    public static Action<bool,bool, string, string> OnPushQuery;
+    public static Action<bool,bool, string, string> OnPushAnswer;
+    public static Action<bool,bool, string, string> OnItemHoldQuery;
+    public static Action<bool,bool, string, string> OnItemHoldAnswer;
+    public static Action<bool,bool, string, string> OnItemDropQuery;
+    public static Action<bool,bool, string, string> OnItemDropAnswer;
+    public static Action<bool,bool, string, string> OnItemPutInBagQuery;
+    public static Action<bool,bool, string, string> OnItemPutInBagAnswer;
 
 
 
@@ -247,31 +247,31 @@ public static class NetworkManager
         switch (msg.InteractionType)
         {
             case Protocol.InteractionType.PushQuery:
-                OnPushQuery?.Invoke(msg.IsValid, msg.senderId, msg.receivedId);
+                OnPushQuery?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId);
                 break;
 
             case Protocol.InteractionType.PushAnswer:
-                OnPushAnswer?.Invoke(msg.IsValid, msg.senderId, msg.receivedId);
+                OnPushAnswer?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId);
                 break;
             case Protocol.InteractionType.ItemHoldQuery:
-                OnItemHoldQuery?.Invoke(msg.IsValid, msg.senderId, msg.receivedId);
+                OnItemHoldQuery?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId);
                 break;
             case Protocol.InteractionType.ItemHoldAnswer:
-                OnItemHoldAnswer?.Invoke(msg.IsValid, msg.senderId, msg.receivedId);
+                OnItemHoldAnswer?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId);
                 break;
             case Protocol.InteractionType.ItemDropQuery:
-                OnItemDropQuery?.Invoke(msg.IsValid, msg.senderId, msg.receivedId);
+                OnItemDropQuery?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId);
                 break;
             case Protocol.InteractionType.ItemDropAnswer:
-                OnItemDropAnswer?.Invoke(msg.IsValid, msg.senderId, msg.receivedId);
+                OnItemDropAnswer?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId);
                 break;
 
             case Protocol.InteractionType.ItemPutInBagQuery:
-                OnItemPutInBagQuery?.Invoke(msg.IsValid, msg.senderId, msg.receivedId);
+                OnItemPutInBagQuery?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId);
                 break;
 
             case Protocol.InteractionType.ItemPutInBagAnswer:
-                OnItemPutInBagAnswer?.Invoke(msg.IsValid, msg.senderId, msg.receivedId);
+                OnItemPutInBagAnswer?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId);
                 break;
 
             default:

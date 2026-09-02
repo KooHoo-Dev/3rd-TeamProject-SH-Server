@@ -22,7 +22,7 @@ public class VoteState : GameTurnState
     protected override void Tick(object sender, ElapsedEventArgs e)
     {
         base.Tick(sender, e);
-        if (currentMsTime > MaxMsTime || gameManager.VoteQueue.Count == (gameManager.users.Length - 1))
+        if (currentMsTime > MaxMsTime || gameManager.VoteQueue.Count == (gameManager.UserGameInfos.Count - 1))
         {
             stateMachine.ChangeState<VoteEndState>();
         }

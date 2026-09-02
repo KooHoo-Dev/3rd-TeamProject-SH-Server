@@ -37,7 +37,7 @@ public class VoteEndState : GameTurnState
         }
 
         // 자기 자신 제외 ( -1 더해줌)
-        for (int i = gameManager.users.Length - count - 1 - 1; i >= 0; i--)
+        for (int i = gameManager.UserGameInfos.Count - count - 1 - 1; i >= 0; i--)
         {
 
             resultList.Add(Protocol.SelectNum.DontKnow.ToString());

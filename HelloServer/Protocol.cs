@@ -174,6 +174,7 @@ namespace HelloServer
             public string Type { get; set; } = "userInteraction";
             public InteractionType InteractionType { get; set; }
             public bool IsValid { get; set; } // 레이스 컨디션 등, 실패시 false 전달
+            public bool IsSuccess { get; set; }
             public string senderId { get; set; }
             public string receivedId { get; set; }
             public string Parameter { get; set; }
@@ -186,9 +187,26 @@ namespace HelloServer
             }
         }
 
+        //서버에서 게산후 담아 보내줌
+        [Serializable]
+        public class ChangeItem
+        {
+            public string changedItemId{ get; set; } // 비어있으면 교체할 필요 없고, 있으면 교체되야하는 가방에 들어있던 아이템 ID
+        }
         #endregion
 
+        [Serializable]
+        public class ItemPutInBagParameter
+        {
+            public string[] ItemIds { get; set; } // 카테고리별 최종 선택한 아이템
 
+        }
+
+        [Serializable]
+        public class ItemInteractiveParameter
+        {
+            public string HoldingItem { get; set; } // 마트에서 들고 이동하는 중인 아이템
+        }
         #region 공용 데이터 처리
 
         [Serializable]
@@ -297,9 +315,8 @@ namespace HelloServer
             public float Z { get; set; }
             public bool IsLiar { get; set; } // 라이어 인가?
 
-            public string[] ItemIds { get; set; } // 카테고리별 최종 선택한 아이템
 
-            public string HoldingItem { get; set; } // 마트에서 들고 이동하는 중인 아이템
+ 
 
             public bool IsPushedState { get; set; } // 현재 밀쳐진 상태인가?
 
@@ -450,13 +467,7 @@ namespace HelloServer
         public class QuestMessaage
         {
             public string Type { get; set; } = "quest";
-            public QuestType QuestType { get; set; }
-            public string Parameter { get; set; }
-            public T GetParameter<T>() where T : class
-            {
-                if (string.IsNullOrEmpty(Parameter)) return null;
-                return JsonSerializer.Deserialize<T>(Parameter);
-            }
+            public string ItemId{get;set;}
         }
 
         // 클라 -> 서버
@@ -472,6 +483,11 @@ namespace HelloServer
             }
         }
 
+        public class PushAnimationMessage
+        {
+            public string Type { get; set; } = "PushAnimation";
+            public string UserID { get; set; }
+        }
         // 퀘스트 정의 예시
         public interface IQuest<out T>
         {

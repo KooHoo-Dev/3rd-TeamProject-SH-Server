@@ -29,14 +29,29 @@ public class GenreAssignAndLiarSelectState: GameTurnState
         foreach (var VARIABLE in gameManager.currentRoom.members.Values)
         {
             VARIABLE.playerState.IsLiar = false;
+            gameManager.UserGameInfos[VARIABLE.User.Id].IsLiar =false;
         }
 
-        int rendIndex = rnd.Next(0, gameManager.users.Length);
-        Console.WriteLine($"[라이어 유저 랜덤 인덱스] 인덱스 : {rendIndex}, 전체 게임 유저 수 {gameManager.users.Length}");
-        Protocol.User Liar = gameManager.users[rendIndex];
-        Console.WriteLine($"[라이어 선정 로직] 라이어 유저 : {Liar?.Id}");
-        gameManager.currentRoom.members[Liar.Id].playerState.IsLiar = true;
-        gameManager.LiarId = Liar.Id;
+        int rendIndex = rnd.Next(0, gameManager.UserGameInfos.Count);
+        Console.WriteLine($"[라이어 유저 랜덤 인덱스] 인덱스 : {rendIndex}, 전체 게임 유저 수 {gameManager.UserGameInfos.Count}");
+        GameManager.UserInfo Liar = new GameManager.UserInfo();
+        int counter = 0;
+        foreach (var VARIABLE in gameManager.UserGameInfos)
+        {
+            if (counter == rendIndex)
+            {
+                VARIABLE.Value.IsLiar = true;
+                
+                gameManager.currentRoom.members[VARIABLE.Value.user.Id].playerState.IsLiar = true;
+                Liar = gameManager.UserGameInfos[VARIABLE.Value.user.Id];
+            }
+            
+            counter++;
+        }
+
+        Console.WriteLine($"[라이어 선정 로직] 라이어 유저 : {Liar?.user.Id}");
+  
+        gameManager.LiarId = Liar.user.Id;
 
         
         BroadcastAsync(TurnMessageFactory.GenreAssignAndLiarSelect(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.CurrentGanre.GenreId,gameManager.LiarId ));

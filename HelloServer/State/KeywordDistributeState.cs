@@ -48,10 +48,10 @@ public class KeywordDistributeState : GameTurnState
         Protocol.TurnMessage msg = TurnMessageFactory.KeywordDistribute(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.CurrentKeyWord.KeywordId);
 
 
-        for (int i = 0; i < gameManager.users.Length; i++)
+        foreach (var VARIABLE in gameManager.UserGameInfos)
         {
             
-            if (gameManager.currentRoom.members[gameManager.users[i].Id].playerState.IsLiar)
+            if (VARIABLE.Value.IsLiar)
             {
                 Console.WriteLine($"[라이어 키워드 선정 로직] 선정된 키워드 : 1, 리스트 갯수 {NewList.Count}");
                 
@@ -61,11 +61,11 @@ public class KeywordDistributeState : GameTurnState
                 gameManager.OldKeyWords.Add(gameManager.CurrentLiarKeyword);
 
                 Protocol.TurnMessage liarMsg = TurnMessageFactory.KeywordDistribute(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.CurrentKeyWord.KeywordId);
-                SendAsync(gameManager.currentRoom.members[gameManager.users[i].Id], liarMsg);
+                SendAsync(gameManager.currentRoom.members[VARIABLE.Key], liarMsg);
             }
             else
             {
-                SendAsync(gameManager.currentRoom.members[gameManager.users[i].Id], msg);
+                SendAsync(gameManager.currentRoom.members[VARIABLE.Key], msg);
             }
         }
         

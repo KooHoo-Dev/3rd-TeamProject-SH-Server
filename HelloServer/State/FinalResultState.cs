@@ -18,24 +18,22 @@ public class FinalResultState : GameTurnState
         
         int maxScore = -999999;
         string winerId = "";
-        for (int i = 0; i < gameManager.currentRoom.members.Count; i++)
+        foreach (var VARIABLE in gameManager.UserGameInfos)
         {
-
-            if (gameManager.currentRoom.members[gameManager.users[i].Id].score > maxScore)
+            
+            if (VARIABLE.Value.score > maxScore)
             {
-                maxScore = gameManager.currentRoom.members[gameManager.users[i].Id].score;
-                winerId = gameManager.users[i].Id;
+                maxScore = VARIABLE.Value.score;
+                winerId = VARIABLE.Key;
             }
         }
 
         List<string> winerIds = new List<string>();
-        
-        for (int i = 0; i < gameManager.currentRoom.members.Count; i++)
+        foreach (var VARIABLE in gameManager.UserGameInfos)
         {
-
-            if (gameManager.users[i].Id != winerId && gameManager.currentRoom.members[gameManager.users[i].Id].score == maxScore )
+            if (VARIABLE.Key != winerId && VARIABLE.Value.score == maxScore )
             {
-                winerIds.Add(gameManager.users[i].Id);
+                winerIds.Add(VARIABLE.Key);
 
             }
         }

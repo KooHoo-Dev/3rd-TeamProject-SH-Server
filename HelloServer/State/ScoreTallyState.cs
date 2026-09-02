@@ -32,26 +32,26 @@ public class ScoreTallyState : GameTurnState
     {
         int liarButtonScoreChangeAmount = gameManager.currentRoom.GameConfig.LiarButtonScoreChangeAmount;
 
-        Protocol.UserScoreInfo[] resultInfo = new Protocol.UserScoreInfo[gameManager.users.Length];
+        Protocol.UserScoreInfo[] resultInfo = new Protocol.UserScoreInfo[gameManager.UserGameInfos.Count];
         string[] pressedNormalUsers = gameManager.LiarOutButtonQueue.ToArray();
         int counter = 0;
-        foreach (var VARIABLE in gameManager.currentRoom.members.Values)
+        foreach (var VARIABLE in gameManager.UserGameInfos)
         {
-            Console.WriteLine($"[라밍아웃 점수 계산 이전] 유저 아이디 : {VARIABLE.User.Id}, 유저 점수 {VARIABLE.score}");
+            Console.WriteLine($"[라밍아웃 점수 계산 이전] 유저 아이디 : {VARIABLE.Key}, 유저 점수 {VARIABLE.Value.score}");
             
             Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
-            if (VARIABLE.playerState.IsLiar)
+            if (VARIABLE.Value.IsLiar)
             {
                 if (string.IsNullOrEmpty(gameManager.PressedLiarId) == false
                     && gameManager.LiarGuessKeyWord == gameManager.CurrentLiarKeyword.KeywordName)
                 {
-                    VARIABLE.score += liarButtonScoreChangeAmount;
+                    VARIABLE.Value.score += liarButtonScoreChangeAmount;
                     
                 }
                 else if (string.IsNullOrEmpty(gameManager.PressedLiarId) == false
                          && gameManager.LiarGuessKeyWord != gameManager.CurrentLiarKeyword.KeywordName)
                 {
-                    VARIABLE.score += -1;
+                    VARIABLE.Value.score += -1;
                 }
 
 
@@ -61,7 +61,7 @@ public class ScoreTallyState : GameTurnState
                 bool isPressed = false;
                 for (int i = 0; i < pressedNormalUsers.Length; i++)
                 {
-                    if (pressedNormalUsers[i] == VARIABLE.User.Id)
+                    if (pressedNormalUsers[i] == VARIABLE.Key)
                     {
                         isPressed = true;
                         break;
@@ -70,13 +70,12 @@ public class ScoreTallyState : GameTurnState
 
                 if (isPressed)
                 {
-                    VARIABLE.score += -(int)(liarButtonScoreChangeAmount/2) == 0 ? -1 : -(int)(liarButtonScoreChangeAmount/2);
+                    VARIABLE.Value.score += -(int)(liarButtonScoreChangeAmount/2) == 0 ? -1 : -(int)(liarButtonScoreChangeAmount/2);
                 }
             }
 
-            if(VARIABLE.score < 0) VARIABLE.score = 0;
-            scoreInfo.UserId = VARIABLE.User.Id;
-            scoreInfo.UserScore = VARIABLE.score;
+            if(VARIABLE.Value.score < 0) VARIABLE.Value.score = 0;
+
             resultInfo[counter] = scoreInfo;
             counter++;
             Console.WriteLine($"[라밍아웃 점수 계산 이후] 유저 아이디 : {scoreInfo.UserId}, 유저 점수 {scoreInfo.UserScore}");

@@ -186,12 +186,13 @@ namespace NetworkManager
     {
         /// <summary>파라미터가 없는 상태 메시지 공용 빌더.</summary>
         public static Protocol.UserInteractionMessage CreateSimple(Protocol.InteractionType type, bool IsValid
-            , string senderId, string receivedId)
+      , bool isSuccess, string senderId, string receivedId)
         {
             return new Protocol.UserInteractionMessage
             {
                 InteractionType = type,
                 IsValid = IsValid,
+                IsSuccess = isSuccess,
                 senderId = senderId,
                 receivedId = receivedId
 
@@ -200,41 +201,42 @@ namespace NetworkManager
 
         /// <summary>파라미터가 있는 상태 메시지 공용 빌더 (Payload를 JSON으로 직렬화).</summary>
         private static Protocol.UserInteractionMessage Create<T>(Protocol.InteractionType type, bool IsValid
-            , string senderId, string receivedId, T parameter)
+            , bool isSuccess , string senderId, string receivedId, T parameter)
         {
             return new Protocol.UserInteractionMessage
             {
                 InteractionType = type,
                 IsValid = IsValid,
+                IsSuccess = isSuccess,
                 senderId = senderId,
                 receivedId = receivedId,
                 Parameter = JsonSerializer.Serialize(parameter)
             };
         }
         public static Protocol.UserInteractionMessage PushQuery(Protocol.InteractionType type, bool IsValid
-            , string senderId, string receivedId)
-            => CreateSimple(type, IsValid, senderId, receivedId);
+       , bool IsSuccess, string senderId, string receivedId)
+            => CreateSimple(type,IsSuccess, IsValid, senderId, receivedId);
         public static Protocol.UserInteractionMessage PushAnswer(Protocol.InteractionType type, bool IsValid
-            , string senderId, string receivedId)
-            => CreateSimple(type, IsValid, senderId, receivedId);
+            , bool IsSuccess , string senderId, string receivedId)
+            => CreateSimple(type,IsSuccess, IsValid, senderId, receivedId);
         public static Protocol.UserInteractionMessage ItemHoldQuery(Protocol.InteractionType type, bool IsValid
-            , string senderId, string receivedId)
-            => CreateSimple(type, IsValid, senderId, receivedId);
+            , bool IsSuccess , string senderId, string receivedId)
+            => CreateSimple(type,IsSuccess, IsValid, senderId, receivedId);
         public static Protocol.UserInteractionMessage ItemHoldAnswer(Protocol.InteractionType type, bool IsValid
-            , string senderId, string receivedId)
-            => CreateSimple(type, IsValid, senderId, receivedId);
+            , bool IsSuccess , string senderId, string receivedId)
+            => CreateSimple(type,IsSuccess, IsValid, senderId, receivedId);
         public static Protocol.UserInteractionMessage ItemDropQuery(Protocol.InteractionType type, bool IsValid
-            , string senderId, string receivedId)
-            => CreateSimple(type, IsValid, senderId, receivedId);
+            , bool IsSuccess, string senderId, string receivedId)
+            => CreateSimple(type,IsSuccess, IsValid, senderId, receivedId);
         public static Protocol.UserInteractionMessage ItemDropAnswer(Protocol.InteractionType type, bool IsValid
-            , string senderId, string receivedId)
-            => CreateSimple(type, IsValid, senderId, receivedId);
+            , bool IsSuccess, string senderId, string receivedId)
+            => CreateSimple(type,IsSuccess, IsValid, senderId, receivedId);
         public static Protocol.UserInteractionMessage ItemPutInBagQuery(Protocol.InteractionType type, bool IsValid
-            , string senderId, string receivedId)
-            => CreateSimple(type, IsValid, senderId, receivedId);
+            , bool IsSuccess, string senderId, string receivedId)
+            => CreateSimple(type,IsSuccess, IsValid, senderId, receivedId);
         public static Protocol.UserInteractionMessage ItemPutInBagAnswer(Protocol.InteractionType type, bool IsValid
-            , string senderId, string receivedId)
-            => CreateSimple(type, IsValid, senderId, receivedId);
+            , bool IsSuccess, string senderId, string receivedId)
+            => CreateSimple(type,IsSuccess, IsValid, senderId, receivedId);
     }
 
 }
