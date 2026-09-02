@@ -41,6 +41,15 @@ public class LiarKeywordGuessEndState : GameTurnState
         int voteScoreChangeAmount = gameManager.currentRoom.GameConfig.VoteScoreChangeAmount;
         int keywordGuessScoreChangeAmount = gameManager.currentRoom.GameConfig.KeywordGuessScoreChangeAmount;
         Protocol.UserScoreInfo[] resultInfo = new Protocol.UserScoreInfo[gameManager.UserGameInfos.Count];
+
+
+        int MaxVoteCount = gameManager.VoteQueue.Count;
+        Dictionary<string, Protocol.VoteMessage> voteDic = new Dictionary<string, Protocol.VoteMessage>();
+        for (int i = 0; i < MaxVoteCount; i++)
+        {
+            gameManager.VoteQueue.TryDequeue(out Protocol.VoteMessage msg);
+            voteDic.Add(msg.UserID,msg);
+        }
         int counter = 0;
         foreach (var VARIABLE in gameManager.UserGameInfos)
         {
@@ -65,13 +74,14 @@ public class LiarKeywordGuessEndState : GameTurnState
                     continue;
                 }
                 VARIABLE.Value.score +=
-                    (gameManager.MostFrequent == VARIABLE.Key)
+                    (gameManager.MostFrequent == gameManager.LiarId)
                         ? 0
                         : voteScoreChangeAmount;
+                
             }
             else
             {
-            Console.WriteLine($"[투표 및 키워드 점수 계산 이전] 일반 유저 아이디 : {VARIABLE.Key}, 유저 점수 {VARIABLE.Value.score}");
+                Console.WriteLine($"[투표 및 키워드 점수 계산 이전] 일반 유저 아이디 : {VARIABLE.Key}, 유저 점수 {VARIABLE.Value.score}");
                 
             VARIABLE.Value.score +=
                     (gameManager.CurrentKeyWord.KeywordName == gameManager.LiarGuessKeyWord)
@@ -86,15 +96,36 @@ public class LiarKeywordGuessEndState : GameTurnState
                     counter++;
                     continue;
                 }
-                VARIABLE.Value.score +=
-                    (gameManager.MostFrequent == VARIABLE.Key)
-                        ? voteScoreChangeAmount
-                        : -(int)(voteScoreChangeAmount / 2)  == 0 ? -1 : -(int)(voteScoreChangeAmount / 2) ;;
-                if (gameManager.MostFrequent == VARIABLE.Key)
+
+                int scoreAmount = 0;
+
+                    Protocol.SelectNum.TryParse(voteDic[VARIABLE.Key].selectNum, out Protocol.SelectNum num);
+                if (gameManager.MostFrequent == gameManager.LiarId)
                 {
-                    
+                    scoreAmount = (num) switch
+                    {
+                        Protocol.SelectNum.Liar => voteScoreChangeAmount,
+                        Protocol.SelectNum.DontKnow => 0,
+                        Protocol.SelectNum.NotLiar => -(int)(voteScoreChangeAmount / 2) == 0
+                            ? -1
+                            : -(int)(voteScoreChangeAmount / 2),
+                    };
                 }
+                else
+                {
+                    scoreAmount = (num) switch
+                    {
+                        Protocol.SelectNum.Liar => -(int)(voteScoreChangeAmount / 2) == 0
+                            ? -1
+                            : -(int)(voteScoreChangeAmount / 2),
+                        Protocol.SelectNum.DontKnow => 0,
+                        Protocol.SelectNum.NotLiar => voteScoreChangeAmount
+                    };
+                }
+                VARIABLE.Value.score += scoreAmount;
+                
             }
+
 
             if(VARIABLE.Value.score < 0) VARIABLE.Value.score = 0;
 

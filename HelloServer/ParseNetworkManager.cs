@@ -66,7 +66,10 @@ public static class NetworkManager
     public static Action<float, int, int, string[]> OnFinalResultState;
 
     public static Action<float, int, int> OnFinalResultEndState;
-
+    
+    // CurrentFocusID (라이어 버튼을 누른 라이어)
+    public static Action<float, int, int, string> OnLiarOutButtonPressedState;
+    
     // ============================================================
     // ===== ChatMessage 이벤트 (ID, NickName, Text) =====
     // ============================================================
@@ -216,6 +219,13 @@ public static class NetworkManager
                 OnFinalResultEndState?.Invoke(msg.TimerMs, msg.CurrentCycle, msg.CurrentRound);
                 break;
 
+            case Protocol.TurnMessageType.LiarOutButtonPressedState:
+            {
+                var p = Parse<Protocol.FocusIdParameter>(msg.Parameter);
+                OnLiarOutButtonPressedState?.Invoke(msg.TimerMs, msg.CurrentCycle, msg.CurrentRound,p.CurrentFocusID);
+                break;
+                
+            }
             default:
                 throw new ArgumentOutOfRangeException();
         }

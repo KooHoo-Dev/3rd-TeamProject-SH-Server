@@ -21,17 +21,18 @@ public class VoteEndState : GameTurnState
         int count = gameManager.VoteQueue.Count;
 
         List<string> resultList = new List<string>();
+        List<Protocol.VoteMessage> list = gameManager.VoteQueue.ToList();
+        
         for (int i = 0; i < count; i++)
         {
-            gameManager.VoteQueue.TryDequeue(out Protocol.VoteMessage v);
-            if (v == null)
+            if (list[i] == null)
             {
                 Console.WriteLine($"[투표 저장 정보 꺼내기 실패]");
                 return;
             }
             else
             {
-                resultList.Add(v.selectNum);
+                resultList.Add(list[i].selectNum);
             }
 
         }

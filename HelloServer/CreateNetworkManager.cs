@@ -135,7 +135,7 @@ namespace NetworkManager
             => CreateSimple(Protocol.TurnMessageType.FinalResultEndState, timerMs, cycle, round);
 
         public static Protocol.TurnMessage LiarOutButtonPressed(float timerMs, int cycle, int round, string liarId)
-            => Create(Protocol.TurnMessageType.LiarOutButtonPressed, timerMs, cycle, round,
+            => Create(Protocol.TurnMessageType.LiarOutButtonPressedState, timerMs, cycle, round,
                 new Protocol.FocusIdParameter { CurrentFocusID = liarId });
 
     }

@@ -47,7 +47,7 @@ namespace HelloServer
             FinalResultEndState, // 최종 결과 종료 상태
 
             // 라이어가 라이어 버튼을 눌러 진입하는 특수 턴
-            LiarOutButtonPressed, // 라밍아웃 버튼 누름 상태
+            LiarOutButtonPressedState, // 라밍아웃 버튼 누름 상태
         }
 
         [Serializable]
