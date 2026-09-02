@@ -81,7 +81,9 @@ public static class NetworkManager
 
     public static Action<bool, string, string> OnPushQuery;
     public static Action<bool, string, string> OnPushAnswer;
+    public static Action<bool, string, string> OnItemHoldQuery;
     public static Action<bool, string, string> OnItemHoldAnswer;
+    public static Action<bool, string, string> OnItemDropQuery;
     public static Action<bool, string, string> OnItemDropAnswer;
     public static Action<bool, string, string> OnItemPutInBagQuery;
     public static Action<bool, string, string> OnItemPutInBagAnswer;
@@ -251,11 +253,15 @@ public static class NetworkManager
             case Protocol.InteractionType.PushAnswer:
                 OnPushAnswer?.Invoke(msg.IsValid, msg.senderId, msg.receivedId);
                 break;
-
+            case Protocol.InteractionType.ItemHoldQuery:
+                OnItemHoldQuery?.Invoke(msg.IsValid, msg.senderId, msg.receivedId);
+                break;
             case Protocol.InteractionType.ItemHoldAnswer:
                 OnItemHoldAnswer?.Invoke(msg.IsValid, msg.senderId, msg.receivedId);
                 break;
-
+            case Protocol.InteractionType.ItemDropQuery:
+                OnItemDropQuery?.Invoke(msg.IsValid, msg.senderId, msg.receivedId);
+                break;
             case Protocol.InteractionType.ItemDropAnswer:
                 OnItemDropAnswer?.Invoke(msg.IsValid, msg.senderId, msg.receivedId);
                 break;

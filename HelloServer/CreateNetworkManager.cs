@@ -217,11 +217,15 @@ namespace NetworkManager
         public static Protocol.UserInteractionMessage PushAnswer(Protocol.InteractionType type, bool IsValid
             , string senderId, string receivedId)
             => CreateSimple(type, IsValid, senderId, receivedId);
-        
+        public static Protocol.UserInteractionMessage ItemHoldQuery(Protocol.InteractionType type, bool IsValid
+            , string senderId, string receivedId)
+            => CreateSimple(type, IsValid, senderId, receivedId);
         public static Protocol.UserInteractionMessage ItemHoldAnswer(Protocol.InteractionType type, bool IsValid
             , string senderId, string receivedId)
             => CreateSimple(type, IsValid, senderId, receivedId);
-
+        public static Protocol.UserInteractionMessage ItemDropQuery(Protocol.InteractionType type, bool IsValid
+            , string senderId, string receivedId)
+            => CreateSimple(type, IsValid, senderId, receivedId);
         public static Protocol.UserInteractionMessage ItemDropAnswer(Protocol.InteractionType type, bool IsValid
             , string senderId, string receivedId)
             => CreateSimple(type, IsValid, senderId, receivedId);

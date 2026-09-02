@@ -194,9 +194,6 @@ public class Room
             }
             if(kind?.Type == "move") HandleMove(member, text);
             else if(kind?.Type == "chat") await HandleChatAsync(member, text);
-            else if(kind?.Type == "normalChat") await HandleChatAsync(member, text);
-            else if(kind?.Type == "specialChat") await HandleSpecialChat(member, text);
-            else if(kind?.Type == "KeywordChat") await HandleKeywordChat(member, text);
             else if (kind?.Type == "Ready") await HandleReady(member, text);
             else if (kind?.Type == "게임 시작") await HandleGameStart();
             else if(kind?.Type == "NonPoint")  await HandleNonPoint(member, text);
@@ -312,33 +309,7 @@ public class Room
         
     }
     
-    private async Task HandleSpecialChat(Member member, string text)
-    {
-        if(gameManager.currentTurnState != gameManager.showItemAndSpeakState) return;
-        // 먼저 Chat메시지를 읽어 준다
-        Protocol.ChatMessage chat = JsonSerializer.Deserialize<Protocol.ChatMessage>(text);
-        // 온 메시지에서 사용자가 말한 부분만 읽어준다.
-        // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
-        string said = chat.Text?.Trim();
-        Console.WriteLine($"[special][{code}] {chat.ID} : {said}");
 
-        gameManager.ChangeSpeakerTrigger = true;
-        
-        await BroadcastAsync(chat);
-    }
-    private async Task HandleKeywordChat(Member member, string text)
-    {
-        if(gameManager.currentTurnState != gameManager.liarKeywordGuessState) return;
-        
-        // 먼저 Chat메시지를 읽어 준다
-        Protocol.ChatMessage chat = JsonSerializer.Deserialize<Protocol.ChatMessage>(text);
-        // 온 메시지에서 사용자가 말한 부분만 읽어준다.
-        // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
-        string said = chat.Text?.Trim();
-        Console.WriteLine($"[Keyword][{code}] {chat.ID} : {said}");
-        gameManager.LiarGuessKeyWord = said;
-        await BroadcastAsync(chat);
-    }
     // 이동 관련 메시지를 처리하는 함수
     private void HandleMove(Member member, string text)
     {
@@ -363,12 +334,15 @@ public class Room
         // 온 메시지에서 사용자가 말한 부분만 읽어준다.
         // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
         string said = chat.Text?.Trim();
-        Console.WriteLine($"[normal][{code}] {chat.NickName} : {said}");
-        // 예시 출력 : [5623] Jay : 안뇽
-        
-        // 여기까지 처리됐으면
-        // (서버) -> (다른 클라이언트) 들에게 보낸다
-        // 받은 객체를 그대로 보낸다.
+        Console.WriteLine($"[{chat.ChatType.ToString()}][{code}] {chat.NickName} : {said}");
+        if (chat.ChatType == Protocol.ChatType.KeywordGuess )
+        {
+            if(gameManager.currentTurnState != gameManager.liarKeywordGuessState) return;
+            gameManager.LiarGuessKeyWord = said;
+            
+        }
+        if(chat.ChatType == Protocol.ChatType.Special && gameManager.currentTurnState != gameManager.showItemAndSpeakState ) return;
+
         await BroadcastAsync(chat);
     }
     
