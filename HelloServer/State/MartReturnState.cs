@@ -19,7 +19,7 @@ public class MartReturnState : GameTurnState
         foreach (var VARIABLE in gameManager.currentRoom.members.Values)
         {
             bool isSuccess = IsSuccessQuest(VARIABLE.User.Id);
-            Console.WriteLine($"[마트 엔터 메시지 보내기] {VARIABLE.User.Id}의 차례(성공 여부) :  {isSuccess}");
+            Console.WriteLine($"[마트 리턴 메시지 보내기] {VARIABLE.User.Id}의 차례(성공 여부) :  {isSuccess}");
             SendAsync(VARIABLE,TurnMessageFactory.MartReturn(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,isSuccess));
             
         }

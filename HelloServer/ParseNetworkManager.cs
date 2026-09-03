@@ -88,8 +88,8 @@ public static class NetworkManager
     public static Action<bool,bool, string, string> OnItemHoldAnswer;
     public static Action<bool,bool, string, string> OnItemDropQuery;
     public static Action<bool,bool, string, string> OnItemDropAnswer;
-    public static Action<bool,bool, string, string> OnItemPutInBagQuery;
-    public static Action<bool,bool, string, string> OnItemPutInBagAnswer;
+    public static Action<bool,bool, string, string,string> OnItemPutInBagQuery;
+    public static Action<bool,bool, string, string,string> OnItemPutInBagAnswer;
 
 
 
@@ -259,7 +259,6 @@ public static class NetworkManager
             case Protocol.InteractionType.PushQuery:
                 OnPushQuery?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId);
                 break;
-
             case Protocol.InteractionType.PushAnswer:
                 OnPushAnswer?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId);
                 break;
@@ -277,12 +276,20 @@ public static class NetworkManager
                 break;
 
             case Protocol.InteractionType.ItemPutInBagQuery:
-                OnItemPutInBagQuery?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId);
+            {
+                var  p = Parse<Protocol.ItemPutInBagParameter>(msg.Parameter);
+                OnItemPutInBagQuery?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId,p.ChangedItemId);
                 break;
+            }
+
 
             case Protocol.InteractionType.ItemPutInBagAnswer:
-                OnItemPutInBagAnswer?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId);
+            {
+                var p = Parse<Protocol.ItemPutInBagParameter>(msg.Parameter);
+                OnItemPutInBagAnswer?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId,p.ChangedItemId);
                 break;
+            }
+
 
             default:
                 throw new ArgumentOutOfRangeException();
