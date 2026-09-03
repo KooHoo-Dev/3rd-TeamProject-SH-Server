@@ -38,7 +38,7 @@ public class ScoreTallyState : GameTurnState
         foreach (var VARIABLE in gameManager.UserGameInfos)
         {
             Console.WriteLine($"[라밍아웃 점수 계산 이전] 유저 아이디 : {VARIABLE.Key}, 유저 점수 {VARIABLE.Value.score}");
-            
+            resultInfo[counter].UserId = VARIABLE.Key;
             Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
             if (VARIABLE.Value.IsLiar)
             {
