@@ -377,15 +377,33 @@ public class Room
         // .Trim() 함수를 이용해서 앞,뒤 공백을 제거해준다
         string said = chat.Text?.Trim();
         Console.WriteLine($"[{chat.ChatType.ToString()}][{code}] {chat.NickName} : {said}");
+        
+        if (chat.ChatType == Protocol.ChatType.Normal)
+        {
+            await BroadcastAsync(chat);
+            return;
+        }
+        bool isVaild = false;
         if (chat.ChatType == Protocol.ChatType.KeywordGuess )
         {
             if(gameManager.currentTurnState != gameManager.liarKeywordGuessState) return;
+            gameManager.ChangeSpeakerTrigger = true;
             gameManager.LiarGuessKeyWord = said;
+            isVaild = true;
             
         }
-        if(chat.ChatType == Protocol.ChatType.Special && gameManager.currentTurnState != gameManager.showItemAndSpeakState ) return;
+        if (chat.ChatType == Protocol.ChatType.Special && gameManager.currentTurnState == gameManager.showItemAndSpeakState)
+        {
+            gameManager.ChangeSpeakerTrigger = true;
+            
+            isVaild = true;
+            
+        }
 
-        await BroadcastAsync(chat);
+        if (isVaild)
+        {
+            await BroadcastAsync(chat);
+        }
     }
     
 
