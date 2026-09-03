@@ -231,6 +231,7 @@ public class Room
             case Protocol.InteractionType.PushQuery:
             {
                 interactionMessage.InteractionType = Protocol.InteractionType.PushAnswer;
+                interactionMessage.IsSuccess = true;
                 break;
             }
             case Protocol.InteractionType.ItemHoldQuery:
@@ -241,12 +242,14 @@ public class Room
                     return;
                 }
                 interactionMessage.InteractionType = Protocol.InteractionType.ItemHoldAnswer;
+                interactionMessage.IsSuccess = true;
                 
                 break;
             }
             case Protocol.InteractionType.ItemPutInBagQuery:
             {
                 interactionMessage.InteractionType = Protocol.InteractionType.ItemPutInBagAnswer;
+                interactionMessage.IsSuccess = true;
                 break;
             }
         }
