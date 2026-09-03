@@ -216,7 +216,7 @@ public class Room
         if(gameManager.currentTurnState != gameManager.martMoveState) return;
         Protocol.PushAnimationMessage pushAnimationMessage = JsonSerializer.Deserialize<Protocol.PushAnimationMessage>(text);
 
-       await BroadcastAsync(pushAnimationMessage, member.User.Id);
+       await BroadcastAsync(pushAnimationMessage);
     }
     // 키값이 건드려진 대상의 ID, 벨류가 건드린 ID
     private readonly ConcurrentDictionary<string, string> _itemOwners = new();
@@ -228,6 +228,11 @@ public class Room
 
         switch (interactionMessage.InteractionType)
         {
+            case Protocol.InteractionType.PushQuery:
+            {
+                interactionMessage.InteractionType = Protocol.InteractionType.PushAnswer;
+                break;
+            }
             case Protocol.InteractionType.ItemHoldQuery:
             {
                 bool won = _itemOwners.TryAdd(interactionMessage.receivedId, interactionMessage.senderId);
@@ -254,7 +259,7 @@ public class Room
         
         Protocol.VoteMessage voteMessage = JsonSerializer.Deserialize<Protocol.VoteMessage>(text);
         gameManager.VoteQueue.Enqueue(voteMessage);
-       await BroadcastAsync(voteMessage, member.User.Id);
+       await BroadcastAsync(voteMessage);
     }
 
     private void HandleLiarButtonPressed(Member member, string text)
@@ -279,7 +284,7 @@ public class Room
         gameManager.SkipCount++;
         Protocol.NonPointMessage nonPointMessage = new Protocol.NonPointMessage();
         nonPointMessage.UserID = member.User.Id;
-        await BroadcastAsync(nonPointMessage, member.User.Id);
+        await BroadcastAsync(nonPointMessage);
     }
 
     private async Task HandleSelectUser(Member member, string text)
@@ -295,7 +300,7 @@ public class Room
             Console.WriteLine($"[지목 핸들] 지목 딕셔너리 {VARIABLE.Key} : {VARIABLE.Value}");
         }
         
-        await BroadcastAsync(selectMessage, member.User.Id);
+        await BroadcastAsync(selectMessage);
     }
     private async Task HandleReady(Member member, string text)
     {

@@ -53,9 +53,9 @@ public class KeywordDistributeState : GameTurnState
             
             if (VARIABLE.Value.IsLiar)
             {
+                NewList = NewList.Except(gameManager.OldKeyWords).ToList();
                 Console.WriteLine($"[라이어 키워드 선정 로직] 선정된 키워드 : 1, 리스트 갯수 {NewList.Count}");
                 
-
                 gameManager.CurrentLiarKeyword = NewList[rnd.Next(NewList.Count)];
                 
                 gameManager.OldKeyWords.Add(gameManager.CurrentLiarKeyword);
