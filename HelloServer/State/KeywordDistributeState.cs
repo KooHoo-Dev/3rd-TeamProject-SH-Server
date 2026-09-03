@@ -60,7 +60,7 @@ public class KeywordDistributeState : GameTurnState
                 
                 gameManager.OldKeyWords.Add(gameManager.CurrentLiarKeyword);
 
-                Protocol.TurnMessage liarMsg = TurnMessageFactory.KeywordDistribute(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.CurrentKeyWord.KeywordId);
+                Protocol.TurnMessage liarMsg = TurnMessageFactory.KeywordDistribute(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.CurrentLiarKeyword.KeywordId);
                 SendAsync(gameManager.currentRoom.members[VARIABLE.Key], liarMsg);
             }
             else
