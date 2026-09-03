@@ -17,20 +17,20 @@ using System.Xml;
         
         private static DataManager instance { get; } = new DataManager();
 
-        private static readonly SemaphoreSlim SendLock 
+        private static readonly SemaphoreSlim DataLock 
             = new SemaphoreSlim(1, 1);
         public static DataManager Instance
         {
             get
             {
-                SendLock.Wait();
+                DataLock.Wait();
                 try
                 {
                     return instance;
                 }
                 finally
                 {
-                    SendLock.Release();
+                    DataLock.Release();
                 }
                 
 

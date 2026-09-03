@@ -226,6 +226,11 @@ public class Room
         
         Protocol.UserInteractionMessage interactionMessage = JsonSerializer.Deserialize<Protocol.UserInteractionMessage>(text);
 
+        if (string.IsNullOrEmpty(interactionMessage?.senderId) || string.IsNullOrEmpty(interactionMessage?.receivedId))
+        {
+            Console.WriteLine($"[null이거나 빈 메세지]");
+            return;
+        }
         switch (interactionMessage.InteractionType)
         {
             case Protocol.InteractionType.PushQuery:
@@ -260,12 +265,38 @@ public class Room
                     Console.WriteLine($"[홀드된 아이템에 없는 경우 리턴] 건드린 id {interactionMessage.senderId}, 건드려진 id{interactionMessage.receivedId}");
                     return;
                 }
-                if (string.IsNullOrEmpty(interactionMessage.Parameter)) break;
 
-                string changedItemId = JsonSerializer.Deserialize<Protocol.ItemPutInBagParameter>(interactionMessage.Parameter).ChangedItemId;
-               
-                    _itemOwners.TryRemove(changedItemId, out _);
-               
+
+
+
+
+                
+                bool IsNeedChange = true;
+                    for (int i = 0; i < gameManager.UserGameInfos[member.User.Id].ItemIds.Length; i++)
+                    {
+                        if (gameManager.UserGameInfos[member.User.Id].ItemIds[i] == null)
+                        {
+                            gameManager.UserGameInfos[member.User.Id].ItemIds[i] = interactionMessage.receivedId;
+                            IsNeedChange = false;
+                        }
+                        
+                    }
+
+                    if (IsNeedChange)
+                    { 
+                        ItemDef holdItemDef =  DataManager.Instance.GetItemDef(int.Parse(interactionMessage.receivedId));
+                        for (int i = 0; i < gameManager.UserGameInfos[member.User.Id].ItemIds.Length; i++)
+                        {
+                            int id = int.Parse(gameManager.UserGameInfos[member.User.Id].ItemIds[i]);
+                            ItemDef currentItem = DataManager.Instance.GetItemDef(id);
+                            if (holdItemDef.CategoryType == currentItem.CategoryType)
+                            {
+                                interactionMessage.Parameter = JsonSerializer.Serialize(
+                                    new Protocol.ItemPutInBagParameter
+                                        { ChangedItemId = currentItem.ItemId.ToString() });
+                            }
+                        }
+                    }
                 interactionMessage.InteractionType = Protocol.InteractionType.ItemPutInBagAnswer;
                 interactionMessage.IsSuccess = true;
                 break;
