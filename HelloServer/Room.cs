@@ -239,6 +239,7 @@ public class Room
                 bool won = _itemOwners.TryAdd(interactionMessage.receivedId, interactionMessage.senderId);
                 if (won == false)
                 {
+                    Console.WriteLine($"[레이스 컨디션으로 인한 리턴] 건드린 id {interactionMessage.senderId}, 건드려진 id{interactionMessage.receivedId}");
                     return;
                 }
                 interactionMessage.InteractionType = Protocol.InteractionType.ItemHoldAnswer;

@@ -54,6 +54,7 @@ public class LiarKeywordGuessEndState : GameTurnState
         foreach (var VARIABLE in gameManager.UserGameInfos)
         {
             Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
+            scoreInfo.UserId = VARIABLE.Key;
             if (VARIABLE.Value.IsLiar)
             {
                 VARIABLE.Value.score +=

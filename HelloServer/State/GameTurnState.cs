@@ -54,7 +54,7 @@ public abstract class GameTurnState : IState
     protected virtual void Tick(object sender, ElapsedEventArgs e)
     {
         currentMsTime += deltaMsTime;
-        if(currentMsTime % 1000 == 0)
+        if(currentMsTime % 5000 == 0)
             Console.WriteLine($"[{gameManager?.currentRoom?.code}][스테이트 머신][{GetGameStateString()?? "null"}] 현재 Timer 상태: {currentMsTime}");
         if (string.IsNullOrEmpty(gameManager?.currentRoom?.code))
         {
