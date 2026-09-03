@@ -260,12 +260,12 @@ public class Room
                     Console.WriteLine($"[홀드된 아이템에 없는 경우 리턴] 건드린 id {interactionMessage.senderId}, 건드려진 id{interactionMessage.receivedId}");
                     return;
                 }
+                if (string.IsNullOrEmpty(interactionMessage.Parameter)) break;
 
-               string changedItemId = JsonSerializer.Deserialize<Protocol.ItemPutInBagParameter>(interactionMessage.Parameter).ChangedItemId;
-               if (string.IsNullOrEmpty(changedItemId) == false)
-               {
+                string changedItemId = JsonSerializer.Deserialize<Protocol.ItemPutInBagParameter>(interactionMessage.Parameter).ChangedItemId;
+               
                     _itemOwners.TryRemove(changedItemId, out _);
-               }
+               
                 interactionMessage.InteractionType = Protocol.InteractionType.ItemPutInBagAnswer;
                 interactionMessage.IsSuccess = true;
                 break;
