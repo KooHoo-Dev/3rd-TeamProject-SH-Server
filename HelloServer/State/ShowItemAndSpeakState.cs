@@ -31,7 +31,7 @@ public class ShowItemAndSpeakState : GameTurnState
             {
                 if (counter == fristIndex)
                 {
-                gameManager.focausUser = VARIABLE.Value.user;
+                    gameManager.focausUser = VARIABLE.Value.user;
                     
                 }
                 counter++;
@@ -53,15 +53,9 @@ public class ShowItemAndSpeakState : GameTurnState
             }
         }
 
-        if (gameManager.currentSpeakedCount >= gameManager.maxSpeakedCount)
-        {
-            gameManager.currentSpeakedCount = 0;
-            stateMachine.ChangeState<PointAtSuspectState>();
-        }
-        else
-        {
+
             BroadcastAsync(TurnMessageFactory.ShowItemAndSpeak(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.focausUser.Id,gameManager.currentCategory.ToString()));
-        }
+
     }
 
 

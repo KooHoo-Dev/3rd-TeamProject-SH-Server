@@ -22,24 +22,22 @@ public class MartReturnState : GameTurnState
         int counter = 0;
         foreach (var VARIABLE in gameManager.UserGameInfos.Values)
         {
-            
-            
-            
-            
             bool isSuccess = IsSuccessQuest(VARIABLE.user.Id);
-            Console.WriteLine($"[마트 리턴 메시지 보내기] {VARIABLE.user.Id}의 차례(성공 여부) :  {isSuccess}");
+
+            userItemLists[counter] = SetRandomFillItemList(VARIABLE.user.Id);
+
+            
             Protocol.UserQuestInfo questInfo = new Protocol.UserQuestInfo();
             questInfo.UserId = VARIABLE.user.Id;
             questInfo.IsSuccess = isSuccess;
             
             userQuestInfos[counter] = questInfo;
-            
-            
-            Protocol.UserItemList itemList = new Protocol.UserItemList();
-            
+            Console.WriteLine($"[마트 리턴 메시지 보내기 {counter}번 째] {VARIABLE.user.Id}의 차례( userItemLists 성공 여부) :  {userItemLists[counter]?.ItemList != null},");
             
             counter++;
         }
+        
+        BroadcastAsync(TurnMessageFactory.MartReturn(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,userItemLists,userQuestInfos));
     }
     
     protected override void Tick(object sender, ElapsedEventArgs e)
@@ -74,7 +72,7 @@ public class MartReturnState : GameTurnState
                 }
             }
         
-        return Sueccess;
+            return Sueccess;
         
     }
 
@@ -82,30 +80,27 @@ public class MartReturnState : GameTurnState
     {
         Random random = new Random();
         Protocol.UserItemList itemList = new Protocol.UserItemList();
-        foreach (var VARIABLE in gameManager.AllCategories)
-        {
-
-        List<string> martCategoryItems = gameManager.AllMartItems[VARIABLE].ToList();
         itemList.UserId = UserId;
         itemList.ItemList = new string[gameManager.AllCategories.Length];
-
-        
-
-        int randomIndex = 0;
-        for (int i = 0; i < gameManager.AllCategories.Length; i++)
+        int counter = 0;
+        foreach (var VARIABLE in gameManager.AllCategories)
         {
-            itemList.ItemList[i] = gameManager.UserGameInfos[UserId].ItemIds[i] ?? "";
-            if (i <= martCategoryItems.Count && string.IsNullOrEmpty(itemList.ItemList[i]))
+            List<string> martCategoryItems = gameManager.AllMartItems[VARIABLE].ToList();
+            int randomIndex = 0;
+            // 유저의 소유 아이템을 꺼낸다
+            itemList.ItemList[counter] = gameManager.UserGameInfos[UserId].ItemIds[counter] ?? "";
+            // 꺼낸 아이템이 비어있거나 null이라면 마트 아이템들 중에 랜덤으로 뽑아서 채운다.
+            if (counter < martCategoryItems.Count && string.IsNullOrEmpty(itemList.ItemList[counter]))
             {
              randomIndex = random.Next(martCategoryItems.Count);
-             itemList.ItemList[i] = martCategoryItems[randomIndex];
+             itemList.ItemList[counter] = martCategoryItems[randomIndex];
              
              martCategoryItems.RemoveAt(randomIndex);
             }
-        }
-        
-        gameManager.UserGameInfos[UserId].ItemIds = itemList.ItemList;
-                    
+            
+            // 원본 저장소에 할당해준다.
+            gameManager.UserGameInfos[UserId].ItemIds = itemList.ItemList;
+            counter++;
         }
         return  itemList;
     }

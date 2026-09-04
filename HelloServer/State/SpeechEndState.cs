@@ -15,8 +15,10 @@ public class SpeechEndState : GameTurnState
     {
         base.Enter();
      
+        gameManager.currentSpeakedCount++;
 
         BroadcastAsync(TurnMessageFactory.SpeechEnd(MaxMsTime,gameManager.currentCycle,gameManager.currentRound));
+        
     }
 
 
@@ -25,13 +27,21 @@ public class SpeechEndState : GameTurnState
         base.Tick(sender, e);
         if (currentMsTime > MaxMsTime)
         {
-            stateMachine.ChangeState<ShowItemAndSpeakState>();
+            if (gameManager.currentSpeakedCount > gameManager.maxSpeakedCount)
+            {
+                gameManager.currentSpeakedCount = 0;
+                stateMachine.ChangeState<PointAtSuspectState>();
+            }
+            else
+            {
+                stateMachine.ChangeState<ShowItemAndSpeakState>();
+                
+            }
         }
     }
 
     public override void Exit()
     {
         base.Exit();
-            gameManager.currentSpeakedCount++;
     }
 }

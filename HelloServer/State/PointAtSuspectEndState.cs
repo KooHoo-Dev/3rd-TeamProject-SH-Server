@@ -20,7 +20,7 @@ public class PointAtSuspectEndState : GameTurnState
         ConcurrentDictionary<string, string> pointInfo = gameManager.PointInfo;
         List<string> list = pointInfo.Values.ToList();
         // 가장 많이 등장한 문자열 찾기(중복 혹은 없으면 "" 반환)
-        gameManager.MostFrequent = GetWinner();  
+        gameManager.MostFrequent = (gameManager.skipCount > (int)(gameManager.UserGameInfos.Count/2)) ? "" : GetWinner();  
         Console.WriteLine($"[{gameManager.currentRoom.code}][최종 당선자] : {gameManager.MostFrequent}");
         BroadcastAsync(TurnMessageFactory.PointAtSuspectEnd(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.MostFrequent));
 
