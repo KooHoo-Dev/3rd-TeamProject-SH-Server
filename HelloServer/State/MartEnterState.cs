@@ -18,15 +18,17 @@ public class MartEnterState : GameTurnState
         int randomIndex = random.Next(gameManager.AllCategories.Length);
         
         Dictionary<CategoryType, List<string>> AllItemIds = new Dictionary<CategoryType, List<string>>();
-  
-        for (int i = 0; i < gameManager.AllCategories.Length; i++)
+        int itmeCounter = 0;
+        foreach (var categoryType in gameManager.AllCategories)
         {
+            Console.WriteLine($"[엔터] 1");
             
-            List<ItemDef> ItemIist = DataManager.Instance.GetItemDefsByCategory(gameManager.AllCategories[(randomIndex + i) % gameManager.AllCategories.Length  - 1]);
+            List<ItemDef> ItemIist = DataManager.Instance.GetItemDefsByCategory(gameManager.AllCategories[(randomIndex + itmeCounter) % gameManager.AllCategories.Length]);
             int MaxItemCount = Math.Min(ItemIist.Count, gameManager.currentRoom.GameConfig.MaxCategoryItemCount);
             List<string> ResultItemList = new List<string>();
-            foreach (var categoryType in gameManager.AllCategories)
+            for (int i = MaxItemCount - 1; i >= 0; i--)
             {
+                Console.WriteLine($"[엔터] 2");
                 
                 int index = random.Next(ItemIist.Count);
                 ResultItemList.Add(ItemIist[index].ItemId.ToString());
@@ -34,9 +36,9 @@ public class MartEnterState : GameTurnState
                 
                 ItemIist.RemoveAt(index);
             }
-            AllItemIds.Add(gameManager.AllCategories[i], ResultItemList);
+            AllItemIds.Add(gameManager.AllCategories[itmeCounter], ResultItemList);
+            itmeCounter++;
         }
-
         Protocol.CategoryItemArray[] sendArrays = new Protocol.CategoryItemArray[AllItemIds.Count];
         int counter = 0;
         foreach (var VARIABLE in AllItemIds)
@@ -50,6 +52,7 @@ public class MartEnterState : GameTurnState
             counter++;
         }
 
+        Console.WriteLine($"[엔터] 3");
         
        foreach (var VARIABLE in gameManager.UserGameInfos.Values)
        {

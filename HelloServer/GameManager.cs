@@ -312,7 +312,12 @@ public class GameManager
         
 
         Console.WriteLine($"테스트3번 위치");
+        MartItemsClear();
         SetRandomCategories();
+        for (int i = 0; i < AllCategories.Length; i++)
+        {
+            AllMartItems.TryAdd(AllCategories[i], new ConcurrentQueue<string>());
+        }
         Console.WriteLine($"테스트4번 위치");
 
         currentCycle = 0;
