@@ -14,8 +14,14 @@ public class ScoreTallyState : GameTurnState
     public override void Enter()
     {
         base.Enter();
+        Protocol.UserScoreInfo[] userScoreInfos = new Protocol.UserScoreInfo[gameManager.UserGameInfos.Count];
+        userScoreInfos = CalculateScoreAndApply();
 
-        BroadcastAsync(TurnMessageFactory.ScoreTally(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.LiarOutButtonQueue?.ToArray(),CalculateScoreAndApply()));
+        for (int i = 0; i < userScoreInfos.Length; i++)
+        {
+            Console.WriteLine($"[최종 점수 집계] {userScoreInfos[i]?.UserId} : {userScoreInfos[i]?.UserScore}");
+        }
+        BroadcastAsync(TurnMessageFactory.ScoreTally(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.LiarOutButtonQueue?.ToArray(),userScoreInfos));
     }
 
 
@@ -39,7 +45,7 @@ public class ScoreTallyState : GameTurnState
         foreach (var VARIABLE in gameManager.UserGameInfos)
         {
             Console.WriteLine($"[라밍아웃 점수 계산 이전] 유저 아이디 : {VARIABLE.Key}, 유저 점수 {VARIABLE.Value.score}");
-            resultInfo[counter].UserId = VARIABLE.Key;
+
             Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
             scoreInfo.UserId = VARIABLE.Key;
             scoreInfo.UserScore = VARIABLE.Value.score;
@@ -61,7 +67,14 @@ public class ScoreTallyState : GameTurnState
             }
             else
             {
-                if(pressedNormalUsers.Count == 0) continue;
+                if(pressedNormalUsers.Count == 0)
+                {
+                    if(scoreInfo.UserScore < 0) scoreInfo.UserScore = 0;
+
+                    resultInfo[counter] = scoreInfo;
+                    counter++;
+                    continue;
+                }
                 bool isPressed = false;
                 for (int i = 0; i < pressedNormalUsers.Count; i++)
                 {
@@ -99,7 +112,7 @@ public class ScoreTallyState : GameTurnState
                     break;
                 }
             Console.WriteLine($"[퀘스트 점수 계산 이후] 유저 아이디 : {scoreInfo.UserId}, 유저 점수 {scoreInfo.UserScore}");
-            resultInfo[counter] =  scoreInfo;
+            resultInfo[counter2] =  scoreInfo;
         }
         
         return  resultInfo;
