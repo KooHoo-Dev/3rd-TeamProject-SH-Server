@@ -30,7 +30,7 @@ public class PointAtSuspectState : GameTurnState
         int harf = (int)(gameManager.UserGameInfos.Count / 2);
 
 
-        if (currentMsTime > MaxMsTime || gameManager.SkipCount >= harf)
+        if (currentMsTime > MaxMsTime || (gameManager.SkipCount > harf))
         { 
             stateMachine.ChangeState<PointAtSuspectEndState>();
         }
