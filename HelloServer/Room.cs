@@ -443,7 +443,7 @@ public class Room
         if (chat.ChatType == Protocol.ChatType.KeywordGuess )
         {
             if(gameManager.currentTurnState != gameManager.liarKeywordGuessState) return;
-            gameManager.ChangeSpeakerTrigger = true;
+
             gameManager.LiarGuessKeyWord = said;
             isVaild = true;
             
