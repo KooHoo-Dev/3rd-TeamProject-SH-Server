@@ -104,6 +104,7 @@ public class LiarKeywordGuessEndState : GameTurnState
                 int scoreAmount = 0;
 
                     Protocol.SelectNum.TryParse(voteDic[VARIABLE.Key].selectNum, out Protocol.SelectNum num);
+                   
                 if (gameManager.MostFrequent == gameManager.LiarId)
                 {
                     scoreAmount = (num) switch
@@ -129,17 +130,23 @@ public class LiarKeywordGuessEndState : GameTurnState
                     };
                 }
                 scoreInfo.UserScore += scoreAmount;
-                
+                Console.WriteLine($"[ 키워드쪽 점수 계산 중] 유저: {VARIABLE.Key}, 선택한 종류: {num}, 적용된 점수 : {scoreAmount}");
             }
 
 
             if(scoreInfo.UserScore < 0) scoreInfo.UserScore = 0;
 
             resultInfo[counter] = scoreInfo;
+            
             counter++;
             Console.WriteLine($"[투표 및 키워드 점수 계산 이후] 유저 아이디 : {scoreInfo.UserId}, 유저 점수 {scoreInfo.UserScore}");
-            
         }
+
+        for (int i = 0; i < resultInfo.Length; i++)
+        {
+            gameManager.UserGameInfos[resultInfo[i].UserId].score = resultInfo[i].UserScore;
+        }
+
         return  resultInfo;
     }
 }
