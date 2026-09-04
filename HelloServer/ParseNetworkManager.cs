@@ -278,7 +278,7 @@ public static class NetworkManager
             case Protocol.InteractionType.ItemPutInBagQuery:
             {
                 var  p = Parse<Protocol.ItemPutInBagParameter>(msg.Parameter);
-                OnItemPutInBagQuery?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId,p.ChangedItemId);
+                OnItemPutInBagQuery?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId,p?.ChangedItemId ?? "");
                 break;
             }
 
@@ -286,7 +286,7 @@ public static class NetworkManager
             case Protocol.InteractionType.ItemPutInBagAnswer:
             {
                 var p = Parse<Protocol.ItemPutInBagParameter>(msg.Parameter);
-                OnItemPutInBagAnswer?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId,p.ChangedItemId);
+                OnItemPutInBagAnswer?.Invoke(msg.IsValid,msg.IsSuccess, msg.senderId, msg.receivedId,p?.ChangedItemId ?? "");
                 break;
             }
 
