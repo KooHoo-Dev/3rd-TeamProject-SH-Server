@@ -57,7 +57,7 @@ public class LiarKeywordGuessEndState : GameTurnState
             scoreInfo.UserId = VARIABLE.Key;
             if (VARIABLE.Value.IsLiar)
             {
-                VARIABLE.Value.score +=
+                scoreInfo.UserScore +=
                     (gameManager.CurrentKeyWord.KeywordName == gameManager.LiarGuessKeyWord)
                         ? keywordGuessScoreChangeAmount
                         : 0;
@@ -68,13 +68,13 @@ public class LiarKeywordGuessEndState : GameTurnState
                 if(string.IsNullOrEmpty(gameManager.PressedLiarId) == false)
                 {
                     
-                    if(VARIABLE.Value.score < 0) VARIABLE.Value.score = 0;
+                    if(scoreInfo.UserScore < 0) scoreInfo.UserScore = 0;
              
                     resultInfo[counter] = scoreInfo;
                     counter++;
                     continue;
                 }
-                VARIABLE.Value.score +=
+                scoreInfo.UserScore +=
                     (gameManager.MostFrequent == gameManager.LiarId)
                         ? 0
                         : voteScoreChangeAmount;
@@ -84,7 +84,7 @@ public class LiarKeywordGuessEndState : GameTurnState
             {
                 Console.WriteLine($"[투표 및 키워드 점수 계산 이전] 일반 유저 아이디 : {VARIABLE.Key}, 유저 점수 {VARIABLE.Value.score}");
                 
-            VARIABLE.Value.score +=
+                scoreInfo.UserScore +=
                     (gameManager.CurrentKeyWord.KeywordName == gameManager.LiarGuessKeyWord)
                         ? 0
                         : (int)(keywordGuessScoreChangeAmount / 2)  == 0 ? 1 : (int)(keywordGuessScoreChangeAmount / 2) ;
@@ -92,7 +92,7 @@ public class LiarKeywordGuessEndState : GameTurnState
                 if(string.IsNullOrEmpty(gameManager.PressedLiarId) == false)
                 {
                     
-                    if(VARIABLE.Value.score < 0) VARIABLE.Value.score = 0;
+                    if(scoreInfo.UserScore < 0) scoreInfo.UserScore = 0;
                     resultInfo[counter] = scoreInfo;
                     counter++;
                     continue;
@@ -125,12 +125,12 @@ public class LiarKeywordGuessEndState : GameTurnState
                         _=> 2222222
                     };
                 }
-                VARIABLE.Value.score += scoreAmount;
+                scoreInfo.UserScore += scoreAmount;
                 
             }
 
 
-            if(VARIABLE.Value.score < 0) VARIABLE.Value.score = 0;
+            if(scoreInfo.UserScore < 0) scoreInfo.UserScore = 0;
 
             resultInfo[counter] = scoreInfo;
             counter++;
