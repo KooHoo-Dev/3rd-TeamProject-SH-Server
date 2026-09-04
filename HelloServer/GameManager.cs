@@ -99,8 +99,8 @@ public class GameManager
     public KeyWordDef CurrentKeyWord = new KeyWordDef();
     public KeyWordDef CurrentLiarKeyword = new KeyWordDef();
     public List<KeyWordDef> OldKeyWords = new List<KeyWordDef>();
-   
 
+    public ConcurrentDictionary<CategoryType,ConcurrentQueue<string>> AllMartItems = new ConcurrentDictionary<CategoryType,ConcurrentQueue<string>>();
     public readonly SemaphoreSlim gameLock 
         = new SemaphoreSlim(1, 1);
 
@@ -374,5 +374,57 @@ public class GameManager
         CurrentKeyWord  = new KeyWordDef();
         CurrentLiarKeyword = new KeyWordDef();
         OldKeyWords.Clear();
+    }
+
+    public void MartItemsClear()
+    {
+        foreach (var VARIABLE in AllMartItems)
+        {
+            VARIABLE.Value.Clear();
+        }
+        AllMartItems.Clear();
+    }
+    public void RemovePlayerSelectedItemFromBag()
+    {
+        foreach (var categoryType in AllCategories)
+        {
+            List<string> list = AllMartItems[categoryType].ToList();
+
+
+            foreach (var userInfo in UserGameInfos)
+            {
+                for (int i = 0; i < userInfo.Value.ItemIds.Length; i++)
+                {
+                    if (list.Contains(userInfo.Value.ItemIds[i]))
+                        list.Remove(userInfo.Value.ItemIds[i]);
+
+                }
+            }
+
+            AllMartItems[categoryType].Clear();
+            for (int i = 0; i < list.Count; i++)
+            {
+                AllMartItems[categoryType].Enqueue(list[i]);
+            }
+        }
+    }
+
+    public void ChangeCategory()
+    {
+        int currentCategoryIndex = -1;
+        for (int i = 0; i < AllCategories.Length; i++)
+        {
+            if (currentCategory == AllCategories[i])
+            {
+                currentCategoryIndex = i;
+                break;
+            }
+        }
+
+        if (currentCategoryIndex != -1)
+        {
+            currentCategory = AllCategories[(currentCategoryIndex + 1) % AllCategories.Length];
+            
+        }
     }
 }

@@ -69,6 +69,7 @@ public class LiarKeywordGuessEndState : GameTurnState
                 {
                     
                     if(scoreInfo.UserScore < 0) scoreInfo.UserScore = 0;
+            Console.WriteLine($"[투표 및 키워드 점수 계산 이후] 유저 아이디 : {scoreInfo.UserId}, 유저 점수 {scoreInfo.UserScore}");
              
                     resultInfo[counter] = scoreInfo;
                     counter++;
@@ -93,6 +94,8 @@ public class LiarKeywordGuessEndState : GameTurnState
                 {
                     
                     if(scoreInfo.UserScore < 0) scoreInfo.UserScore = 0;
+            Console.WriteLine($"[투표 및 키워드 점수 계산 이후] 유저 아이디 : {scoreInfo.UserId}, 유저 점수 {scoreInfo.UserScore}");
+                    
                     resultInfo[counter] = scoreInfo;
                     counter++;
                     continue;

@@ -114,9 +114,24 @@ namespace HelloServer
         [Serializable]
         public class MartReturnParameter
         {
+            
+           public UserQuestInfo[] UserQuestInfo { get; set; }
+           public UserItemList[] UserItemList { get; set; }
+            
+        }
+        [Serializable]
+        public class UserQuestInfo
+        {
+            public string UserId { get; set; }
             public bool IsSuccess { get; set; }
         }
-
+        [Serializable]
+        public class UserItemList
+        {
+            public string UserId { get; set; }
+            public string[] ItemList { get; set; }
+            
+        }
         [Serializable]
         public class ShowItemAndSpeakParameter
         {

@@ -25,15 +25,16 @@ public class MartEnterState : GameTurnState
             List<ItemDef> ItemIist = DataManager.Instance.GetItemDefsByCategory(gameManager.AllCategories[(randomIndex + i) % gameManager.AllCategories.Length ]);
             int MaxItemCount = Math.Min(ItemIist.Count, gameManager.currentRoom.GameConfig.MaxCategoryItemCount);
             List<string> ResultItemList = new List<string>();
-            for (int j = 0; j < MaxItemCount; j++)
+            foreach (var categoryType in gameManager.AllCategories)
             {
                 
                 int index = random.Next(ItemIist.Count);
                 ResultItemList.Add(ItemIist[index].ItemId.ToString());
+                gameManager.AllMartItems[categoryType].Enqueue(ItemIist[index].ItemId.ToString());
+                
                 ItemIist.RemoveAt(index);
             }
             AllItemIds.Add(gameManager.AllCategories[i], ResultItemList);
-            
         }
 
         Protocol.CategoryItemArray[] sendArrays = new Protocol.CategoryItemArray[AllItemIds.Count];

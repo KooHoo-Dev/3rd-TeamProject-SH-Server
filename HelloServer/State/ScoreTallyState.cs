@@ -100,19 +100,17 @@ public class ScoreTallyState : GameTurnState
         }
 
         int counter2 = 0;
-        foreach (var VARIABLE in gameManager.UserGameInfos)
+        foreach (var VARIABLE in resultInfo)
         {
-            Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
-            scoreInfo.UserId = VARIABLE.Key;
-            scoreInfo.UserScore = VARIABLE.Value.score;
-                if (VARIABLE.Value.IsQuestSuccess)
+
+                if (gameManager.UserGameInfos[VARIABLE.UserId].IsQuestSuccess)
                 {
 
-                    scoreInfo.UserScore += gameManager.currentRoom.GameConfig.QuestScoreChangeAmount;
+                    VARIABLE.UserScore += gameManager.currentRoom.GameConfig.QuestScoreChangeAmount;
                     break;
                 }
-            Console.WriteLine($"[퀘스트 점수 계산 이후] 유저 아이디 : {scoreInfo.UserId}, 유저 점수 {scoreInfo.UserScore}");
-            resultInfo[counter2] =  scoreInfo;
+            Console.WriteLine($"[퀘스트 점수 계산 이후] 유저 아이디 : {VARIABLE.UserId}, 유저 점수 {VARIABLE.UserScore}");
+
         }
         
         return  resultInfo;

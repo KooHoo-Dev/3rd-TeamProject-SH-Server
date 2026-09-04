@@ -16,8 +16,11 @@ public class ShowItemAndSpeakState : GameTurnState
     public override void Enter()
     {
         base.Enter();
-        if(gameManager.currentSpeakedCount == 0)
+        if (gameManager.currentSpeakedCount == 0)
+        {
+            gameManager.ChangeCategory();
             gameManager.currentCycle++;
+        }
         
         if (gameManager.currentSpeakedCount == 0)
         {
@@ -79,7 +82,7 @@ public class ShowItemAndSpeakState : GameTurnState
             
         }
     }
-
+    
     public override void Exit()
     {
         base.Exit();
