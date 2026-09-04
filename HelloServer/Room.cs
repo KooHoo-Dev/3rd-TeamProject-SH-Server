@@ -254,6 +254,9 @@ public class Room
             }
             case Protocol.InteractionType.ItemDropQuery:
             {
+                if(_itemOwners.ContainsKey(interactionMessage.receivedId)) return;
+                if(_itemOwners[interactionMessage.receivedId] != interactionMessage.senderId) return;
+                _itemOwners.TryRemove(interactionMessage.receivedId,out _);
                 interactionMessage.InteractionType = Protocol.InteractionType.ItemDropAnswer;
                 interactionMessage.IsSuccess = true;
                 break;

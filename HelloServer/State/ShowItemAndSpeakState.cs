@@ -68,6 +68,8 @@ public class ShowItemAndSpeakState : GameTurnState
         bool trigger = gameManager.ChangeSpeakerTrigger;
         if (string.IsNullOrEmpty(gameManager.PressedLiarId) == false)
         {
+            gameManager.currentSpeakedCount = 0;
+            
             stateMachine.ChangeState<LiarOutButtonPressedState>();
         }
         else if (currentMsTime > MaxMsTime || trigger)

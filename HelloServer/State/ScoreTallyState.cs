@@ -40,18 +40,20 @@ public class ScoreTallyState : GameTurnState
             Console.WriteLine($"[라밍아웃 점수 계산 이전] 유저 아이디 : {VARIABLE.Key}, 유저 점수 {VARIABLE.Value.score}");
             resultInfo[counter].UserId = VARIABLE.Key;
             Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
+            scoreInfo.UserId = VARIABLE.Key;
+            scoreInfo.UserScore = VARIABLE.Value.score;
             if (VARIABLE.Value.IsLiar)
             {
                 if (string.IsNullOrEmpty(gameManager.PressedLiarId) == false
                     && gameManager.LiarGuessKeyWord == gameManager.CurrentLiarKeyword.KeywordName)
                 {
-                    VARIABLE.Value.score += liarButtonScoreChangeAmount;
+                    scoreInfo.UserScore += liarButtonScoreChangeAmount;
                     
                 }
                 else if (string.IsNullOrEmpty(gameManager.PressedLiarId) == false
                          && gameManager.LiarGuessKeyWord != gameManager.CurrentLiarKeyword.KeywordName)
                 {
-                    VARIABLE.Value.score += -1;
+                    scoreInfo.UserScore += -1;
                 }
 
 
@@ -70,11 +72,11 @@ public class ScoreTallyState : GameTurnState
 
                 if (isPressed)
                 {
-                    VARIABLE.Value.score += -(int)(liarButtonScoreChangeAmount/2) == 0 ? -1 : -(int)(liarButtonScoreChangeAmount/2);
+                    scoreInfo.UserScore += -(int)(liarButtonScoreChangeAmount/2) == 0 ? -1 : -(int)(liarButtonScoreChangeAmount/2);
                 }
             }
 
-            if(VARIABLE.Value.score < 0) VARIABLE.Value.score = 0;
+            if(scoreInfo.UserScore < 0) scoreInfo.UserScore = 0;
 
             resultInfo[counter] = scoreInfo;
             counter++;
@@ -82,18 +84,20 @@ public class ScoreTallyState : GameTurnState
             
         }
 
-        
+        int counter2 = 0;
         foreach (var VARIABLE in gameManager.UserGameInfos)
         {
-
+            Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
+            scoreInfo.UserId = VARIABLE.Key;
+            scoreInfo.UserScore = VARIABLE.Value.score;
                 if (VARIABLE.Value.IsQuestSuccess)
                 {
 
-                    VARIABLE.Value.score += gameManager.currentRoom.GameConfig.QuestScoreChangeAmount;
+                    scoreInfo.UserScore += gameManager.currentRoom.GameConfig.QuestScoreChangeAmount;
                     break;
                 }
-            Console.WriteLine($"[퀘스트 점수 계산 이후] 유저 아이디 : {VARIABLE.Key}, 유저 점수 {VARIABLE.Value.score}");
-
+            Console.WriteLine($"[퀘스트 점수 계산 이후] 유저 아이디 : {scoreInfo.UserId}, 유저 점수 {scoreInfo.UserScore}");
+            resultInfo[counter] =  scoreInfo;
         }
         
         return  resultInfo;
