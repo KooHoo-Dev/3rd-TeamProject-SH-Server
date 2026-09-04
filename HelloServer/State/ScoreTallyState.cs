@@ -15,7 +15,7 @@ public class ScoreTallyState : GameTurnState
     {
         base.Enter();
 
-        BroadcastAsync(TurnMessageFactory.ScoreTally(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.LiarOutButtonQueue.ToArray(),CalculateScoreAndApply()));
+        BroadcastAsync(TurnMessageFactory.ScoreTally(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.LiarOutButtonQueue?.ToArray(),CalculateScoreAndApply()));
     }
 
 
@@ -33,7 +33,8 @@ public class ScoreTallyState : GameTurnState
         int liarButtonScoreChangeAmount = gameManager.currentRoom.GameConfig.LiarButtonScoreChangeAmount;
 
         Protocol.UserScoreInfo[] resultInfo = new Protocol.UserScoreInfo[gameManager.UserGameInfos.Count];
-        string[] pressedNormalUsers = gameManager.LiarOutButtonQueue.ToArray();
+        List<string> pressedNormalUsers = new List<string>();
+        pressedNormalUsers = gameManager.LiarOutButtonQueue?.ToList();
         int counter = 0;
         foreach (var VARIABLE in gameManager.UserGameInfos)
         {
@@ -60,8 +61,9 @@ public class ScoreTallyState : GameTurnState
             }
             else
             {
+                if(pressedNormalUsers.Count == 0) continue;
                 bool isPressed = false;
-                for (int i = 0; i < pressedNormalUsers.Length; i++)
+                for (int i = 0; i < pressedNormalUsers.Count; i++)
                 {
                     if (pressedNormalUsers[i] == VARIABLE.Key)
                     {

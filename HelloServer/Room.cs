@@ -297,6 +297,7 @@ public class Room
                                 interactionMessage.Parameter = JsonSerializer.Serialize(
                                     new Protocol.ItemPutInBagParameter
                                         { ChangedItemId = currentItem.ItemId.ToString() });
+                                _itemOwners.TryRemove(currentItem.ItemId.ToString(),out _);
                             }
                         }
                     }
