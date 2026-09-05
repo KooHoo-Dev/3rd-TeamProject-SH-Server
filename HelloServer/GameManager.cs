@@ -312,7 +312,7 @@ public class GameManager
         
 
         Console.WriteLine($"테스트3번 위치");
-        MartItemsClear();
+        MartItemsCategoryClear();
         SetRandomCategories();
         for (int i = 0; i < AllCategories.Length; i++)
         {
@@ -381,13 +381,21 @@ public class GameManager
         OldKeyWords.Clear();
     }
 
+    public void MartItemsCategoryClear()
+    {
+        foreach (var VARIABLE in AllMartItems)
+        {
+            VARIABLE.Value?.Clear();
+        }
+        AllMartItems.Clear();
+    }
     public void MartItemsClear()
     {
         foreach (var VARIABLE in AllMartItems)
         {
-            VARIABLE.Value.Clear();
+            VARIABLE.Value?.Clear();
         }
-        AllMartItems.Clear();
+
     }
     public void RemovePlayerSelectedItemFromBag()
     {

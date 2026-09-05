@@ -52,7 +52,7 @@ public class MartReturnState : GameTurnState
     public override void Exit()
     {
         base.Exit(); 
-        gameManager.MartItemsClear();
+
     }
 
     // 아직 미 구현
