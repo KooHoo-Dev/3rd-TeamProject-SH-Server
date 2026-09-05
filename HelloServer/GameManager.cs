@@ -192,7 +192,7 @@ public class GameManager
         }
 
     }
-    public int skipCount = 0;
+    private int skipCount = 0;
     public int SkipCount
     {
         get
