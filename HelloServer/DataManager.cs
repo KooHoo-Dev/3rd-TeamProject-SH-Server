@@ -42,8 +42,6 @@ public class DataManager
             ItemCategories.Load();
             Items.Load();
             IsReady = true;
-
-            Console.WriteLine($"[진단-Load직후] DataManager 인스턴스 해시: {instance.GetHashCode()}, Genres.Count: {instance.Genres.Count}");
             Console.WriteLine($"[DataManager] : Loaded {Genres.Count} Genres, {Keywords.Count} Keywords, {ItemCategories.Count} ItemCategories, {Items.Count} Items");
         }
         finally
