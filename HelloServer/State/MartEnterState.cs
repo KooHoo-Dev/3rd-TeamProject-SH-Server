@@ -26,6 +26,7 @@ public class MartEnterState : GameTurnState
             List<ItemDef> ItemIist = DataManager.Instance.GetItemDefsByCategory(gameManager.AllCategories[(randomIndex + itmeCounter) % gameManager.AllCategories.Length]);
             int MaxItemCount = Math.Min(ItemIist.Count, gameManager.currentRoom.GameConfig.MaxCategoryItemCount);
             List<string> ResultItemList = new List<string>();
+            gameManager.AllMartItems[categoryType].Clear();
             for (int i = MaxItemCount - 1; i >= 0; i--)
             {
 
