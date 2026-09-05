@@ -15,7 +15,7 @@ public class PointAtSuspectState : GameTurnState
     public override void Enter()
     {
         base.Enter();
-
+        
         BroadcastAsync(TurnMessageFactory.PointAtSuspect(MaxMsTime,gameManager.currentCycle,gameManager.currentRound));
 
         foreach ((string key, string value) in gameManager.PointInfo)
@@ -33,6 +33,7 @@ public class PointAtSuspectState : GameTurnState
 
         if (currentMsTime > MaxMsTime || (gameManager.SkipCount > harf))
         { 
+            gameManager.SkipCount = 0;
             stateMachine.ChangeState<PointAtSuspectEndState>();
         }
     }

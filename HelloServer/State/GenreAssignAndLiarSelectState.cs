@@ -16,6 +16,7 @@ public class GenreAssignAndLiarSelectState: GameTurnState
     {
         base.Enter();
         gameManager.currentRound++;
+        gameManager.currentCycle = 0;
         Random rnd = new Random();
         var dm = DataManager.Instance;
       
