@@ -14,12 +14,12 @@ using System.Xml;
 // 2. DataManager에 추가하면 되는 구조입니다.
 public class DataManager
 {
-    // static readonly 필드 초기화는 CLR이 스레드 안전하게 보장하므로
-    // 여기에 별도의 락이 필요 없습니다. (기존 세마포어는 의미 없는 오버헤드였음)
+
     private static readonly DataManager instance = new DataManager();
     public static DataManager Instance => instance;
 
     // 읽기(Get 계열)는 동시에 여러 스레드 허용, 쓰기(Load)는 배타적으로 처리
+    // ReaderWriterLockSlim : 동기적인 코드에서 쓰는 최신 락,읽기는 병렬 가능, 쓰기는 한번에 하나씩(쓰는동안에는 읽기도 대기) (일반 락보다 무거움)
     private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 
     public GenreTable Genres { get; } = new GenreTable();
