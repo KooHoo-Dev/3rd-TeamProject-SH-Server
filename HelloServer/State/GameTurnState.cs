@@ -35,7 +35,7 @@ public abstract class GameTurnState : IState
      currentMsTime = 0;
      gameManager.currentRoom.timer.Elapsed += Tick;
      gameManager.currentRoom.timer.Start();
-        Console.WriteLine($"[스테이트 머신] 현재 Enter 상태: {stateMachine.CurrentState}, 제한시간(ms): {MaxMsTime}");
+        Console.WriteLine($"[스테이트 머신] 현재 Enter 상태: {stateMachine.CurrentState} , 현재 사이클 {gameManager.currentCycle} , 현재 라운드 {gameManager.currentRound} , 제한시간(ms): {MaxMsTime}");
      
     }
     public string GetGameStateString()

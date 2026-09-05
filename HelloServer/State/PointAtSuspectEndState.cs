@@ -7,6 +7,7 @@ namespace HelloServer.State;
 
 public class PointAtSuspectEndState : GameTurnState
 {
+
     
     public PointAtSuspectEndState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
@@ -18,7 +19,7 @@ public class PointAtSuspectEndState : GameTurnState
         base.Enter();
 
         ConcurrentDictionary<string, string> pointInfo = gameManager.PointInfo;
-        List<string> list = pointInfo.Values.ToList();
+
         // 가장 많이 등장한 문자열 찾기(중복 혹은 없으면 "" 반환)
         gameManager.MostFrequent = (gameManager.SkipCount > (int)(gameManager.UserGameInfos.Count/2)) ? "" : GetWinner();  
         Console.WriteLine($"[{gameManager.currentRoom.code}][최종 당선자] : {gameManager.MostFrequent}");
@@ -31,10 +32,10 @@ public class PointAtSuspectEndState : GameTurnState
         base.Tick(sender, e);
         if (currentMsTime > MaxMsTime)
         {
+
             if (string.IsNullOrEmpty(gameManager.MostFrequent) &&
-                gameManager.currentCycle != gameManager.currentRoom.GameConfig.MaxCycle)
+                gameManager.currentCycle < gameManager.currentRoom.GameConfig.MaxCycle )
             {
-                
                 stateMachine.ChangeState<ShowItemAndSpeakState>();
             }
             else if (string.IsNullOrEmpty(gameManager.MostFrequent) &&

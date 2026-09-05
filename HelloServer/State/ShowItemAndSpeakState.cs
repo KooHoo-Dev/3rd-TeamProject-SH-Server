@@ -16,14 +16,13 @@ public class ShowItemAndSpeakState : GameTurnState
     public override void Enter()
     {
         base.Enter();
+
+        
         if (gameManager.currentSpeakedCount == 0)
         {
             gameManager.ChangeCategory();
             gameManager.currentCycle++;
-        }
-        
-        if (gameManager.currentSpeakedCount == 0)
-        {
+            gameManager.SkipCount = 0;
             Random rnd = new Random();
             fristIndex = rnd.Next(0, gameManager.UserGameInfos.Count);
             int counter = 0;
