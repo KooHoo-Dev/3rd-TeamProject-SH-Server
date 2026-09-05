@@ -27,7 +27,7 @@ public class SpeechEndState : GameTurnState
         base.Tick(sender, e);
         if (currentMsTime > MaxMsTime)
         {
-            if (gameManager.currentSpeakedCount > gameManager.maxSpeakedCount)
+            if (gameManager.currentSpeakedCount >= gameManager.maxSpeakedCount)
             {
                 gameManager.currentSpeakedCount = 0;
                 stateMachine.ChangeState<PointAtSuspectState>();
