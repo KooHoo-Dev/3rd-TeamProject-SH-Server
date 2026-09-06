@@ -99,6 +99,9 @@ public class GameManager
     public KeyWordDef CurrentKeyWord = new KeyWordDef();
     public KeyWordDef CurrentLiarKeyword = new KeyWordDef();
     public List<KeyWordDef> OldKeyWords = new List<KeyWordDef>();
+    
+    // 키값이 건드려진 대상의 ID, 벨류가 건드린 ID
+    public readonly ConcurrentDictionary<string, string> itemOwnersDic = new();
 
     public ConcurrentDictionary<CategoryType,ConcurrentQueue<string>> AllMartItems = new ConcurrentDictionary<CategoryType,ConcurrentQueue<string>>();
     public readonly SemaphoreSlim gameLock 

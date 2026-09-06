@@ -218,8 +218,7 @@ public class Room
 
        await BroadcastAsync(pushAnimationMessage);
     }
-    // 키값이 건드려진 대상의 ID, 벨류가 건드린 ID
-    private readonly ConcurrentDictionary<string, string> _itemOwners = new();
+
     private async Task HandleInteraction(Member member, string text)
     {
         if(gameManager.currentTurnState != gameManager.martMoveState) return;
@@ -241,7 +240,7 @@ public class Room
             }
             case Protocol.InteractionType.ItemHoldQuery:
             {
-                bool won = _itemOwners.TryAdd(interactionMessage.receivedId, interactionMessage.senderId);
+                bool won = gameManager.itemOwnersDic.TryAdd(interactionMessage.receivedId, interactionMessage.senderId);
                 if (won == false)
                 {
                     Console.WriteLine($"[레이스 컨디션으로 인한 리턴] 건드린 id {interactionMessage.senderId}, 건드려진 id{interactionMessage.receivedId}");
@@ -254,16 +253,16 @@ public class Room
             }
             case Protocol.InteractionType.ItemDropQuery:
             {
-                if(_itemOwners.ContainsKey(interactionMessage.receivedId) == false) return;
-                if(_itemOwners[interactionMessage.receivedId] != interactionMessage.senderId) return;
-                _itemOwners.TryRemove(interactionMessage.receivedId,out _);
+                if(gameManager.itemOwnersDic.ContainsKey(interactionMessage.receivedId) == false) return;
+                if(gameManager.itemOwnersDic[interactionMessage.receivedId] != interactionMessage.senderId) return;
+                gameManager.itemOwnersDic.TryRemove(interactionMessage.receivedId,out _);
                 interactionMessage.InteractionType = Protocol.InteractionType.ItemDropAnswer;
                 interactionMessage.IsSuccess = true;
                 break;
             }
             case Protocol.InteractionType.ItemPutInBagQuery:
             {
-                if (_itemOwners.ContainsKey(interactionMessage.receivedId) ==false)
+                if (gameManager.itemOwnersDic.ContainsKey(interactionMessage.receivedId) ==false)
                 {
                     Console.WriteLine($"[홀드된 아이템에 없는 경우 리턴] 건드린 id {interactionMessage.senderId}, 건드려진 id{interactionMessage.receivedId}");
                     return;
@@ -297,7 +296,7 @@ public class Room
                                 interactionMessage.Parameter = JsonSerializer.Serialize(
                                     new Protocol.ItemPutInBagParameter
                                         { ChangedItemId = currentItem.ItemId.ToString() });
-                                _itemOwners.TryRemove(currentItem.ItemId.ToString(),out _);
+                                gameManager.itemOwnersDic.TryRemove(currentItem.ItemId.ToString(),out _);
                             }
                         }
                     }
