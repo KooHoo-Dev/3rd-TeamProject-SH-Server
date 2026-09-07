@@ -35,6 +35,7 @@ public class MartReturnState : GameTurnState
             Console.WriteLine($"[마트 리턴 메시지 보내기 {counter}번 째] {VARIABLE.user.Id}의 차례( userItemLists 성공 여부) :  {userItemLists[counter]?.ItemList != null},");
             
             counter++;
+            
         }
         
         BroadcastAsync(TurnMessageFactory.MartReturn(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,userItemLists,userQuestInfos));
@@ -64,7 +65,7 @@ public class MartReturnState : GameTurnState
             for (int i = 0; i < gameManager.currentRoom.GameConfig.MaxCycle; i++)
             {
                 
-                if (gameManager.UserGameInfos[UserId].ItemIds[i] != null && gameManager.UserGameInfos[UserId].ItemIds[i] == gameManager.QuestInfo[UserId])
+                if (string.IsNullOrEmpty(gameManager.UserGameInfos[UserId].ItemIds[i]) == false && gameManager.UserGameInfos[UserId].ItemIds[i] == gameManager.QuestInfo[UserId])
                 {
                     Sueccess = true;
                     gameManager.UserGameInfos[UserId].IsQuestSuccess = true;
