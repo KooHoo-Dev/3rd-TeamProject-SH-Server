@@ -50,6 +50,7 @@ public class LiarKeywordGuessEndState : GameTurnState
             gameManager.VoteQueue.TryDequeue(out Protocol.VoteMessage msg);
             voteDic.Add(msg.UserID,msg);
         }
+        
         int counter = 0;
         foreach (var VARIABLE in gameManager.UserGameInfos)
         {
@@ -102,8 +103,15 @@ public class LiarKeywordGuessEndState : GameTurnState
                 }
 
                 int scoreAmount = 0;
-
-                    Protocol.SelectNum.TryParse(voteDic[VARIABLE.Key].selectNum, out Protocol.SelectNum num);
+                Protocol.SelectNum num;
+                if (voteDic.ContainsKey(VARIABLE.Key) == false)
+                {
+                    num = Protocol.SelectNum.DontKnow;
+                }
+                else
+                {
+                    Protocol.SelectNum.TryParse(voteDic[VARIABLE.Key].selectNum, out num);
+                }
                    
                 if (gameManager.MostFrequent == gameManager.LiarId)
                 {
