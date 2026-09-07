@@ -193,7 +193,7 @@ public class Room
             }
             if(kind?.Type == "move") HandleMove(member, text);
             else if(kind?.Type == "chat") await HandleChatAsync(member, text);
-            else if (kind?.Type == "Ready") await HandleReady(member, text);
+            else if (kind?.Type == "ready") await HandleReady(member, text);
             else if (kind?.Type == "게임 시작") await HandleGameStart();
             else if(kind?.Type == "NonPoint")  await HandleNonPoint(member, text);
             else if(kind?.Type == "Select") await HandleSelectUser( member, text);
