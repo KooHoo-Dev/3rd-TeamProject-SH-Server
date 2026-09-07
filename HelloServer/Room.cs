@@ -268,45 +268,108 @@ public class Room
                     return;
                 }
 
+                interactionMessage.IsSuccess = true;
+                interactionMessage.InteractionType = Protocol.InteractionType.ItemPutInBagAnswer;
 
 
+                if (int.TryParse(interactionMessage.receivedId, out int holdItemId) == false)
+                {
+                    interactionMessage.IsSuccess = false;
+                    Console.WriteLine($"[아이템 체인지 로직] 해석되지 않는 아이디 들어옴");
+                    break;
+                }
+                ItemDef holdItemDef = DataManager.Instance.GetItemDef(holdItemId);
+                if (holdItemDef == null)
+                {
+                    interactionMessage.IsSuccess = false; // 잘못된 아이템 ID
+                    Console.WriteLine($"[아이템 체인지 로직] : 아이템이 존재하지 않는 ID {interactionMessage.receivedId}");
+
+                }
+                bool IsNeedChanged = false;
+                int nullCount = 0;
+                for(int j = 0; j < gameManager.currentRoom.GameConfig.MaxCycle; j++)
+                {
+                    if (gameManager.UserGameInfos[member.User.Id].ItemIds[j] == null)
+                    {
+                        nullCount++;
+                        continue;
+                    }
+                    int.TryParse(gameManager.UserGameInfos[member.User.Id].ItemIds[j],  out int bagInItemId);
+                    ItemDef currentItemDef = DataManager.Instance.GetItemDef(bagInItemId) ?? new ItemDef();
+                    if (string.IsNullOrEmpty(currentItemDef?.ItemId.ToString()))
+                    {
+                        Console.WriteLine($"[가방 속 아이템 해석] 가방에 아이템이 있지만 유효한 값이 아님");
+                    }
+
+                    if (currentItemDef.CategoryType == holdItemDef.CategoryType)
+                    {
+                        IsNeedChanged = true;
+                    }
+                }
+
+                if (IsNeedChanged)
+                {
+                    if (gameManager.UserGameInfos.TryGetValue(member.User.Id, out var userInfo))
+                    {
+                        bool found = false;
+                        for (int i = 0; i < userInfo.ItemIds.Length; i++)
+                        {
+                            Console.WriteLine($"[아이템 체인지 로직] : 1번");
+                            string selectedItemId = userInfo.ItemIds[i] ?? "";
+                            if (string.IsNullOrEmpty(selectedItemId)) continue;
+                            if (!int.TryParse(selectedItemId, out int id)) continue;
+                            Console.WriteLine($"[아이템 체인지 로직] : 2번");
+
+                            ItemDef currentItem = DataManager.Instance.GetItemDef(id);
+                            if (currentItem != null && holdItemDef.CategoryType == currentItem.CategoryType)
+                            {
+                                Console.WriteLine($"[아이템 체인지 로직] : 3번");
+
+                                interactionMessage.Parameter = JsonSerializer.Serialize(
+                                    new Protocol.ItemPutInBagParameter
+                                        { ChangedItemId = currentItem.ItemId.ToString() });
+                                Console.WriteLine($"[아이템 체인지 로직] : 4번");
+
+                                gameManager.itemOwnersDic.TryRemove(currentItem.ItemId.ToString(), out _);
+                                Console.WriteLine($"[아이템 체인지 로직] : 5번");
+
+                                userInfo.ItemIds[i] = holdItemDef.ItemId.ToString();
+                                Console.WriteLine($"[아이템 체인지 로직] : 6번");
+
+                                found = true;
+                                break;
+                            }
+                        }
 
 
-                
-                bool IsNeedChange = true;
-                    for (int i = 0; i < gameManager.UserGameInfos[member.User.Id].ItemIds.Length; i++)
+                        Console.WriteLine($"[아이템 체인지 로직] : 바꾸기 성공 여부 : {found}");
+                        interactionMessage.IsSuccess = found; // 못 찾았으면 실패로
+                    }
+                    else
+                    {
+                        interactionMessage.IsSuccess = false; // 유저 정보 없음
+                        Console.WriteLine($"[아이템 체인지 로직] : 유저 정보 없음");
+                    }
+
+                }
+                else if (nullCount != 0)
+                {
+                    Console.WriteLine($"[일반적인 아이템 추가]");
+                    for (int i = 0; i < gameManager.currentRoom.GameConfig.MaxCycle; i++)
                     {
                         if (gameManager.UserGameInfos[member.User.Id].ItemIds[i] == null)
                         {
                             gameManager.UserGameInfos[member.User.Id].ItemIds[i] = interactionMessage.receivedId;
-                            IsNeedChange = false;
                             break;
                         }
-                        
                     }
-
-                    if (IsNeedChange)
-                    { 
-                        ItemDef holdItemDef =  DataManager.Instance.GetItemDef(int.Parse(interactionMessage.receivedId));
-                        for (int i = 0; i < gameManager.UserGameInfos[member.User.Id].ItemIds.Length; i++)
-                        {
-                            string selectedItemId = gameManager.UserGameInfos[member.User.Id].ItemIds[i] ?? "";
-                            if(string.IsNullOrEmpty(selectedItemId)) continue;
-                            int id = int.Parse(selectedItemId);
-                            ItemDef currentItem = DataManager.Instance.GetItemDef(id);
-                            if (holdItemDef.CategoryType == currentItem?.CategoryType)
-                            {
-                                interactionMessage.Parameter = JsonSerializer.Serialize(
-                                    new Protocol.ItemPutInBagParameter
-                                        { ChangedItemId = currentItem.ItemId.ToString() });
-                                gameManager.itemOwnersDic.TryRemove(currentItem.ItemId.ToString(),out _);
-                                break;
-                            }
-                        }
-                    }
-                interactionMessage.InteractionType = Protocol.InteractionType.ItemPutInBagAnswer;
-                interactionMessage.IsSuccess = true;
+                }
+                else
+                {
+                    Console.WriteLine($"[비어있지도 않지만, 같은 카테고리도 발견하지 못한 버그]");
+                }
                 break;
+                
             }
         }
 

@@ -11,7 +11,28 @@ public class GameManager
     {
         public Protocol.User user;
         public bool IsLiar;
-        public string[] ItemIds;
+        private string[] itemIds;
+
+        public string[] ItemIds
+        {
+            get
+            {
+                lock (userLock)
+                {
+                    return  itemIds;
+                }
+  
+            }
+            set
+            {
+                lock (userLock)
+                {
+                    itemIds = value;
+                }
+
+            }
+        }
+
         public string HoldingItem;
         public int score;
         public bool IsQuestSuccess;
@@ -28,6 +49,8 @@ public class GameManager
         {
             
         }
+        public readonly SemaphoreSlim userLock 
+            = new SemaphoreSlim(1, 1);
     }
     StateMachine<IState> stateMachine;
 
