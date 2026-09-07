@@ -86,6 +86,18 @@ public class MartReturnState : GameTurnState
         foreach (var VARIABLE in gameManager.AllCategories)
         {
             List<string> martCategoryItems = gameManager.AllMartItems[VARIABLE].ToList();
+            // 이미 선택된 아이템들은 걸러주는 작업
+            foreach (var userInfo in gameManager.UserGameInfos.Values)
+            {
+                for (int i = userInfo.ItemIds.Length - 1; i >= 0; i--)
+                {
+                    if(string.IsNullOrEmpty(userInfo.ItemIds[i] ?? "")) continue;
+                    if (martCategoryItems.Contains(userInfo.ItemIds[i]))
+                    {
+                        martCategoryItems.Remove(userInfo.ItemIds[i]);
+                    }
+                }
+            }
             int randomIndex = 0;
             // 유저의 소유 아이템을 꺼낸다
             itemList.ItemList[counter] = gameManager.UserGameInfos[UserId].ItemIds[counter] ?? "";
@@ -102,6 +114,7 @@ public class MartReturnState : GameTurnState
             gameManager.UserGameInfos[UserId].ItemIds = itemList.ItemList;
             counter++;
         }
+        
         return  itemList;
     }
     

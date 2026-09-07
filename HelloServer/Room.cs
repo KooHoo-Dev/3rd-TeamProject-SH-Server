@@ -394,6 +394,7 @@ public class Room
     private async Task HandleGameStart()
     {
         if(gameManager.IsGameRunning) return;
+        if(members.Count < 3) return;
         Protocol.GameStartOKMessage gameStartOkMessage = new Protocol.GameStartOKMessage();
         Protocol.NewGameConfig newGameConfig = new Protocol.NewGameConfig();
         newGameConfig.MaxCycle = GameConfig.MaxCycle;
