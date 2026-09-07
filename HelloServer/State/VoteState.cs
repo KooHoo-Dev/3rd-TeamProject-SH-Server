@@ -15,6 +15,7 @@ public class VoteState : GameTurnState
     {
         base.Enter();
 
+        gameManager.VoteQueue.Clear();
         BroadcastAsync(TurnMessageFactory.Vote(MaxMsTime,gameManager.currentCycle,gameManager.currentRound));
     }
 
