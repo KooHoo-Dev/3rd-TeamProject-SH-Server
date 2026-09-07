@@ -290,9 +290,11 @@ public class Room
                         ItemDef holdItemDef =  DataManager.Instance.GetItemDef(int.Parse(interactionMessage.receivedId));
                         for (int i = 0; i < gameManager.UserGameInfos[member.User.Id].ItemIds.Length; i++)
                         {
-                            int id = int.Parse(gameManager.UserGameInfos[member.User.Id].ItemIds[i]);
+                            string selectedItemId = gameManager.UserGameInfos[member.User.Id].ItemIds[i] ?? "";
+                            if(string.IsNullOrEmpty(selectedItemId)) continue;
+                            int id = int.Parse(selectedItemId);
                             ItemDef currentItem = DataManager.Instance.GetItemDef(id);
-                            if (holdItemDef.CategoryType == currentItem.CategoryType)
+                            if (holdItemDef.CategoryType == currentItem?.CategoryType)
                             {
                                 interactionMessage.Parameter = JsonSerializer.Serialize(
                                     new Protocol.ItemPutInBagParameter
