@@ -366,6 +366,7 @@ public class Room
        bool isAllReeay = true;
        foreach (Member m in members.Values)
        {
+           if(m.IsHost) continue;
            if (m.IsReady == false)
            {
                isAllReeay = false;
