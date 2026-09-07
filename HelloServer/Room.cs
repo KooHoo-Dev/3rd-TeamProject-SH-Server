@@ -360,8 +360,8 @@ public class Room
     private async Task HandleReady(Member member, string text)
     {
        Protocol.ReadyMessage readyMessage = JsonSerializer.Deserialize<Protocol.ReadyMessage>(text);
-       bool isReady = members[readyMessage.ID].IsReady;
-       members[readyMessage.ID].IsReady = isReady;
+
+       members[readyMessage.ID].IsReady = true;
        Console.WriteLine($"[{code}] {readyMessage.ID} : 준비 버튼을 눌렀다!");
        bool isAllReeay = true;
        foreach (Member m in members.Values)
@@ -374,7 +374,7 @@ public class Room
            }
        }
        
-       await BroadcastAsync(readyMessage, member.User.Id);
+       await BroadcastAsync(readyMessage);
        if (isAllReeay)
        {
 
@@ -396,6 +396,12 @@ public class Room
     {
         if(gameManager.IsGameRunning) return;
         if(members.Count < 3) return;
+
+        foreach (var member in members.Values)
+        {
+            member.IsReady = false;
+        }
+        
         Protocol.GameStartOKMessage gameStartOkMessage = new Protocol.GameStartOKMessage();
         Protocol.NewGameConfig newGameConfig = new Protocol.NewGameConfig();
         newGameConfig.MaxCycle = GameConfig.MaxCycle;
