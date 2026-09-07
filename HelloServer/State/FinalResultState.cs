@@ -15,6 +15,7 @@ public class FinalResultState : GameTurnState
     public override void Enter()
     {
         base.Enter();
+        List<string> winerIds = new List<string>();
         
         int maxScore = -999999;
         string winerId = "";
@@ -27,8 +28,7 @@ public class FinalResultState : GameTurnState
                 winerId = VARIABLE.Key;
             }
         }
-
-        List<string> winerIds = new List<string>();
+        winerIds.Add(winerId);
         foreach (var VARIABLE in gameManager.UserGameInfos)
         {
             if (VARIABLE.Key != winerId && VARIABLE.Value.score == maxScore )
