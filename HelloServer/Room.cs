@@ -280,6 +280,7 @@ public class Room
                         {
                             gameManager.UserGameInfos[member.User.Id].ItemIds[i] = interactionMessage.receivedId;
                             IsNeedChange = false;
+                            break;
                         }
                         
                     }
@@ -297,6 +298,7 @@ public class Room
                                     new Protocol.ItemPutInBagParameter
                                         { ChangedItemId = currentItem.ItemId.ToString() });
                                 gameManager.itemOwnersDic.TryRemove(currentItem.ItemId.ToString(),out _);
+                                break;
                             }
                         }
                     }
@@ -363,16 +365,19 @@ public class Room
 
        members[readyMessage.ID].IsReady = true;
        Console.WriteLine($"[{code}] {readyMessage.ID} : 준비 버튼을 눌렀다!");
-       bool isAllReeay = true;
+       bool isAllReeay = false;
+       int count = 0;
        foreach (Member m in members.Values)
        {
            if(m.IsHost) continue;
-           if (m.IsReady == false)
+           if (m.IsReady)
            {
-               isAllReeay = false;
-               break;
+               count++;
+
            }
        }
+       readyMessage.readyCount = count;
+       if(count >= members.Count - 1) isAllReeay = true;
        
        await BroadcastAsync(readyMessage);
        if (isAllReeay)
@@ -610,6 +615,18 @@ public class Room
             welcome.RoomCode = code; // 서버 방정보를 보낸다
             welcome.User = member.User; // 서버에서 생성한 유저 정보를 접속자에게 보낸다
             welcome.Users = already.ToArray(); // 현재 방에 있는 유저들 정보를 보낸다
+            int count = 0;
+            foreach (Member m in members.Values)
+            {
+                if(m.IsHost) continue;
+                if (m.IsReady)
+                {
+                    count++;
+
+                }
+            }
+
+            welcome.ReadyCount = count;
             await SendAsync(member, welcome);
             if (members.IsEmpty) member.IsHost = true; // 가장 처음 접속하면 호스트 취급한다.
             members[member.User.Id] = member;
