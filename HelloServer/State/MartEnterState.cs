@@ -20,25 +20,27 @@ public class MartEnterState : GameTurnState
         int randomIndex = random.Next(gameManager.AllCategories.Length);
         
         Dictionary<CategoryType, List<string>> AllItemIds = new Dictionary<CategoryType, List<string>>();
-        int itmeCounter = 0;
-        foreach (var categoryType in gameManager.AllCategories)
+
+        for (int i = 0; i <  gameManager.AllCategories.Length; i++)
         {
 
-            
-            List<ItemDef> ItemIist = DataManager.Instance.GetItemDefsByCategory(gameManager.AllCategories[(randomIndex + itmeCounter) % gameManager.AllCategories.Length]);
+            CategoryType currentCategory =
+                gameManager.AllCategories[(randomIndex + i) % gameManager.AllCategories.Length];
+
+            List<ItemDef> ItemIist = DataManager.Instance.GetItemDefsByCategory(currentCategory);
             int MaxItemCount = Math.Min(ItemIist.Count, gameManager.currentRoom.GameConfig.MaxCategoryItemCount);
             List<string> ResultItemList = new List<string>();
-            for (int i = MaxItemCount - 1; i >= 0; i--)
+            for (int j = MaxItemCount - 1; j >= 0; j--)
             {
 
                 int index = random.Next(ItemIist.Count);
                 ResultItemList.Add(ItemIist[index].ItemId.ToString());
-                gameManager.AllMartItems[categoryType].Enqueue(ItemIist[index].ItemId.ToString());
+                gameManager.AllMartItems[currentCategory].Enqueue(ItemIist[index].ItemId.ToString());
                 
                 ItemIist.RemoveAt(index);
             }
-            AllItemIds.Add(gameManager.AllCategories[itmeCounter], ResultItemList);
-            itmeCounter++;
+            AllItemIds.Add(currentCategory, ResultItemList);
+
         }
         Protocol.CategoryItemArray[] sendArrays = new Protocol.CategoryItemArray[AllItemIds.Count];
         int counter = 0;
