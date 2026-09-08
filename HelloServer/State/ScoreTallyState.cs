@@ -54,13 +54,13 @@ public class ScoreTallyState : GameTurnState
                 if (string.IsNullOrEmpty(gameManager.PressedLiarId) == false
                     && gameManager.LiarGuessKeyWord == gameManager.CurrentKeyWord.KeywordName)
                 {
-                    scoreInfo.UserScore += liarButtonScoreChangeAmount * 2;
+                    scoreInfo.UserScore += liarButtonScoreChangeAmount;
                     
                 }
                 else if (string.IsNullOrEmpty(gameManager.PressedLiarId) == false
                          && gameManager.LiarGuessKeyWord != gameManager.CurrentKeyWord.KeywordName)
                 {
-                    scoreInfo.UserScore += -1 * liarButtonScoreChangeAmount * 2;
+                    scoreInfo.UserScore += -1 * liarButtonScoreChangeAmount;
                 }
 
 
