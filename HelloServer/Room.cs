@@ -354,15 +354,17 @@ public class Room
                 }
                 else if (nullCount != 0)
                 {
-                    Console.WriteLine($"[일반적인 아이템 추가]");
+                    bool isSuccess = false;
                     for (int i = 0; i < gameManager.currentRoom.GameConfig.MaxCycle; i++)
                     {
-                        if (gameManager.UserGameInfos[member.User.Id].ItemIds[i] == null)
+                        if (gameManager.UserGameInfos[member.User.Id].ItemIds[i] == null && gameManager.AllCategories[i] == holdItemDef?.CategoryType)
                         {
                             gameManager.UserGameInfos[member.User.Id].ItemIds[i] = interactionMessage.receivedId;
+                            isSuccess = true;
                             break;
                         }
                     }
+                    Console.WriteLine($"[일반적인 아이템 추가] : 성공 여부 : {isSuccess}");
                 }
                 else
                 {

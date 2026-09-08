@@ -17,7 +17,7 @@ public class MartEnterState : GameTurnState
         gameManager.MartItemsClear();
         gameManager.itemOwnersDic.Clear();
         Random random = new Random();
-        int randomIndex = random.Next(gameManager.AllCategories.Length);
+        int randomIndex;
         
         Dictionary<CategoryType, List<string>> AllItemIds = new Dictionary<CategoryType, List<string>>();
 
@@ -25,7 +25,7 @@ public class MartEnterState : GameTurnState
         {
 
             CategoryType currentCategory =
-                gameManager.AllCategories[(randomIndex + i) % gameManager.AllCategories.Length];
+                gameManager.AllCategories[(i) % gameManager.AllCategories.Length];
 
             List<ItemDef> ItemIist = DataManager.Instance.GetItemDefsByCategory(currentCategory);
             int MaxItemCount = Math.Min(ItemIist.Count, gameManager.currentRoom.GameConfig.MaxCategoryItemCount);
