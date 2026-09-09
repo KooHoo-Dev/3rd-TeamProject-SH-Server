@@ -539,10 +539,7 @@ public class Room
         member.X = move.X;
         member.Y = move.Y;
         member.Z = move.Z;
-        
-        //member.MovesSinceLog++;
-       // LogMove(member, move);
-     _ = BroadcastStateAsync();
+
     }
 
     // 채팅 관련 메시지를 처리하는 함수
