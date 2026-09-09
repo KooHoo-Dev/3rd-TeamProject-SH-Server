@@ -150,19 +150,11 @@ public class Room
         StringBuilder builder = new StringBuilder();
         Decoder decoder = Encoding.UTF8.GetDecoder();
         int totalBytes = 0;
-        // StringBuilder?
-        // : 여러 문자들을 이어붙힐때 사용하는 객체. string은 각각 개별로
-        // 생성되는 별도의 객체임("a" + "b" + "c" = "abc" 이런식이면 총 string 4개가 생성됨)
-        // StringBuilder를 사용하게 되면 하나의 스트링 객체를 이어 붙힐 수 있게 됨.
-        // 예전에 유니티에서도 많이 썼었음.
-        // TMP_Text text 객체에게 text.SetText("abc"); 하면 내부에서 StringBuilder를
-        // 이용해서 문자열을 취합해 줍니다. 최적화된 "문자열 계산기"라고 생각하면 됩니다
-            
+
+        try
+        {
             while (true)
             {
-                // 웹소켓 수신 결과를 저장할 수있는 객체를 선언해주고,
-                // await 키워드를 이용하여 해당 소켓(유저와 연결된..)에
-                // 메시지가 들어올때까지 기다려 줍니다.
                 WebSocketReceiveResult result;
                 try
                 {
@@ -170,15 +162,11 @@ public class Room
                 }
                 catch (WebSocketException)
                 {
-                    // 인사 없이 끊었다. 닫힌 것과 똑같이 취급한다.
                     return null;
                 }
 
-                // 예외 처리부터 해줍니다. 소켓이 닫혔을 경우.
                 if (result.MessageType == WebSocketMessageType.Close) return null;
-                // Decoder는 내부적으로 "이전 호출에서 다 못 쓴 바이트"를 기억하고 있다가
-                // 다음 GetChars 호출 때 이어붙여서 디코딩하기 때문에, 청크 경계에서 문자가 잘려도 안전합니다.
-                // 이게 StreamReader가 내부적으로 하는 일이기도 합니다.
+
                 int charCount = decoder.GetCharCount(buffer, 0, result.Count, false);
                 char[] chars = ArrayPool<char>.Shared.Rent(charCount);
                 try
@@ -190,24 +178,22 @@ public class Room
                 {
                     ArrayPool<char>.Shared.Return(chars);
                 }
+
                 totalBytes += result.Count;
-                // 메세지가 한번에 너무 많이 들어오면 연결을 끊어버린다.
                 if (totalBytes > MaxMessageBytes)
                 {
                     await socket.CloseAsync(WebSocketCloseStatus.MessageTooBig, "들어온 메세지가 상한을 넘었습니다.", token);
                     return null;
                 }
-                // 일단 메세지가 도착을 했으면 StringBuilder에 이어 붙혀 줍니다. 
-                builder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
-                // 메세지가 끝났니?. 끝났다면
-                // StringBuilder.ToString을 호출해서 String을 생성하여 반환합니다. 
+                
                 if (result.EndOfMessage) return builder.ToString();
-
-                // 아니라면 다시 루프를 반복합니다
             }
-
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
     }
-    
     // 멤버와 연결이 끊길때까지 멤버가 보낸 메시지를 계속 듣는다. 
     private async Task ReceiveLoopAsync(Member member, CancellationToken token)
     {
