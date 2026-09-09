@@ -273,10 +273,10 @@ public class Room
             }
             case Protocol.InteractionType.ItemHoldQuery:
             {
-                bool won = gameManager.itemOwnersDic.TryAdd(interactionMessage.receivedId, interactionMessage.senderId);
+                bool won = gameManager.itemOwnersDic.TryAdd(interactionMessage.receivedId, member.User.Id);
                 if (won == false)
                 {
-                    Console.WriteLine($"[레이스 컨디션으로 인한 리턴] 건드린 id {interactionMessage.senderId}, 건드려진 id{interactionMessage.receivedId}");
+                    Console.WriteLine($"[레이스 컨디션으로 인한 리턴] 건드린 id {member.User.Id}, 건드려진 id{interactionMessage.receivedId}");
                     return;
                 }
                 interactionMessage.InteractionType = Protocol.InteractionType.ItemHoldAnswer;
