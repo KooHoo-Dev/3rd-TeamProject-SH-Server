@@ -399,6 +399,15 @@ public class GameManager
         }
 
     }
+
+    public void SetMartItemsDicCategory()
+    {
+        MartItemsCategoryClear();
+        for (int i = 0; i < AllCategories.Length; i++)
+        {
+            AllMartItems.TryAdd(AllCategories[i], new ConcurrentQueue<string>());
+        }
+    }
     public void RemovePlayerSelectedItemFromBag()
     {
         foreach (var categoryType in AllCategories)

@@ -14,10 +14,10 @@ public class MartEnterState : BaseGameTurnState
     public override void Enter()
     {
         base.Enter();
-        gameManager.MartItemsClear();
         gameManager.itemOwnersDic.Clear();
         gameManager.SetRandomCategories();
         gameManager.ChangeCategory();
+        gameManager.SetMartItemsDicCategory();
         Random random = new Random();
         int randomIndex;
         
