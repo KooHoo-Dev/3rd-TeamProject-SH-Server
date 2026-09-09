@@ -120,7 +120,8 @@ public class Room
     
     public bool IsEmpty => members.IsEmpty;
     public GameConfig GameConfig { get; }
-    public bool roomExpired = false;
+    public int roomExpired;
+    public bool RoomExpired => Volatile.Read(ref roomExpired) == 1;
     private readonly CancellationTokenSource roomExpiredCancellation = new();
     public Room(string code, GameConfig config)
     {
@@ -200,6 +201,11 @@ public class Room
         // 토큰에 취소 요청이 없으면 계속 돈다
         while (token.IsCancellationRequested == false)
         {
+            if (RoomExpired)
+            {
+               await LeaveAsync(member);
+               return;
+            }
             string text = await ReceiveTextAsync(member.Socket, token);
             // text가 비어있으면 닫았다는 뜻
             if (string.IsNullOrEmpty(text)) return;
@@ -833,7 +839,7 @@ public class Room
             members.TryRemove(member.User.Id, out _);
             if (gameManager.IsGameRunning)
             {
-                roomExpired = true;
+                Interlocked.Exchange(ref roomExpired, 1);
                 gameManager.GameEnd();
                 await roomExpiredCancellation.CancelAsync();
             }
