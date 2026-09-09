@@ -27,7 +27,8 @@ public class RoomHub
     private int lastId;
 
     GameConfig DefulatConfig;
-
+    // 방 개수 상한
+    private const int MaxRooms = 16;
 
     public RoomHub(int broadcastPerSecond, GameConfig  defulatConfig)
     {
@@ -56,6 +57,7 @@ public class RoomHub
         //  잠글 수 있음)
         lock (gate)
         {
+            
             if (rooms.TryGetValue(code, out Entry entry) == false)
             {
                 
@@ -65,7 +67,8 @@ public class RoomHub
                 
                 Console.WriteLine($"[{code}] 방을 열었다. 총 방의 개수 : {rooms.Count}");
             }
-            if (entry.Users >= 4) return null;   // 요구사항: 최대 4인
+            if (entry.Users >= 4) return null;   //  최대 4인 제한
+            if (rooms.Count >= MaxRooms && rooms.ContainsKey(code) == false) return null; // 최대 방 개수 제한
             entry.Users++;
             return entry.Room;
         }
@@ -112,6 +115,7 @@ public class RoomHub
         {
             // room.HandleAsync는 유저가 퇴장할때 끝납니다.
             Leave(code);
+            
         }
     }
 
@@ -186,7 +190,9 @@ public class RoomHub
         
         // raw의 앞뒤 공백을 제거하고, 대문자 처리 해준다.
         string code = raw.Trim().ToUpper();
-
+        
+        // 방 코드 길이 상한
+        if (code.Length is < 1 or > 8) return null;
         // string의 문자를 하나씩 검사해서
         // 특수문자가 있는지 확인해 준다
         foreach (char c in code)

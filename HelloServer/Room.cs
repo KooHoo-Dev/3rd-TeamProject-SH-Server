@@ -827,6 +827,11 @@ public class Room
             // 루프가 종료되었으면 연결이 끊어진 것
             // 퇴장 처리 해준다
             await LeaveAsync(member);
+            if (socket.State == WebSocketState.Open)
+            {
+                // 클라이언트가 '정상 종료'로 인식하도록 닫기 인사를 보낸다.
+                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "bye", CancellationToken.None);
+            }
         }
     }
     

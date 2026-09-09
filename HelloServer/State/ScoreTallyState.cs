@@ -88,8 +88,6 @@ public class ScoreTallyState : BaseGameTurnState
             Console.WriteLine($"[라밍아웃 점수 계산 이후] 유저 아이디 : {scoreInfo.UserId}, 유저 점수 {scoreInfo.UserScore}");
             
         }
-
-        int counter2 = 0;
         foreach (var VARIABLE in resultInfo)
         {
 
