@@ -286,9 +286,15 @@ public class Room
             }
             case Protocol.InteractionType.ItemDropQuery:
             {
-                if(gameManager.itemOwnersDic.ContainsKey(member.User.Id) == false) return;
-                if(gameManager.itemOwnersDic[interactionMessage.receivedId] != member.User.Id) return;
-                gameManager.itemOwnersDic.TryRemove(interactionMessage.receivedId,out _);
+
+                if (gameManager.itemOwnersDic.TryRemove(interactionMessage.receivedId, out string userId))
+                {
+                    Console.WriteLine($"[내려놓기 성공]: {userId}");
+                }
+                else
+                {
+                    Console.WriteLine("[내려놓기 실패]:(키가 없음)");
+                }
                 interactionMessage.InteractionType = Protocol.InteractionType.ItemDropAnswer;
                 interactionMessage.IsSuccess = true;
                 break;
