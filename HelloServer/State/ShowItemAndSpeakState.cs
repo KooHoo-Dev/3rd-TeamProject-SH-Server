@@ -25,30 +25,31 @@ public class ShowItemAndSpeakState : BaseGameTurnState
             gameManager.SkipUserDicClear();
             Random rnd = new Random();
             firstIndex = rnd.Next(0, gameManager.UserGameInfos.Count);
-            int counter = 0;
-            foreach (var VARIABLE in gameManager.UserGameInfos)
+
+            List<GameManager.UserInfo> userList = gameManager.UserGameInfos.Values.ToList().OrderBy(info => info.user.Id).ToList();
+            for (int i = 0; i < userList.Count; i++)
             {
-                if (counter == firstIndex)
+                if (i == firstIndex)
                 {
-                    gameManager.focausUser = VARIABLE.Value.user;
+                    gameManager.focausUser = userList[i].user;
                     
                 }
-                counter++;
+
             }
    
         }
         else
         {
-            int counter = 0;
-            
-            foreach (var VARIABLE in gameManager.UserGameInfos)
+
+            List<GameManager.UserInfo> userList = gameManager.UserGameInfos.Values.ToList().OrderBy(info => info.user.Id).ToList();
+            for(int i = 0; i < userList.Count; i++)
             {
-                if (counter == (gameManager.currentSpeakedCount + firstIndex) % (gameManager.UserGameInfos.Count))
+                if (i == (gameManager.currentSpeakedCount + firstIndex) % (gameManager.UserGameInfos.Count))
                 {
-                    gameManager.focausUser = VARIABLE.Value.user;
+                    gameManager.focausUser = userList[i].user;
                     
                 }
-                counter++;
+
             }
         }
 
