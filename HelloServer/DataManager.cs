@@ -73,7 +73,10 @@ public class DataManager
         try { return ItemCategories.Get(id); }
         finally { _lock.ExitReadLock(); }
     }
-
+    public List<CategoryType> GetAllTypes()
+    {
+        return ItemCategories.GetAllTypes();
+    }
     public ItemDef GetItemDef(int id)
     {
         _lock.EnterReadLock();

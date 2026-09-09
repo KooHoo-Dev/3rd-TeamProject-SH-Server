@@ -4,9 +4,9 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class LiarKeywordGuessEndState : GameTurnState
+public class LiarKeywordGuessEndState : BaseGameTurnState
 {
-
+    protected override Type NextState => typeof(ScoreTallyState);
     public LiarKeywordGuessEndState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -21,18 +21,6 @@ public class LiarKeywordGuessEndState : GameTurnState
             CalculateScoreAndApply());
         BroadcastAsync(msg);
         
-    }
-
-
-    public override void Tick(int deltaMs)
-    {
-        base.Tick(deltaMs);
-
-
-        if (currentMsTime > MaxMsTime)
-        {
-            stateMachine.ChangeState<ScoreTallyState>();
-        }
     }
 
     // 시민이 라이어를 맞춘 여부와, 라이어가 키워드를 맞춘 여부에 따라 점수 분배
@@ -105,15 +93,13 @@ public class LiarKeywordGuessEndState : GameTurnState
 
                 int scoreAmount = 0;
                 Protocol.SelectNum num;
-                if (voteDic.ContainsKey(VARIABLE.Key) == false)
+                if (voteDic.TryGetValue(VARIABLE.Key, out Protocol.VoteMessage vote) == false ||
+                    Enum.TryParse(vote.selectNum, out num) == false)
                 {
+                    // 안 냈거나 규약에 없는 값이면 '모르겠다'로 본다.
                     num = Protocol.SelectNum.DontKnow;
                 }
-                else
-                {
-                    Protocol.SelectNum.TryParse(voteDic[VARIABLE.Key].selectNum, out num);
-                }
-                   
+                
                 if (gameManager.MostFrequent == gameManager.LiarId)
                 {
                     scoreAmount = (num) switch
@@ -123,7 +109,7 @@ public class LiarKeywordGuessEndState : GameTurnState
                         Protocol.SelectNum.NotLiar => -(int)(voteScoreChangeAmount / 2) == 0
                             ? -1
                             : -(int)(voteScoreChangeAmount / 2),
-                        _=> 111111
+                        _=> 0
                     };
                 }
                 else
@@ -135,8 +121,13 @@ public class LiarKeywordGuessEndState : GameTurnState
                             : -(int)(voteScoreChangeAmount / 2),
                         Protocol.SelectNum.DontKnow => 0,
                         Protocol.SelectNum.NotLiar => voteScoreChangeAmount,
-                        _=> 2222222
+                        _=> 0
                     };
+                }
+
+                if (num != Protocol.SelectNum.DontKnow && scoreAmount == 0)
+                {
+                    Console.WriteLine($"[투표 범위가 아닌 투표 값 에러] num의 값 : {num}");
                 }
                 scoreInfo.UserScore += scoreAmount;
                 Console.WriteLine($"[ 키워드쪽 점수 계산 중] 유저: {VARIABLE.Key}, 선택한 종류: {num}, 적용된 점수 : {scoreAmount}");

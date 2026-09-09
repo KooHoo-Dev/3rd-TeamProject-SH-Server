@@ -4,9 +4,9 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class GenreAssignAndLiarSelectState: GameTurnState
+public class GenreAssignAndLiarSelectState: BaseGameTurnState
 {
- 
+    protected override Type NextState => typeof(KeywordDistributeState);
     public GenreAssignAndLiarSelectState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
         
@@ -20,8 +20,7 @@ public class GenreAssignAndLiarSelectState: GameTurnState
         Random rnd = new Random();
         var dm = DataManager.Instance;
       
-        Console.WriteLine($"[장르 랜덤 숫자] 랜덤 테스트 : {rnd.Next(0, DataManager.Instance.Genres.Count)}");
-        
+
         GenreDef genreDef = DataManager.Instance.Genres.Get(rnd.Next(DataManager.Instance.Genres.Count));
         gameManager.CurrentGanre = genreDef;
         Console.WriteLine($"[장르 선정 로직] 현재 장르 : {genreDef?.GenreName}");
@@ -34,7 +33,7 @@ public class GenreAssignAndLiarSelectState: GameTurnState
         }
 
         int rendIndex = rnd.Next(0, gameManager.UserGameInfos.Count);
-        Console.WriteLine($"[라이어 유저 랜덤 인덱스] 인덱스 : {rendIndex}, 전체 게임 유저 수 {gameManager.UserGameInfos.Count}");
+
         GameManager.UserInfo Liar = new GameManager.UserInfo();
         int counter = 0;
         foreach (var VARIABLE in gameManager.UserGameInfos)
@@ -56,19 +55,5 @@ public class GenreAssignAndLiarSelectState: GameTurnState
 
         
         BroadcastAsync(TurnMessageFactory.GenreAssignAndLiarSelect(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.CurrentGanre.GenreId,gameManager.LiarId ));
-    }
- 
-    public override void Tick(int deltaMs)
-    {
-        base.Tick(deltaMs);
-        if (currentMsTime > MaxMsTime)
-        {
-            stateMachine.ChangeState<KeywordDistributeState>();
-        }
-    }
-
-    public override void Exit()
-    {
-        base.Exit();
     }
 }

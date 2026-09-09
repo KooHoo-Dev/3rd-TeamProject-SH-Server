@@ -5,7 +5,7 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class PointAtSuspectEndState : GameTurnState
+public class PointAtSuspectEndState : BaseGameTurnState
 {
 
     
@@ -26,9 +26,9 @@ public class PointAtSuspectEndState : GameTurnState
         BroadcastAsync(TurnMessageFactory.PointAtSuspectEnd(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.MostFrequent));
 
     }
-    public override void Tick(int deltaMs)
+    public override void Tick()
     {
-        base.Tick(deltaMs);
+        base.Tick();
         if (currentMsTime > MaxMsTime)
         {
 
@@ -40,7 +40,8 @@ public class PointAtSuspectEndState : GameTurnState
             else if (string.IsNullOrEmpty(gameManager.MostFrequent) &&
                      gameManager.currentCycle >= gameManager.currentRoom.GameConfig.MaxCycle)
             {
-                gameManager.SkipCount = 0;
+                    gameManager.SkipUserDicClear();
+
                 stateMachine.ChangeState<PointAtSuspectState>();
             }
             else if (string.IsNullOrEmpty(gameManager.MostFrequent) == false)

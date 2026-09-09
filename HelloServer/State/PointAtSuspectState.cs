@@ -5,9 +5,10 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class PointAtSuspectState : GameTurnState
+public class PointAtSuspectState : BaseGameTurnState
 {
     private int harf = 0;
+    protected override Type NextState => typeof(PointAtSuspectEndState);
     public PointAtSuspectState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -25,12 +26,11 @@ public class PointAtSuspectState : GameTurnState
         harf = (int)(gameManager.UserGameInfos.Count / 2);
         
     }
-    public override void Tick(int deltaMs)
+    public override void Tick()
     {
-        base.Tick(deltaMs);
+        base.Tick();
 
-
-        if (currentMsTime > MaxMsTime || (gameManager.SkipCount > harf))
+        if ((gameManager.SkipCount > harf))
         { 
             stateMachine.ChangeState<PointAtSuspectEndState>();
         }

@@ -21,7 +21,6 @@ public class RoomHub
     private readonly Dictionary<string, Entry> rooms = new();
 
     private readonly int broadcastPerSecond;
-    private readonly int logMovesPerSecond;
 
     private readonly object gate = new object();
 
@@ -30,10 +29,9 @@ public class RoomHub
     GameConfig DefulatConfig;
 
 
-    public RoomHub(int broadcastPerSecond, int logMovesPerSecond, GameConfig  defulatConfig)
+    public RoomHub(int broadcastPerSecond, GameConfig  defulatConfig)
     {
         this.broadcastPerSecond = broadcastPerSecond;
-        this.logMovesPerSecond = logMovesPerSecond;
         this.DefulatConfig = defulatConfig;
 
     }
@@ -62,7 +60,7 @@ public class RoomHub
             {
                 
                 entry = new Entry()
-                    {Room = new Room(code, logMovesPerSecond, DefulatConfig, broadcastPerSecond), Users = 0};
+                    {Room = new Room(code, DefulatConfig), Users = 0};
                 rooms.Add(code, entry);
                 
                 Console.WriteLine($"[{code}] 방을 열었다. 총 방의 개수 : {rooms.Count}");
@@ -130,51 +128,48 @@ public class RoomHub
         // 타이머 클래스 입니다. TimeSpan(검색해보세여)으로 1초당 몇펀 broadcast할지 타이머를
         // 설정해 놨습니다.
 
-        try
+
+        // 타이머가 종료되면 자동으로 false를 반환합니다.
+        while (await timer.WaitForNextTickAsync(token))
         {
-            // 타이머가 종료되면 자동으로 false를 반환합니다.
-            while (await timer.WaitForNextTickAsync(token))
+            try
             {
                 // 락을걸기전에 snapshot(복사본)이 들어갈
                 // list를 생성해놓는다
-                List<Room> snapshot = new List<Room>();
+                var snapshot = new List<Room>();
 
                 // 위에 설정된 object 객체인 gate를 이용하여 lock을 걸어놓는다.
                 lock (gate)
                 {
-                    if(rooms.Count ==0) continue;
+                    if (rooms.Count == 0) continue;
 
-                    foreach (Entry entry in rooms.Values)
-                    {
-                        snapshot.Add(entry.Room);
-                    }
+                    foreach (var entry in rooms.Values) snapshot.Add(entry.Room);
                 }
 
 
-                foreach (Room room in snapshot)
+                foreach (var room in snapshot)
                 {
                     // 만약 게임 중이라면 게임 진행을 한다.
-                    if (room.gameManager.IsGameRunning)
-                    {
-                        room.GameTick();
-                        
-                    }
-                    // 상태정보 보내는 Task를 가져와서 sending에 추가해준다.
-                  _= room.BroadcastStateAsync();
-                }
-                
-            }
+                    if (room.gameManager.IsGameRunning) room.GameTick();
 
+                    // 마트 이동 상태가 아니라면 계속 보내지 않는다.
+                    if (room.gameManager.currentTurnState != room.gameManager.martMoveState) continue;
+                    
+                    _ = room.BroadcastStateAsync();
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // 서버가 꺼지는 중.
+            }
+            catch (Exception e)
+            {
+                // 방 하나가 터져도 나머지 방 방송은 계속되어야 한다.
+                // Message만 찍으면 원인 추적이 불가능하므로 e 전체를 찍는다.
+                Console.WriteLine($"[RoomHub] 방송 실패: {e}");
+            }
         }
-        catch (OperationCanceledException)
-        {
-            // 서버가 꺼지는 중.
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"[RoomHub] Exception: {e.Message}");
-        }
-    }
+}
 
     // 방 코드를 정규화 하는 유틸 함수입니다.
     // 빈 문자처리, 특수문자 처리등을 합니다.

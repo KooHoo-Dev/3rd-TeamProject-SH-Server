@@ -4,9 +4,9 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class MartMoveState : GameTurnState
+public class MartMoveState : BaseGameTurnState
 {
-
+    protected override Type NextState => typeof(MartReturnState);
     public MartMoveState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -17,16 +17,5 @@ public class MartMoveState : GameTurnState
 
         BroadcastAsync(TurnMessageFactory.MartMove(MaxMsTime,gameManager.currentCycle,gameManager.currentRound));
     }
-
-
-    public override void Tick(int deltaMs)
-    {
-        base.Tick(deltaMs);
-        if (currentMsTime > MaxMsTime)
-        {
-            stateMachine.ChangeState<MartReturnState>();
-        }
-        
-    }
-
+    
 }

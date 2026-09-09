@@ -4,9 +4,9 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class VoteState : GameTurnState
+public class VoteState : BaseGameTurnState
 {
-
+    protected override Type NextState => typeof(VoteEndState);
     public VoteState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -20,10 +20,10 @@ public class VoteState : GameTurnState
     }
 
 
-    public override void Tick(int deltaMs)
+    public override void Tick()
     {
-        base.Tick(deltaMs);
-        if (currentMsTime > MaxMsTime || gameManager.Votes.Count >= gameManager.UserGameInfos.Count - 1)
+        base.Tick();
+        if (gameManager.Votes.Count >= gameManager.UserGameInfos.Count - 1)
         {
             stateMachine.ChangeState<VoteEndState>();
         }

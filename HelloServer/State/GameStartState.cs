@@ -5,9 +5,9 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class GameStartState : GameTurnState
+public class GameStartState : BaseGameTurnState
 {
-
+    protected override Type NextState => typeof(GenreAssignAndLiarSelectState);
     public GameStartState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float maxTime) : base(stateMachine, gameManager, maxTime)
     {
         
@@ -20,19 +20,5 @@ public class GameStartState : GameTurnState
         gameManager.currentCycle = 0;
         
         BroadcastAsync(TurnMessageFactory.GameStart(MaxMsTime,0,0));
-    }
-
-    public override void Tick(int deltaMs)
-    {
-        base.Tick(deltaMs);
-        if (currentMsTime > MaxMsTime)
-        {
-            stateMachine.ChangeState<GenreAssignAndLiarSelectState>();
-        }
-    }
-
-    public override void Exit()
-    {
-        base.Exit();
     }
 }

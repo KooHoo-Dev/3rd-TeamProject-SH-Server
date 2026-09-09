@@ -4,9 +4,9 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class MartEnterState : GameTurnState
+public class MartEnterState : BaseGameTurnState
 {
-   
+    protected override Type NextState => typeof(MartMoveState);
     public MartEnterState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -68,14 +68,5 @@ public class MartEnterState : GameTurnState
            
        }
     }
-
-
-    public override void Tick(int deltaMs)
-    {
-        base.Tick(deltaMs);
-        if (currentMsTime > MaxMsTime)
-        {
-            stateMachine.ChangeState<MartMoveState>();
-        }
-    }
+    
 }

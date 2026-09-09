@@ -4,7 +4,7 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class SpeechEndState : GameTurnState
+public class SpeechEndState : BaseGameTurnState
 {
 
     public SpeechEndState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
@@ -22,9 +22,9 @@ public class SpeechEndState : GameTurnState
     }
 
 
-    public override void Tick(int deltaMs)
+    public override void Tick()
     {
-        base.Tick(deltaMs);
+        base.Tick();
         if (currentMsTime > MaxMsTime)
         {
             if (gameManager.currentSpeakedCount >= gameManager.maxSpeakedCount)
@@ -40,8 +40,5 @@ public class SpeechEndState : GameTurnState
         }
     }
 
-    public override void Exit()
-    {
-        base.Exit();
-    }
+
 }

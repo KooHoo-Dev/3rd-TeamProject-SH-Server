@@ -4,7 +4,7 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class ShowItemAndSpeakState : GameTurnState
+public class ShowItemAndSpeakState : BaseGameTurnState
 {
 
 
@@ -22,7 +22,7 @@ public class ShowItemAndSpeakState : GameTurnState
         {
             gameManager.ChangeCategory();
             gameManager.currentCycle++;
-            gameManager.SkipCount = 0;
+            gameManager.SkipUserDicClear();
             Random rnd = new Random();
             fristIndex = rnd.Next(0, gameManager.UserGameInfos.Count);
             int counter = 0;
@@ -58,9 +58,9 @@ public class ShowItemAndSpeakState : GameTurnState
     }
 
 
-    public override void Tick(int deltaMs)
+    public override void Tick()
     {
-        base.Tick(deltaMs);
+        base.Tick();
         bool trigger = gameManager.ChangeSpeakerTrigger;
         if (string.IsNullOrEmpty(gameManager.PressedLiarId) == false)
         {
@@ -76,9 +76,5 @@ public class ShowItemAndSpeakState : GameTurnState
         }
     }
     
-    public override void Exit()
-    {
-        base.Exit();
-        
-    }
+ 
 }

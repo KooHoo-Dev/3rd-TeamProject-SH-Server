@@ -4,10 +4,10 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class LiarOutButtonPressedState : GameTurnState
+public class LiarOutButtonPressedState : BaseGameTurnState
 {
 
-
+    protected override Type NextState => typeof(LiarKeywordGuessState);
     public LiarOutButtonPressedState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -17,24 +17,8 @@ public class LiarOutButtonPressedState : GameTurnState
         base.Enter();
         
         
-        Console.WriteLine($"[라밍아웃 초기화] 변수 내용 :{gameManager.PressedLiarId}");
 
         BroadcastAsync(TurnMessageFactory.LiarOutButtonPressed(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.PressedLiarId));
     }
 
-
-    public override void Tick(int deltaMs)
-    {
-        base.Tick(deltaMs);
-        if (currentMsTime > MaxMsTime)
-        {
-            stateMachine.ChangeState<LiarKeywordGuessState>();
-        }
-    }
-
-    public override void Exit()
-    {
-        base.Exit();
-  
-    }
 }

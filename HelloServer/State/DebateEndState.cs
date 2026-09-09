@@ -4,9 +4,9 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class DebateEndState: GameTurnState
+public class DebateEndState: BaseGameTurnState
 {
-
+    protected override Type NextState => typeof(VoteState);
     public DebateEndState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float maxTime) : base(stateMachine, gameManager, maxTime)
     {
     }
@@ -16,15 +16,5 @@ public class DebateEndState: GameTurnState
         base.Enter();
 
         BroadcastAsync(TurnMessageFactory.DebateEnd(MaxMsTime,gameManager.currentCycle,gameManager.currentRound));
-    }
-
-
-    public override void Tick(int deltaMs)
-    {
-        base.Tick(deltaMs);
-        if (currentMsTime > MaxMsTime)
-        {
-            stateMachine.ChangeState<VoteState>();
-        }
     }
 }

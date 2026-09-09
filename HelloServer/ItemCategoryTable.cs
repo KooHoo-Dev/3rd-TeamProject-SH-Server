@@ -13,7 +13,12 @@ using Jay.FileIO;
 
         public int Count => itemCategoryDefs.Count;
         public ItemCategoryDef Get(int id) => itemCategoryDefs.TryGetValue(id, out ItemCategoryDef def) ? def : null;
-
+        public List<CategoryType> GetAllTypes()
+        {
+            List<CategoryType> types = new List<CategoryType>();
+            foreach (ItemCategoryDef def in itemCategoryDefs.Values) types.Add(def.CategoryType);
+            return types;
+        }
         public void Load()
         {
             itemCategoryDefs.Clear();

@@ -4,9 +4,9 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class ScoreTallyState : GameTurnState
+public class ScoreTallyState : BaseGameTurnState
 {
-
+    protected override Type NextState => typeof(ScoreTallyEndState);
     public ScoreTallyState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -22,16 +22,6 @@ public class ScoreTallyState : GameTurnState
             Console.WriteLine($"[최종 점수 집계] {userScoreInfos[i]?.UserId} : {userScoreInfos[i]?.UserScore}");
         }
         BroadcastAsync(TurnMessageFactory.ScoreTally(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.LiarOutButtonQueue?.ToArray(),userScoreInfos));
-    }
-
-
-    public override void Tick(int deltaMs)
-    {
-        base.Tick(deltaMs);
-        if (currentMsTime > MaxMsTime)
-        {
-            stateMachine.ChangeState<ScoreTallyEndState>();
-        }
     }
     // 라이어 자진공개 버튼을 누른 여부에 따라 점수 분배
     private Protocol.UserScoreInfo[] CalculateScoreAndApply()
@@ -103,13 +93,12 @@ public class ScoreTallyState : GameTurnState
         foreach (var VARIABLE in resultInfo)
         {
 
-                if (gameManager.UserGameInfos[VARIABLE.UserId].IsQuestSuccess)
-                {
+                if (gameManager.UserGameInfos[VARIABLE.UserId].IsQuestSuccess == false) continue;
+                
 
                     VARIABLE.UserScore += gameManager.currentRoom.GameConfig.QuestScoreChangeAmount;
-                    break;
-                }
-                Console.WriteLine($"[퀘스트 점수 계산 이후] 유저 아이디 : {VARIABLE.UserId}, 유저 점수 {VARIABLE.UserScore}");
+                
+                Console.WriteLine($"[퀘스트 성공 계산] 유저 아이디 : {VARIABLE.UserId}, 유저 점수 {VARIABLE.UserScore}");
 
         }
         

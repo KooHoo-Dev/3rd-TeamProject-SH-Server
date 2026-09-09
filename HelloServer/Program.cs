@@ -41,15 +41,13 @@ public class Program
         // 앱의 구성에 값을 가져온다 "Room:BroadcastPerSecond" 키의 값을, 없다면 10을 넣는다
         int perSecond = app.Configuration.GetValue("Room:BroadcastPerSecond", 10);
         
-        // 앱의 구성에 값을 가져온다 "Room:LogMovesPerSecond" 키의 값을, 없다면 1을 넣는다
-        int logMoves = app.Configuration.GetValue("Room:LogMovesPerSecond", 1);
 
         DataManager.Instance.Load();
         GameConfig gameConfig = app.Configuration.GetSection("GameConfig").Get<GameConfig>();
 
         
         // 서버에 방을 추가해 줍시다.
-        RoomHub hub = new RoomHub(perSecond, logMoves,  gameConfig);
+        RoomHub hub = new RoomHub(perSecond,  gameConfig);
         
         app.UseWebSockets();
         app.MapGet("/ping", () => "pong");
@@ -94,19 +92,15 @@ public class Program
         
         // 어느 주소로 찾아오면 되는지 한번 출력함
         // (강의장에서 서버 실행했을때 주소 확인용)
-        Announce(perSecond, logMoves);
+        Announce();
         
         app.Run();
     }
 
     // 수업에서 안한 함수
-    private static void Announce(int perSecond, int logMoves)
+    private static void Announce()
     {
-        string moveLog = logMoves <= 0
-            ? "위치 로그는 안 찍는다"
-            : $"위치 로그는 사람마다 초당 {logMoves}줄";
 
-        Console.WriteLine($"[방] 초당 {perSecond}번 뿌린다. {moveLog}.");
 
         foreach (IPAddress address in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
         {

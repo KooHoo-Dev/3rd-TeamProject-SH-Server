@@ -4,7 +4,7 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class FinalResultEndState : GameTurnState
+public class FinalResultEndState : BaseGameTurnState
 {
  
     public FinalResultEndState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float maxTime) : base(stateMachine, gameManager, maxTime)
@@ -20,9 +20,9 @@ public class FinalResultEndState : GameTurnState
     }
 
  
-    public override void Tick(int deltaMs)
+    public override void Tick()
     {
-        base.Tick(deltaMs);
+        base.Tick();
         if (currentMsTime > MaxMsTime)
         {
              gameManager.GameEnd();

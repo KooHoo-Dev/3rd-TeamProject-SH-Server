@@ -4,9 +4,9 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class FinalResultState : GameTurnState
+public class FinalResultState : BaseGameTurnState
 {
-
+    protected override Type NextState => typeof(FinalResultEndState);
     public FinalResultState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float maxTime) : base(stateMachine, gameManager, maxTime)
     {
         
@@ -42,14 +42,5 @@ public class FinalResultState : GameTurnState
         BroadcastAsync(TurnMessageFactory.FinalResult(MaxMsTime, gameManager.currentCycle, gameManager.currentRound,
             winerIds.ToArray()));
     }
-
-
-    public override void Tick(int deltaMs)
-    {
-        base.Tick(deltaMs);
-        if (currentMsTime > MaxMsTime)
-        {
-            stateMachine.ChangeState<FinalResultEndState>();
-        }
-    }
+    
 }

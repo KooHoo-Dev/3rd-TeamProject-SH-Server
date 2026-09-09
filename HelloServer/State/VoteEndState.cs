@@ -4,7 +4,7 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class VoteEndState : GameTurnState
+public class VoteEndState : BaseGameTurnState
 {
 
 
@@ -53,9 +53,9 @@ public class VoteEndState : GameTurnState
     }
 
 
-    public override void Tick(int deltaMs)
+    public override void Tick()
     {
-        base.Tick(deltaMs);
+        base.Tick();
         if (currentMsTime > MaxMsTime)
         {
 

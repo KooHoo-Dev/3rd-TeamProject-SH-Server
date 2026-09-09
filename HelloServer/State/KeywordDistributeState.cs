@@ -4,9 +4,9 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class KeywordDistributeState : GameTurnState
+public class KeywordDistributeState : BaseGameTurnState
 {
-
+    protected override Type NextState => typeof(MartEnterState);
     public KeywordDistributeState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
 
@@ -40,7 +40,7 @@ public class KeywordDistributeState : GameTurnState
 
         if (NewList.Contains(gameManager.CurrentKeyWord))
         {
-            Console.WriteLine($"[키워드 선정 로직] 삭제 로직 이전");
+
             NewList.Remove(gameManager.CurrentKeyWord);
             
         }
@@ -54,7 +54,7 @@ public class KeywordDistributeState : GameTurnState
             if (VARIABLE.Value.IsLiar)
             {
                 NewList = NewList.Except(gameManager.OldKeyWords).ToList();
-                Console.WriteLine($"[라이어 키워드 선정 로직] 선정된 키워드 : 1, 리스트 갯수 {NewList.Count}");
+
                 
                 gameManager.CurrentLiarKeyword = NewList[rnd.Next(NewList.Count)];
                 
@@ -69,13 +69,5 @@ public class KeywordDistributeState : GameTurnState
             }
         }
         
-    }
-    public override void Tick(int deltaMs)
-    {
-        base.Tick(deltaMs);
-        if (currentMsTime > MaxMsTime)
-        {
-            stateMachine.ChangeState<MartEnterState>();
-        }
     }
 }

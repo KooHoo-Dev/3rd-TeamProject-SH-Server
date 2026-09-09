@@ -59,8 +59,7 @@ namespace Jay.FSM
                 return;
             }
 
-            // 자기 자신 상태를 반복해서 진입 할 수 있도록 주석 처리함
-           // if (ReferenceEquals(next, CurrentState)) return;
+             if (ReferenceEquals(next, CurrentState)) return;
             
             var prev = CurrentState;
 
@@ -76,11 +75,11 @@ namespace Jay.FSM
             return CurrentState is T;
         }
 
-        public void Tick(int deltaTime)
+        public void Tick()
         {
             if (CurrentState is IUpdatableState updatable)
             {
-                updatable.Tick(deltaTime);
+                updatable.Tick();
             }
         }
     }

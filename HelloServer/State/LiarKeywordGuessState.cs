@@ -4,9 +4,9 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class LiarKeywordGuessState : GameTurnState
+public class LiarKeywordGuessState : BaseGameTurnState
 {
-
+    protected override Type NextState => typeof(LiarKeywordGuessEndState);
     public LiarKeywordGuessState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -19,10 +19,10 @@ public class LiarKeywordGuessState : GameTurnState
     }
 
 
-    public override void Tick(int deltaMs)
+    public override void Tick()
     {
-        base.Tick(deltaMs);
-        if (currentMsTime > MaxMsTime || string.IsNullOrEmpty(gameManager.LiarGuessKeyWord) == false)
+        base.Tick();
+        if (string.IsNullOrEmpty(gameManager.LiarGuessKeyWord) == false)
         {
             stateMachine.ChangeState<LiarKeywordGuessEndState>();
         }

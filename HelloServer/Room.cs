@@ -64,10 +64,11 @@ public class Room
 {
 
     public  GameManager gameManager;
-    public int DeltaMs {get; private set;}
 
     private int isBroadcasting;
     private bool IsBroadcasting => Volatile.Read(ref isBroadcasting) == 1;
+    
+    
     // 접속자 한 명.
     public class Member
     {
@@ -114,25 +115,24 @@ public class Room
     // lock블록이 await가 안먹어서 사용합니다.
     private readonly SemaphoreSlim gate = new SemaphoreSlim(1, 1);
     public readonly string code; // 방번호
-    private readonly int logMovesPerSecond; // 룸허브를 통해서 전달 받습니다. 
+
     
     public bool IsEmpty => members.IsEmpty;
     public GameConfig GameConfig { get; }
     public bool roomExpired = false;
     private readonly CancellationTokenSource roomExpiredCancellation = new();
-    public Room(string code, int logMovesPerSecond, GameConfig config, int broadcastPerSecond)
+    public Room(string code, GameConfig config)
     {
         this.code = code;
-        this.logMovesPerSecond = logMovesPerSecond;
+
         this.GameConfig = config;
-        DeltaMs = (TimeSpan.FromSeconds(1.0 / broadcastPerSecond).Milliseconds);
         gameManager = new GameManager(config,this);
     }
 
     // 게임의 틱 업데이트(진행)을 담당하는 함수( RoomHub의 모든 룸의 함수를 실행시키는 곳에서 실행된다.)
     public void GameTick()
     {
-        gameManager.Tick(DeltaMs);
+        gameManager.Tick();
     }
     
     #region 듣기
@@ -198,7 +198,13 @@ public class Room
             // C#에서 Json의 직렬화, 역직렬화를 담당하는 클래스 입니다.
             // Unity와 C#에서 사용하는 직렬화 클래스가 다른것에 유의하세여
             // (타입이랑 매개변수로 텍스트만 넘기면 알아서 잘 처리해줍니다)
-            Protocol.TypeOnly kind = JsonSerializer.Deserialize<Protocol.TypeOnly>(text);
+            Protocol.TypeOnly kind;
+            try { kind = JsonSerializer.Deserialize<Protocol.TypeOnly>(text); }
+            catch (JsonException)
+            {
+                Console.WriteLine($"[{code}] {member.User.Id} 가 해석 불가능한 메시지를 보냄. 버림 처리.");
+                continue;
+            }
             if (kind?.Type != "move")
             {
                 Console.WriteLine($"[Type] 들어온 타입 : {kind?.Type}");
@@ -228,7 +234,8 @@ public class Room
     {
         if(gameManager.currentTurnState != gameManager.martMoveState) return;
         Protocol.PushAnimationMessage pushAnimationMessage = JsonSerializer.Deserialize<Protocol.PushAnimationMessage>(text);
-
+        if(pushAnimationMessage == null) return;
+        pushAnimationMessage.UserID = member.User.Id;
        await BroadcastAsync(pushAnimationMessage);
     }
 
@@ -243,6 +250,7 @@ public class Room
             Console.WriteLine($"[null이거나 빈 메세지]");
             return;
         }
+        interactionMessage.senderId = member.User.Id;
         switch (interactionMessage.InteractionType)
         {
             case Protocol.InteractionType.PushQuery:
@@ -327,27 +335,25 @@ public class Room
                         bool found = false;
                         for (int i = 0; i < userInfo.ItemIds.Length; i++)
                         {
-                            Console.WriteLine($"[아이템 체인지 로직] : 1번");
+
                             string selectedItemId = userInfo.ItemIds[i] ?? "";
                             if (string.IsNullOrEmpty(selectedItemId)) continue;
                             if (!int.TryParse(selectedItemId, out int id)) continue;
-                            Console.WriteLine($"[아이템 체인지 로직] : 2번");
 
                             ItemDef currentItem = DataManager.Instance.GetItemDef(id);
                             if (currentItem != null && holdItemDef.CategoryType == currentItem.CategoryType)
                             {
-                                Console.WriteLine($"[아이템 체인지 로직] : 3번");
 
                                 interactionMessage.Parameter = JsonSerializer.Serialize(
                                     new Protocol.ItemPutInBagParameter
                                         { ChangedItemId = currentItem.ItemId.ToString() });
-                                Console.WriteLine($"[아이템 체인지 로직] : 4번");
+
 
                                 gameManager.itemOwnersDic.TryRemove(currentItem.ItemId.ToString(), out _);
-                                Console.WriteLine($"[아이템 체인지 로직] : 5번");
+
 
                                 userInfo.ItemIds[i] = holdItemDef.ItemId.ToString();
-                                Console.WriteLine($"[아이템 체인지 로직] : 6번");
+
 
                                 found = true;
                                 break;
@@ -421,7 +427,7 @@ public class Room
     {
         if(gameManager.currentTurnState != gameManager.pointAtSuspectState) return;
         
-        gameManager.SkipCount++;
+        if (gameManager.SkipUsers.TryAdd(member.User.Id, true) == false) return;
         Protocol.NonPointMessage nonPointMessage = new Protocol.NonPointMessage();
         nonPointMessage.UserID = member.User.Id;
         await BroadcastAsync(nonPointMessage);
@@ -515,9 +521,10 @@ public class Room
         member.X = move.X;
         member.Y = move.Y;
         member.Z = move.Z;
-        member.MovesSinceLog++;
         
+        //member.MovesSinceLog++;
        // LogMove(member, move);
+     _ = BroadcastStateAsync();
     }
 
     // 채팅 관련 메시지를 처리하는 함수
@@ -616,6 +623,11 @@ public class Room
             // 보내는 순간 끊길 수 있음.
             // 나가기 처리는 다른 곳에서 함.
         }
+        catch (ObjectDisposedException)
+        {
+            member.Socket.Abort();
+            Console.WriteLine($"[폐기된 리소스 접근] : 멤버 {member.User.Id}의 접근");
+        }
         finally // 예외가 발생하든 안하든 꼭 처리되는 finally 구문(찾아 보십쇼) 
         {
             member.SendLock.Release();
@@ -649,7 +661,7 @@ public class Room
                 Z = member.Z,
             });
         }
-
+        
         // states를 배열로 바꿔서 뿌린다(Broadcast)
         await BroadcastAsync(new Protocol.StateMessage() { States = states.ToArray() });
         Interlocked.Exchange(ref isBroadcasting, 0);
@@ -678,8 +690,14 @@ public class Room
             return null;
         }
         
-        // 아래서 부터는 정상처리
         Protocol.HelloMessage hello = JsonSerializer.Deserialize<Protocol.HelloMessage>(first);
+        if (string.IsNullOrWhiteSpace(hello?.NickName))
+        {
+            Console.WriteLine($"[{code}] hello 에 닉네임이 없다");
+            return null;
+        }
+        
+        // 아래서 부터는 정상처리
         // 메시지와 매개변수를 조합해서 Member객체를 생성한다.
         Member member = new Member();
         member.Socket = socket;
@@ -815,30 +833,5 @@ public class Room
     #endregion
     
     
-    // LogMove 함수는 수업에서 안한 부분
-    // 위치가 들어오고 있다는 것을 눈으로 보여 주는 함수. 
-    // 사실 없어도 그만.
-    
-    // 받을 때마다 찍지 않고 간격을 두는 이유?
-    // : 오는 것을 다 찍으면 콘솔이 위치로만 채워져 정작 중요한 들어옴,나감이 안 보인다.
-    //  대신 그동안 몇 번 받았는지 출력해줌.
-    private void LogMove(Member member, Protocol.MoveMessage move)
-    {
-        if (logMovesPerSecond <= 0) return;
 
-        TimeSpan gap = DateTime.Now - member.LastLogAt;
-        if (gap.TotalSeconds < 1.0 / logMovesPerSecond) return;
-
-        // 보낸 쪽이 적은 번호가 서버가 아는 번호와 다르면 그대로 드러내 준다.
-        // 평소에는 같으므로 아무것도 붙지 않는다.
-        string claimed = move.Id == member.User.Id ? "" : $"  (보낸 쪽이 적은 번호 : {move.Id})";
-
-        Console.WriteLine(
-            $"[{code}] 받음 {member.User.NickName}({member.User.Id}) " +
-            $"({member.X,7:F2}, {member.Z,7:F2})  " +
-            $"지난 {gap.TotalSeconds:F1}초에 {member.MovesSinceLog}번{claimed}");
-
-        member.MovesSinceLog = 0;
-        member.LastLogAt = DateTime.Now;
-    }
 }

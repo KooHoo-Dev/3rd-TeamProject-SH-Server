@@ -49,8 +49,8 @@ public class GameManager
         {
             
         }
-        public readonly SemaphoreSlim userLock 
-            = new SemaphoreSlim(1, 1);
+
+        private readonly object userLock = new object();
     }
     StateMachine<IUpdatableState> stateMachine;
 
@@ -99,7 +99,8 @@ public class GameManager
     public Protocol.User focausUser;
 
 
-
+    // 1) lock 의 자물쇠는 lock 전용 객체로. await 없이 짧게 감싸는 용도이므로 object 가 맞다.
+    private readonly object gameLock = new object();
     private string mostFrequent;
     public string MostFrequent
     {
@@ -129,8 +130,7 @@ public class GameManager
     public readonly ConcurrentDictionary<string, string> itemOwnersDic = new();
 
     public ConcurrentDictionary<CategoryType,ConcurrentQueue<string>> AllMartItems = new ConcurrentDictionary<CategoryType,ConcurrentQueue<string>>();
-    public readonly SemaphoreSlim gameLock 
-        = new SemaphoreSlim(1, 1);
+   
 
     #region 비동기 함수에서 보내는 정보들
     // GameManager: ConcurrentQueue<VoteMessage> 대신
@@ -220,24 +220,11 @@ public class GameManager
         }
 
     }
-    private int skipCount = 0;
-    public int SkipCount
-    {
-        get
-        {
-            lock (gameLock)
-            {
-                return skipCount;
-            }
-        }
-        set
-        {
-            lock (gameLock)
-            {
-                skipCount = value;
-            }
-        }
-    }
+    public readonly object SkipUserLock = new object();
+    public readonly ConcurrentDictionary<string, bool> SkipUsers = new();
+    public int SkipCount => SkipUsers.Count;
+    
+
 
     // Key :한 유저, Value : 지목을 받은 유저 (만약 없다면 빈 스트링)(모든 유저가 key값으로 있음)
     public readonly ConcurrentDictionary<string, string> PointInfo = new ConcurrentDictionary<string, string>();
@@ -302,9 +289,9 @@ public class GameManager
         
     }
 
-    public void Tick(int intarvelMs)
+    public void Tick()
     {
-        stateMachine.Tick(intarvelMs);
+        stateMachine.Tick();
     }
 
     public void GameStart()
@@ -323,8 +310,7 @@ public class GameManager
 
     private void Init()
     {
-        Interlocked.Exchange(ref isGameRunning, 1);
-        Console.WriteLine($"테스트1번 위치");
+
         List<Room.Member> memberList = currentRoom.members.Values.ToList();
         UserGameInfos = new ConcurrentDictionary<string, UserInfo>();
         for (int i = 0; i < memberList.Count; i++)
@@ -338,25 +324,21 @@ public class GameManager
             currentRoom.members[VARIABLE.Key].IsReady = false;
             bool s = PointInfo.TryAdd(VARIABLE.Key, "");
             bool q = QuestInfo.TryAdd(VARIABLE.Key, "");
-        Console.WriteLine($"테스트2.3번 위치 {VARIABLE.Key} 성공 여부: {s}, {q}");
             
             
         }
         
-            
         
-
-        Console.WriteLine($"테스트3번 위치");
         MartItemsCategoryClear();
         SetRandomCategories();
         for (int i = 0; i < AllCategories.Length; i++)
         {
             AllMartItems.TryAdd(AllCategories[i], new ConcurrentQueue<string>());
         }
-        Console.WriteLine($"테스트4번 위치");
+
 
         currentSpeakedCount = 0;
-        skipCount = 0;
+        SkipUserDicClear();
         currentCycle = 0;
         currentRound = 0;
         currentCategory = AllCategories[0];
@@ -364,52 +346,35 @@ public class GameManager
         Protocol.User focausUser = new Protocol.User();
 
         OldKeyWords = new List<KeyWordDef>();
+        Console.WriteLine($"[게임 초기화 완료]: 룸: {currentRoom.code}");
     }
 
+    public void SkipUserDicClear()
+    {
+        lock (SkipUserLock)
+        {
+            SkipUsers.Clear();
+        }
+    }
     private void SetRandomCategories()
     {
-        CategoryType[] temp = new CategoryType[currentRoom.members.Count];
-        Console.WriteLine($"테스트2.1번 위치");
-        Random randomObj = new Random();
-
-        List<int> list = new List<int>();
         
-        int randomValue;
-
-        for(int i = 0; i < currentRoom.GameConfig.MaxCycle; i++)
-        {
-            randomValue = randomObj.Next(0,DataManager.Instance.ItemCategories.Count);
-
-            int MaxCount = 10;
-            if (list.Contains(randomValue))
-            {
-                while (true)
-                {
-                    if (list.Contains(randomValue) == false || MaxCount < 0)
-                    {
-                        break;
-                    }
-                    randomValue = randomObj.Next(0,DataManager.Instance.ItemCategories.Count);
-                    MaxCount--;
-                }
-            }
-            list.Add(randomValue);
-            
-        }
-
-        Console.WriteLine($"테스트2.3번 위치 및 PointInfo: {PointInfo.Count}");
+        List<CategoryType> pool = DataManager.Instance.GetAllTypes();
+        int need = currentRoom.GameConfig.MaxCycle;
+        if (need > pool.Count)
+            throw new InvalidOperationException($"MaxCycle({need})이 카테고리 수({pool.Count})보다 크다. appsettings.json 을 고쳐라.");
+  
+        Random rnd = new Random();
         
-        AllCategories = new CategoryType[list.Count];
-        for (int i = 0; i < list.Count; i++)
-        {
-            AllCategories[i] = (CategoryType)list[i];
-        }
-        Console.WriteLine($"테스트2.4번 위치 및 AllCategories: {AllCategories.Length}");
+
+        AllCategories = pool.OrderBy(_ => rnd.Next()).Take(need).ToArray();
+        
 
     }
     public void GameEnd()
     {
-        isGameRunning = 0;
+        // 1 -> 0 로 바꾼 경우만 통과
+        if (Interlocked.CompareExchange(ref isGameRunning, 0, 1) != 1) return;
         stateMachine.StopStateMachine();
         PointInfo.Clear();
         CurrentGanre = new GenreDef();

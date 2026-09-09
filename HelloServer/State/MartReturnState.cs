@@ -4,9 +4,9 @@ using NetworkManager;
 
 namespace HelloServer.State;
 
-public class MartReturnState : GameTurnState
+public class MartReturnState : BaseGameTurnState
 {
-
+    protected override Type NextState => typeof(ShowItemAndSpeakState);
     public MartReturnState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -41,20 +41,6 @@ public class MartReturnState : GameTurnState
         BroadcastAsync(TurnMessageFactory.MartReturn(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,userItemLists,userQuestInfos));
     }
     
-    public override void Tick(int deltaMs)
-    {
-        base.Tick(deltaMs);
-        if (currentMsTime > MaxMsTime)
-        {
-            stateMachine.ChangeState<ShowItemAndSpeakState>();
-        }
-    }
-
-    public override void Exit()
-    {
-        base.Exit(); 
-
-    }
 
     // 아직 미 구현
     private bool IsSuccessQuest(string UserId)
