@@ -20,19 +20,19 @@ public class MartReturnState : BaseGameTurnState
         Protocol.UserItemList[] userItemLists = new Protocol.UserItemList[gameManager.UserGameInfos.Count];
         Protocol.UserQuestInfo[] userQuestInfos = new Protocol.UserQuestInfo[gameManager.UserGameInfos.Count];
         int counter = 0;
-        foreach (var VARIABLE in gameManager.UserGameInfos.Values)
+        foreach (var userInfo in gameManager.UserGameInfos.Values)
         {
-            bool isSuccess = IsSuccessQuest(VARIABLE.user.Id);
+            bool isSuccess = IsSuccessQuest(userInfo.user.Id);
 
-            userItemLists[counter] = SetRandomFillItemList(VARIABLE.user.Id);
+            userItemLists[counter] = SetRandomFillItemList(userInfo.user.Id);
 
             
             Protocol.UserQuestInfo questInfo = new Protocol.UserQuestInfo();
-            questInfo.UserId = VARIABLE.user.Id;
+            questInfo.UserId = userInfo.user.Id;
             questInfo.IsSuccess = isSuccess;
             
             userQuestInfos[counter] = questInfo;
-            Console.WriteLine($"[마트 리턴 메시지 보내기 {counter}번 째] {VARIABLE.user.Id}의 차례( userItemLists 성공 여부) :  {userItemLists[counter]?.ItemList != null},");
+            Console.WriteLine($"[마트 리턴 메시지 보내기 {counter}번 째] {userInfo.user.Id}의 차례( userItemLists 성공 여부) :  {userItemLists[counter]?.ItemList != null},");
             
             counter++;
             
@@ -45,7 +45,7 @@ public class MartReturnState : BaseGameTurnState
     // 아직 미 구현
     private bool IsSuccessQuest(string UserId)
     {
-            bool Sueccess = false;
+            bool Success = false;
             Console.WriteLine($"[퀘스트 판별 함수] 퀘스트Info의 개수 :  {gameManager.QuestInfo?.Count}, 유저 Id :{UserId}");
 
             for (int i = 0; i < gameManager.currentRoom.GameConfig.MaxCycle; i++)
@@ -53,13 +53,13 @@ public class MartReturnState : BaseGameTurnState
                 
                 if (string.IsNullOrEmpty(gameManager.UserGameInfos[UserId].ItemIds[i]) == false && gameManager.UserGameInfos[UserId].ItemIds[i] == gameManager.QuestInfo[UserId])
                 {
-                    Sueccess = true;
+                    Success = true;
                     gameManager.UserGameInfos[UserId].IsQuestSuccess = true;
                     break;
                 }
             }
         
-            return Sueccess;
+            return Success;
         
     }
 
@@ -70,9 +70,9 @@ public class MartReturnState : BaseGameTurnState
         itemList.UserId = UserId;
         itemList.ItemList = new string[gameManager.AllCategories.Length];
         int counter = 0;
-        foreach (var VARIABLE in gameManager.AllCategories)
+        foreach (var categoryType in gameManager.AllCategories)
         {
-            List<string> martCategoryItems = gameManager.AllMartItems[VARIABLE].ToList();
+            List<string> martCategoryItems = gameManager.AllMartItems[categoryType].ToList();
             // 이미 선택된 아이템들은 걸러주는 작업
             foreach (var userInfo in gameManager.UserGameInfos.Values)
             {
@@ -89,13 +89,13 @@ public class MartReturnState : BaseGameTurnState
             
             // 유저의 소유 아이템을 꺼낸다
             itemList.ItemList[counter] = gameManager.UserGameInfos[UserId].ItemIds[counter] ?? "";
-            Console.WriteLine($"[원래 유저의 {VARIABLE} 카테고리의 선택 아이템 : {itemList.ItemList[counter]}]");
+            Console.WriteLine($"[원래 유저의 {categoryType} 카테고리의 선택 아이템 : {itemList.ItemList[counter]}]");
             // 꺼낸 아이템이 비어있거나 null이라면 마트 아이템들 중에 랜덤으로 뽑아서 채운다.
             if ( string.IsNullOrEmpty(itemList.ItemList[counter]))
             {
                 if (martCategoryItems.Count == 0)
                 {
-                    List<ItemDef> list = DataManager.Instance.GetItemDefsByCategory(VARIABLE);
+                    List<ItemDef> list = new List<ItemDef>(DataManager.Instance.GetItemDefsByCategory(categoryType));
                     itemList.ItemList[counter] = list[random.Next(list.Count)].ItemId.ToString();
                 }
                 else

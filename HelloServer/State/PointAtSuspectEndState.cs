@@ -53,7 +53,7 @@ public class PointAtSuspectEndState : BaseGameTurnState
     private string GetWinner()
     {
 
-        int harf = (int)(gameManager.UserGameInfos.Count / 2);
+        int half = (int)(gameManager.UserGameInfos.Count / 2);
 
         string ElectedUser = "";
         ConcurrentDictionary<string, string> pointInfo = gameManager.PointInfo;
@@ -77,12 +77,12 @@ public class PointAtSuspectEndState : BaseGameTurnState
             {
                 Console.WriteLine($"[지목 결정된 유저 계산 함수] 유저 : {user}, 투표 받은 수 {count}");
                 
-                if (count > harf)
+                if (count > half)
                 {
                     ElectedUser = user;
                     break;
                 }
-                else if (count == harf)
+                else if (count == half)
                 {
                     ElectedUser = user;
                     TiedCount++;

@@ -147,16 +147,7 @@ namespace HelloServer
         {
             public string CurrentFocusID { get; set; }
         }
-
-        /// <summary>
-        /// "며러명이 담겨야할 때 공용으로 쓰는 파라미터. ( 동점 우승자 )
-        /// </summary>
-        [Serializable]
-        public class FocusIdsParameter
-        {
-            public string[] CurrentFocusIDs { get; set; }
-        }
-
+        
         [Serializable]
         public class LiarKeywordGuessEndParameter
         {
@@ -227,13 +218,6 @@ namespace HelloServer
             DontKnow,
             NotLiar,
         }
-
-        [Serializable]
-        public enum QuestType
-        {
-            ItemPickUp
-        }
-
 
         #region 채팅 처리
 
@@ -332,10 +316,7 @@ namespace HelloServer
             public float Z { get; set; }
             public bool IsLiar { get; set; } // 라이어 인가?
 
-
- 
-
-            public bool IsPushedState { get; set; } // 현재 밀쳐진 상태인가?
+            
 
         }
 
@@ -412,13 +393,6 @@ namespace HelloServer
             public string NickName { get; set; }
         }
 
-        [Serializable]
-        public class GameLeaveMessage
-        {
-            public string Type { get; set; } = "GameLeave";
-            public string ID { get; set; }
-        }
-
         #endregion
 
         #region 게임 시작 처리
@@ -436,13 +410,7 @@ namespace HelloServer
         {
             public string Type { get; set; } = "AllReady";
         }
-
-        [Serializable]
-        public class GameStartMessage
-        {
-            public string Type { get; set; } = "게임 시작";
-        }
-
+        
         #endregion
 
         #region 투표 처리

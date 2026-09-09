@@ -8,11 +8,10 @@ namespace Jay.FSM
     public class StateMachine<TState> where TState : class, IState
     {
         private readonly List<TState> states = new List<TState>();
-        public GameConfig gameConfig { get; set; } = new GameConfig();
+
         public TState CurrentState { get; private set; }
 
         
-        public event Action<TState, TState> OnStateChanged;
 
         public StateMachine() { }
 
@@ -67,7 +66,6 @@ namespace Jay.FSM
             prev?.Exit();
             CurrentState = next;
             next.Enter();
-            OnStateChanged?.Invoke(prev, next);
         }
 
         public bool IsCurrent<T>() where T : TState

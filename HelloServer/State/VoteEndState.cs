@@ -82,15 +82,15 @@ public class VoteEndState : BaseGameTurnState
         if (list == null || list.Count == 0) return "";
 
         Dictionary<string, int> dict = new Dictionary<string, int>();
-        foreach (var VARIABLE in list)
+        foreach (var s in list)
         {
-            if (dict.ContainsKey(VARIABLE) == false)
+            if (dict.ContainsKey(s) == false)
             {
-                dict.Add(VARIABLE, 1);
+                dict.Add(s, 1);
             }
             else
             {
-                dict[VARIABLE]++;
+                dict[s]++;
             }
         }
 

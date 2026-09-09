@@ -7,7 +7,7 @@ namespace HelloServer.State;
 
 public class PointAtSuspectState : BaseGameTurnState
 {
-    private int harf = 0;
+    private int half = 0;
     protected override Type NextState => typeof(PointAtSuspectEndState);
     public PointAtSuspectState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
@@ -23,14 +23,14 @@ public class PointAtSuspectState : BaseGameTurnState
         {
             gameManager.PointInfo[key] = "";
         }
-        harf = (int)(gameManager.UserGameInfos.Count / 2);
+        half = (int)(gameManager.UserGameInfos.Count / 2);
         
     }
     public override void Tick()
     {
         base.Tick();
 
-        if ((gameManager.SkipCount > harf))
+        if ((gameManager.SkipCount > half))
         { 
             stateMachine.ChangeState<PointAtSuspectEndState>();
         }

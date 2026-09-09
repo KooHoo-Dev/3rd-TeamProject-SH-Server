@@ -21,7 +21,9 @@ public class DataManager
     // 읽기(Get 계열)는 동시에 여러 스레드 허용, 쓰기(Load)는 배타적으로 처리
     // ReaderWriterLockSlim : 동기적인 코드에서 쓰는 최신 락,읽기는 병렬 가능, 쓰기는 한번에 하나씩(쓰는동안에는 읽기도 대기) (일반 락보다 무거움)
     private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-
+    
+    private Dictionary<CategoryType, IReadOnlyList<ItemDef>> itemsByCategory;
+    public IReadOnlyList<ItemDef> GetItemDefsByCategory(CategoryType type) => itemsByCategory[type];
     public GenreTable Genres { get; } = new GenreTable();
     public KeyWordTable Keywords { get; } = new KeyWordTable();
     public ItemCategoryTable ItemCategories { get; } = new ItemCategoryTable();
@@ -34,22 +36,17 @@ public class DataManager
 
     public void Load()
     {
-        _lock.EnterWriteLock();
-        try
-        {
+
             Genres.Load();
             Keywords.Load();
             ItemCategories.Load();
             Items.Load();
             IsReady = true;
+            itemsByCategory = Items.GetListAll()
+                .GroupBy(x => x.CategoryType)
+                .ToDictionary(g => g.Key, g => (IReadOnlyList<ItemDef>)g.ToArray());
             Console.WriteLine($"[DataManager] : Loaded {Genres.Count} Genres, {Keywords.Count} Keywords, {ItemCategories.Count} ItemCategories, {Items.Count} Items");
-        }
-        finally
-        {
-            _lock.ExitWriteLock();
-        }
-
-        // 이벤트는 락 밖에서, 로컬로 캡처한 뒤 호출 (구독 해제 경합 방지)
+            
         OnReady?.Invoke();
     }
 
@@ -91,26 +88,7 @@ public class DataManager
         finally { _lock.ExitReadLock(); }
     }
 
-    public List<ItemDef> GetItemDefsByCategory(CategoryType categoryType)
-    {
-        _lock.EnterReadLock();
-        try
-        {
-            List<ItemDef> itemsInCategory = new List<ItemDef>();
-            foreach (var item in Items.GetListAll())
-            {
-                if (item.CategoryType == categoryType)
-                {
-                    itemsInCategory.Add(item);
-                }
-            }
-            return itemsInCategory;
-        }
-        finally
-        {
-            _lock.ExitReadLock();
-        }
-    }
+
 
     public List<KeyWordDef> GetKeyWordDefsByGenre(string genre)
     {

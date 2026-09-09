@@ -40,18 +40,18 @@ public class LiarKeywordGuessEndState : BaseGameTurnState
         }
         
         int counter = 0;
-        foreach (var VARIABLE in gameManager.UserGameInfos)
+        foreach (var userGameInfoDic in gameManager.UserGameInfos)
         {
             Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
-            scoreInfo.UserId = VARIABLE.Key;
-            scoreInfo.UserScore = VARIABLE.Value.score;
-            if (VARIABLE.Value.IsLiar)
+            scoreInfo.UserId = userGameInfoDic.Key;
+            scoreInfo.UserScore = userGameInfoDic.Value.score;
+            if (userGameInfoDic.Value.IsLiar)
             {
                 scoreInfo.UserScore +=
                     (gameManager.CurrentKeyWord.KeywordName == gameManager.LiarGuessKeyWord)
                         ? keywordGuessScoreChangeAmount
                         : 0;
-                Console.WriteLine($"[투표 및 키워드 점수 계산 이전] 일반 유저 아이디 : {VARIABLE.Key}, 유저 점수 {VARIABLE.Value.score}");
+                Console.WriteLine($"[투표 및 키워드 점수 계산 이전] 일반 유저 아이디 : {userGameInfoDic.Key}, 유저 점수 {userGameInfoDic.Value.score}");
                 
                 Console.WriteLine($"[라이어 키워드 맞춤 여부] 맟췄는가? :{gameManager.CurrentKeyWord.KeywordName == gameManager.LiarGuessKeyWord}");
                 // 라밍아웃 버튼으로 투표가 스킵된 경우, 투표 점수 집계 안함
@@ -73,7 +73,7 @@ public class LiarKeywordGuessEndState : BaseGameTurnState
             }
             else
             {
-                Console.WriteLine($"[투표 및 키워드 점수 계산 이전] 일반 유저 아이디 : {VARIABLE.Key}, 유저 점수 {VARIABLE.Value.score}");
+                Console.WriteLine($"[투표 및 키워드 점수 계산 이전] 일반 유저 아이디 : {userGameInfoDic.Key}, 유저 점수 {userGameInfoDic.Value.score}");
                 
                 scoreInfo.UserScore +=
                     (gameManager.CurrentKeyWord.KeywordName == gameManager.LiarGuessKeyWord)
@@ -93,7 +93,7 @@ public class LiarKeywordGuessEndState : BaseGameTurnState
 
                 int scoreAmount = 0;
                 Protocol.SelectNum num;
-                if (voteDic.TryGetValue(VARIABLE.Key, out Protocol.VoteMessage vote) == false ||
+                if (voteDic.TryGetValue(userGameInfoDic.Key, out Protocol.VoteMessage vote) == false ||
                     Enum.TryParse(vote.selectNum, out num) == false)
                 {
                     // 안 냈거나 규약에 없는 값이면 '모르겠다'로 본다.
@@ -130,7 +130,7 @@ public class LiarKeywordGuessEndState : BaseGameTurnState
                     Console.WriteLine($"[투표 범위가 아닌 투표 값 에러] num의 값 : {num}");
                 }
                 scoreInfo.UserScore += scoreAmount;
-                Console.WriteLine($"[ 키워드쪽 점수 계산 중] 유저: {VARIABLE.Key}, 선택한 종류: {num}, 적용된 점수 : {scoreAmount}");
+                Console.WriteLine($"[ 키워드쪽 점수 계산 중] 유저: {userGameInfoDic.Key}, 선택한 종류: {num}, 적용된 점수 : {scoreAmount}");
             }
 
 

@@ -27,7 +27,7 @@ public class MartEnterState : BaseGameTurnState
             CategoryType currentCategory =
                 gameManager.AllCategories[(i) % gameManager.AllCategories.Length];
 
-            List<ItemDef> ItemIist = DataManager.Instance.GetItemDefsByCategory(currentCategory);
+            List<ItemDef> ItemIist = new List<ItemDef>(DataManager.Instance.GetItemDefsByCategory(currentCategory));
             int MaxItemCount = Math.Min(ItemIist.Count, gameManager.currentRoom.GameConfig.MaxCategoryItemCount);
             List<string> ResultItemList = new List<string>();
             for (int j = MaxItemCount - 1; j >= 0; j--)
@@ -44,27 +44,27 @@ public class MartEnterState : BaseGameTurnState
         }
         Protocol.CategoryItemArray[] sendArrays = new Protocol.CategoryItemArray[AllItemIds.Count];
         int counter = 0;
-        foreach (var VARIABLE in AllItemIds)
+        foreach (var allItemIdsDic in AllItemIds)
         {
             
             sendArrays[counter] = new Protocol.CategoryItemArray();
-            sendArrays[counter].Category = VARIABLE.Key;
-            sendArrays[counter].ItemIds = new string[VARIABLE.Value.Count];
-            sendArrays[counter].ItemIds = VARIABLE.Value.ToArray();
+            sendArrays[counter].Category = allItemIdsDic.Key;
+            sendArrays[counter].ItemIds = new string[allItemIdsDic.Value.Count];
+            sendArrays[counter].ItemIds = allItemIdsDic.Value.ToArray();
 
             counter++;
         }
 
         
-       foreach (var VARIABLE in gameManager.UserGameInfos.Values)
+       foreach (var userInfo in gameManager.UserGameInfos.Values)
        {
            
-           VARIABLE.ItemIds = new string[gameManager.AllCategories.Length];
+           userInfo.ItemIds = new string[gameManager.AllCategories.Length];
             randomIndex = random.Next(gameManager.AllCategories.Length);
             List<string> list = AllItemIds[gameManager.AllCategories[randomIndex]];
 
-           gameManager.QuestInfo[VARIABLE.user.Id] = list[random.Next(list.Count)];
-            SendAsync(gameManager.currentRoom.members[VARIABLE.user.Id],TurnMessageFactory.MartEnter(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.QuestInfo[VARIABLE.user.Id],sendArrays));
+           gameManager.QuestInfo[userInfo.user.Id] = list[random.Next(list.Count)];
+            SendAsync(gameManager.currentRoom.members[userInfo.user.Id],TurnMessageFactory.MartEnter(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.QuestInfo[userInfo.user.Id],sendArrays));
            
        }
     }

@@ -77,28 +77,14 @@ namespace Jay.FileIO
             if (!File.Exists(filePath))
             {
                 OnError?.Invoke($"[TSVReader] 파일이 존재하지 않습니다: {filePath}");
-                OnError?.Invoke($"[TSVReader] 경로 존재 여부: {{File.Exists(filePath)}}");
-                return null;
+                OnError?.Invoke($"[TSVReader] 경로 존재 여부: {File.Exists(filePath)}");
             }
 
-            try
-            {
                 using var reader = new StreamReader(filePath);
                 using var csv = new CsvReader(reader, TsvConfig);
 
-                var records = new List<T>();
-                foreach (var record in csv.GetRecords<T>())
-                {
-                    records.Add(record);
-                }
+                return csv.GetRecords<T>().ToList();
 
-                return records;
-            }
-            catch (Exception ex)
-            {
-                OnError?.Invoke($"[TSVReader] {filePath} 로딩 실패: {ex.Message}");
-                return null;
-            }
         }
 
         /// <summary>

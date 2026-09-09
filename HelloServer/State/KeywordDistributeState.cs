@@ -19,10 +19,7 @@ public class KeywordDistributeState : BaseGameTurnState
         
         Random rnd = new Random();
         List<KeyWordDef> list = DataManager.Instance.GetKeyWordDefsByGenre(gameManager.CurrentGanre.GenreName);
-        // 중복되는 모든 값 리스트에서 제거
-        // OldKeyWords의 ID 목록을 해시셋(HashSet)으로 만들어 검색 속도를 높입니다.
-        var oldIds = new HashSet<int>(gameManager.OldKeyWords.Select(x => x.KeywordId));
-
+ 
         // list에서 OldKeyWords에 포함된 항목을 제외합니다.
         List<KeyWordDef> NewList = list.Except(gameManager.OldKeyWords).ToList();
         gameManager.CurrentKeyWord = NewList[rnd.Next(NewList.Count)];
@@ -48,10 +45,10 @@ public class KeywordDistributeState : BaseGameTurnState
         Protocol.TurnMessage msg = TurnMessageFactory.KeywordDistribute(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.CurrentKeyWord.KeywordId);
 
 
-        foreach (var VARIABLE in gameManager.UserGameInfos)
+        foreach (var userGameInfoDic in gameManager.UserGameInfos)
         {
             
-            if (VARIABLE.Value.IsLiar)
+            if (userGameInfoDic.Value.IsLiar)
             {
                 NewList = NewList.Except(gameManager.OldKeyWords).ToList();
 
@@ -61,11 +58,11 @@ public class KeywordDistributeState : BaseGameTurnState
                 gameManager.OldKeyWords.Add(gameManager.CurrentLiarKeyword);
 
                 Protocol.TurnMessage liarMsg = TurnMessageFactory.KeywordDistribute(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.CurrentLiarKeyword.KeywordId);
-                SendAsync(gameManager.currentRoom.members[VARIABLE.Key], liarMsg);
+                SendAsync(gameManager.currentRoom.members[userGameInfoDic.Key], liarMsg);
             }
             else
             {
-                SendAsync(gameManager.currentRoom.members[VARIABLE.Key], msg);
+                SendAsync(gameManager.currentRoom.members[userGameInfoDic.Key], msg);
             }
         }
         

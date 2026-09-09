@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Buffers;
+using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -68,7 +69,7 @@ public class Room
     private int isBroadcasting;
     private bool IsBroadcasting => Volatile.Read(ref isBroadcasting) == 1;
     
-    
+    private const int MaxMessageBytes = 1024 * 1024; // 들어오는 메세지 용량 1MB 제한
     // 접속자 한 명.
     public class Member
     {
@@ -137,7 +138,7 @@ public class Room
     
     #region 듣기
 
-    // 글자를 받는다. 상대가 연결을 닫았으면 nulll을 돌려준다
+    // 글자를 받는다. 상대가 연결을 닫았으면 null을 돌려준다
     // PS
     // : 긴글자일 경우 가끔 조각으로 나뉘어서 오는 경우가 있다.
     //  우리가 StreamReader를 다뤘을때 처럼 메시지의 끝 EndOf~~
@@ -145,8 +146,10 @@ public class Room
     private static async Task<string> ReceiveTextAsync
         (WebSocket socket, CancellationToken token)
     {
-        byte[] buffer = new byte[4096];
+        byte[] buffer = ArrayPool<byte>.Shared.Rent(4096);
         StringBuilder builder = new StringBuilder();
+        Decoder decoder = Encoding.UTF8.GetDecoder();
+        int totalBytes = 0;
         // StringBuilder?
         // : 여러 문자들을 이어붙힐때 사용하는 객체. string은 각각 개별로
         // 생성되는 별도의 객체임("a" + "b" + "c" = "abc" 이런식이면 총 string 4개가 생성됨)
@@ -154,32 +157,55 @@ public class Room
         // 예전에 유니티에서도 많이 썼었음.
         // TMP_Text text 객체에게 text.SetText("abc"); 하면 내부에서 StringBuilder를
         // 이용해서 문자열을 취합해 줍니다. 최적화된 "문자열 계산기"라고 생각하면 됩니다
-
-        while (true)
-        {
-            // 웹소켓 수신 결과를 저장할 수있는 객체를 선언해주고,
-            // await 키워드를 이용하여 해당 소켓(유저와 연결된..)에
-            // 메시지가 들어올때까지 기다려 줍니다.
-            WebSocketReceiveResult result;
-            try
+            
+            while (true)
             {
-                result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
-            }
-            catch (WebSocketException)
-            {
-                // 인사 없이 끊었다. 닫힌 것과 똑같이 취급한다.
-                return null;
-            }
-            // 예외 처리부터 해줍니다. 소켓이 닫혔을 경우.
-            if (result.MessageType == WebSocketMessageType.Close) return null;
-            // 일단 메세지가 도착을 했으면 StringBuilder에 이어 붙혀 줍니다. 
-            builder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
-            // 메세지가 끝났니?. 끝났다면
-            // StringBuilder.ToString을 호출해서 String을 생성하여 반환합니다. 
-            if (result.EndOfMessage) return builder.ToString();
+                // 웹소켓 수신 결과를 저장할 수있는 객체를 선언해주고,
+                // await 키워드를 이용하여 해당 소켓(유저와 연결된..)에
+                // 메시지가 들어올때까지 기다려 줍니다.
+                WebSocketReceiveResult result;
+                try
+                {
+                    result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
+                }
+                catch (WebSocketException)
+                {
+                    // 인사 없이 끊었다. 닫힌 것과 똑같이 취급한다.
+                    return null;
+                }
 
-            // 아니라면 다시 루프를 반복합니다
-        }
+                // 예외 처리부터 해줍니다. 소켓이 닫혔을 경우.
+                if (result.MessageType == WebSocketMessageType.Close) return null;
+                // Decoder는 내부적으로 "이전 호출에서 다 못 쓴 바이트"를 기억하고 있다가
+                // 다음 GetChars 호출 때 이어붙여서 디코딩하기 때문에, 청크 경계에서 문자가 잘려도 안전합니다.
+                // 이게 StreamReader가 내부적으로 하는 일이기도 합니다.
+                int charCount = decoder.GetCharCount(buffer, 0, result.Count, false);
+                char[] chars = ArrayPool<char>.Shared.Rent(charCount);
+                try
+                {
+                    decoder.GetChars(buffer, 0, result.Count, chars, 0, false);
+                    builder.Append(chars, 0, charCount);
+                }
+                finally
+                {
+                    ArrayPool<char>.Shared.Return(chars);
+                }
+                totalBytes += result.Count;
+                // 메세지가 한번에 너무 많이 들어오면 연결을 끊어버린다.
+                if (totalBytes > MaxMessageBytes)
+                {
+                    await socket.CloseAsync(WebSocketCloseStatus.MessageTooBig, "들어온 메세지가 상한을 넘었습니다.", token);
+                    return null;
+                }
+                // 일단 메세지가 도착을 했으면 StringBuilder에 이어 붙혀 줍니다. 
+                builder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                // 메세지가 끝났니?. 끝났다면
+                // StringBuilder.ToString을 호출해서 String을 생성하여 반환합니다. 
+                if (result.EndOfMessage) return builder.ToString();
+
+                // 아니라면 다시 루프를 반복합니다
+            }
+
     }
     
     // 멤버와 연결이 끊길때까지 멤버가 보낸 메시지를 계속 듣는다. 
@@ -274,8 +300,8 @@ public class Room
             }
             case Protocol.InteractionType.ItemDropQuery:
             {
-                if(gameManager.itemOwnersDic.ContainsKey(interactionMessage.receivedId) == false) return;
-                if(gameManager.itemOwnersDic[interactionMessage.receivedId] != interactionMessage.senderId) return;
+                if(gameManager.itemOwnersDic.ContainsKey(member.User.Id) == false) return;
+                if(gameManager.itemOwnersDic[interactionMessage.receivedId] != member.User.Id) return;
                 gameManager.itemOwnersDic.TryRemove(interactionMessage.receivedId,out _);
                 interactionMessage.InteractionType = Protocol.InteractionType.ItemDropAnswer;
                 interactionMessage.IsSuccess = true;
@@ -441,9 +467,9 @@ public class Room
 
         Console.WriteLine($"[실제 지목 메세지] 지목 당한 유저 {selectMessage.selectedID}");
         gameManager.PointInfo[member.User.Id] = selectMessage.IsSelectCancel ? "" : selectMessage.selectedID;
-        foreach (var VARIABLE in gameManager.PointInfo)
+        foreach (var pointInfoDic in gameManager.PointInfo)
         {
-            Console.WriteLine($"[지목 핸들] 지목 딕셔너리 {VARIABLE.Key} : {VARIABLE.Value}");
+            Console.WriteLine($"[지목 핸들] 지목 딕셔너리 {pointInfoDic.Key} : {pointInfoDic.Value}");
         }
         
         await BroadcastAsync(selectMessage);
@@ -454,7 +480,7 @@ public class Room
 
        members[member.User.Id].IsReady = true;
        Console.WriteLine($"[{code}] {readyMessage.ID} : 준비 버튼을 눌렀다!");
-       bool isAllReeay = false;
+       bool isAllReady = false;
        int count = 0;
        foreach (Member m in members.Values)
        {
@@ -466,10 +492,10 @@ public class Room
            }
        }
        readyMessage.readyCount = count;
-       if(count >= members.Count - 1) isAllReeay = true;
+       if(count >= members.Count - 1) isAllReady = true;
        
        await BroadcastAsync(readyMessage);
-       if (isAllReeay)
+       if (isAllReady)
        {
 
            foreach (Member m in members.Values)
@@ -574,7 +600,7 @@ public class Room
     // 메시지를 여러명한테 뿌리는 함수
     public async Task BroadcastAsync(object message, string exceptId = null)
     {
-        string json = JsonSerializer.Serialize(message, message.GetType());
+        byte[] bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message, message.GetType()));
         
        // Console.WriteLine($"[직렬화 체크][{code}] {json}");
         // 보낼 json객체를 미리 생성하고,
@@ -587,13 +613,50 @@ public class Room
             // 제외 대상이라면 건너 뛴다
             if(member.User.Id == exceptId) continue;
             // 한명단위 메시지 Task를 만들어서 List에 넣어준다
-            sending.Add(SendRawAsync(member, json));
+            sending.Add(SendRawAsync(member, bytes));
         }
         
         await Task.WhenAll(sending);
     }
+    // 한명의 User에게 메시지를 보내는 함수( Json을 Byte로 바로 받아서 보내는 최적화 함수)
+    private async Task SendRawAsync(Member member, byte[] bytes)
+    {
+        // 소켓이 끊겨있는지 확인을 해준다. 보내기전에 마지막 체크
+        if (member.Socket.State != WebSocketState.Open) return;
+        
 
-    // 한명의 User에게 메시지를 보내는 함수
+        // A가 채팅 한 줄을 보내면, A의 수신 루프는 B·C·D 전송이 전부 끝날 때까지 다음 메시지를 못 읽습니다.
+        // 이러한 구조 때문에 너무 오래 걸릴 시 예외처리
+        using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+        // 보내는 중인 메시지가 있다면 lock이 풀릴때까지 잠깐 기다린다.
+        // 그리고 내가 보낼 턴이면 잠궈버린다. 두가지를 동시에 수행합니다.
+        await member.SendLock.WaitAsync(cts.Token);
+
+        try
+        {
+            await member.Socket.SendAsync(bytes, WebSocketMessageType.Text, true, cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // 3초 안에 못 보냈다 = 사실상 끊긴 사람. 소켓을 중단시켜 ReceiveLoop가 스스로 빠져나오게 한다.
+            member.Socket.Abort();
+        }
+        catch (WebSocketException)
+        {
+            // 보내는 순간 끊길 수 있음.
+            // 나가기 처리는 다른 곳에서 함.
+        }
+        catch (ObjectDisposedException)
+        {
+            member.Socket.Abort();
+            Console.WriteLine($"[폐기된 리소스 접근] : 멤버 {member.User.Id}의 접근");
+        }
+        finally // 예외가 발생하든 안하든 꼭 처리되는 finally 구문(찾아 보십쇼) 
+        {
+            member.SendLock.Release();
+        }
+    }
+    // 한명의 User에게 메시지를 보내는 함수 (Json을 받아 내부에서 Byte로 변환해 보내는 함수)
     private async Task SendRawAsync(Member member, string json)
     {
         // 소켓이 끊겨있는지 확인을 해준다. 보내기전에 마지막 체크
@@ -711,6 +774,7 @@ public class Room
         // 그래서 여기서도 lock을 걸어줘야 하는데 await이기 때문에
         // lock을 못걸어서 gate를 이용해서 대기하여 처리합니다.
         await gate.WaitAsync(token);
+        Protocol.WelcomeMessage welcome;
 
         try
         {
@@ -719,12 +783,11 @@ public class Room
             // 현재 방 사람들을 접속한 유저에게 전송하고,
             // join 메시지를 다른 사람들에게 보내준다
             List<Protocol.User> already = new List<Protocol.User>();
-
+            welcome = new Protocol.WelcomeMessage();
             foreach (Member other in members.Values)
                 already.Add(other.User);
 
             // welcome 메시지를 전송
-            Protocol.WelcomeMessage welcome = new Protocol.WelcomeMessage();
             welcome.RoomCode = code; // 서버 방정보를 보낸다
             welcome.User = member.User; // 서버에서 생성한 유저 정보를 접속자에게 보낸다
             welcome.Users = already.ToArray(); // 현재 방에 있는 유저들 정보를 보낸다
@@ -740,18 +803,19 @@ public class Room
             }
 
             welcome.ReadyCount = count;
-            await SendAsync(member, welcome);
+          
             if (members.IsEmpty) member.IsHost = true; // 가장 처음 접속하면 호스트 취급한다.
             members[member.User.Id] = member;
-            // join 메시지를 뿌린다. 접속자인 member 에게는 보내지 않는다
-            await BroadcastAsync(new Protocol.JoinMessage { User = member.User }, member.User.Id);
+       
 
         }
         finally
         {
             gate.Release();
         }
-        
+        await SendAsync(member, welcome);
+        // join 메시지를 뿌린다. 접속자인 member 에게는 보내지 않는다
+        await BroadcastAsync(new Protocol.JoinMessage { User = member.User }, member.User.Id);
         Console.WriteLine($"[{code}] {member.User.NickName}({member.User.Id}) 들어옴");
         return member;
     }
@@ -762,7 +826,7 @@ public class Room
         // 들어오기 나가기는 방의 멤버를 수정하고 메시지를 처리하기 때문에
         // 같은 자물쇠를 사용해줘야 합니다.
         // (안하면 유령객체 생길수도?)
-        await gate.WaitAsync();
+        await gate.WaitAsync(TimeSpan.FromSeconds(5));
 
         try
         {
@@ -784,14 +848,14 @@ public class Room
                 gameManager.GameEnd();
                 await roomExpiredCancellation.CancelAsync();
             }
-            // 퇴장한것을 알려줍니다.
-            await BroadcastAsync(new Protocol.LeaveMessage { Id = member.User.Id }, member.User.Id);
+          
         }
         finally
         {
             gate.Release();
         }
-        
+        // 퇴장한것을 알려줍니다.
+        await BroadcastAsync(new Protocol.LeaveMessage { Id = member.User.Id }, member.User.Id);
         Console.WriteLine($"[{code}] {member.User.NickName}({member.User.Id}) 나감");
     }
 

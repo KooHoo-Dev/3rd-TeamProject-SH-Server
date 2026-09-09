@@ -26,24 +26,24 @@ public class GenreAssignAndLiarSelectState: BaseGameTurnState
         Console.WriteLine($"[장르 선정 로직] 현재 장르 : {genreDef?.GenreName}");
 
         gameManager.LiarId = "";
-        foreach (var VARIABLE in gameManager.currentRoom.members.Values)
+        foreach (var member in gameManager.currentRoom.members.Values)
         {
-            VARIABLE.playerState.IsLiar = false;
-            gameManager.UserGameInfos[VARIABLE.User.Id].IsLiar =false;
+            member.playerState.IsLiar = false;
+            gameManager.UserGameInfos[member.User.Id].IsLiar =false;
         }
 
         int rendIndex = rnd.Next(0, gameManager.UserGameInfos.Count);
 
         GameManager.UserInfo Liar = new GameManager.UserInfo();
         int counter = 0;
-        foreach (var VARIABLE in gameManager.UserGameInfos)
+        foreach (var userGameInfoDic in gameManager.UserGameInfos)
         {
             if (counter == rendIndex)
             {
-                VARIABLE.Value.IsLiar = true;
+                userGameInfoDic.Value.IsLiar = true;
                 
-                gameManager.currentRoom.members[VARIABLE.Value.user.Id].playerState.IsLiar = true;
-                Liar = gameManager.UserGameInfos[VARIABLE.Value.user.Id];
+                gameManager.currentRoom.members[userGameInfoDic.Value.user.Id].playerState.IsLiar = true;
+                Liar = gameManager.UserGameInfos[userGameInfoDic.Value.user.Id];
             }
             
             counter++;

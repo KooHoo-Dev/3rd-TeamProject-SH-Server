@@ -33,10 +33,10 @@ public class GameManager
             }
         }
 
-        public string HoldingItem;
+
         public int score;
         public bool IsQuestSuccess;
-        public bool IsPushedState; // 현재 밀쳐진 상태인가?
+  
         public UserInfo(Protocol.User user, int score)
         {
             this.user = user;
@@ -319,11 +319,11 @@ public class GameManager
         }
         PointInfo.Clear();
         QuestInfo.Clear();
-        foreach (var VARIABLE in UserGameInfos)
+        foreach (var userInfoDic in UserGameInfos)
         {
-            currentRoom.members[VARIABLE.Key].IsReady = false;
-            bool s = PointInfo.TryAdd(VARIABLE.Key, "");
-            bool q = QuestInfo.TryAdd(VARIABLE.Key, "");
+            currentRoom.members[userInfoDic.Key].IsReady = false;
+            bool s = PointInfo.TryAdd(userInfoDic.Key, "");
+            bool q = QuestInfo.TryAdd(userInfoDic.Key, "");
             
             
         }
@@ -343,7 +343,7 @@ public class GameManager
         currentRound = 0;
         currentCategory = AllCategories[0];
         maxSpeakedCount = UserGameInfos.Count;
-        Protocol.User focausUser = new Protocol.User();
+        focausUser = new Protocol.User();
 
         OldKeyWords = new List<KeyWordDef>();
         Console.WriteLine($"[게임 초기화 완료]: 룸: {currentRoom.code}");
@@ -385,17 +385,17 @@ public class GameManager
 
     public void MartItemsCategoryClear()
     {
-        foreach (var VARIABLE in AllMartItems)
+        foreach (var martItems in AllMartItems.Values)
         {
-            VARIABLE.Value?.Clear();
+            martItems?.Clear();
         }
         AllMartItems.Clear();
     }
     public void MartItemsClear()
     {
-        foreach (var VARIABLE in AllMartItems)
+        foreach (var martItems in AllMartItems.Values)
         {
-            VARIABLE.Value?.Clear();
+            martItems?.Clear();
         }
 
     }

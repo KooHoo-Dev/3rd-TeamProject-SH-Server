@@ -8,7 +8,7 @@ public class ShowItemAndSpeakState : BaseGameTurnState
 {
 
 
-    private int fristIndex = 0;
+    private int firstIndex = 0;
     public ShowItemAndSpeakState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
@@ -24,11 +24,11 @@ public class ShowItemAndSpeakState : BaseGameTurnState
             gameManager.currentCycle++;
             gameManager.SkipUserDicClear();
             Random rnd = new Random();
-            fristIndex = rnd.Next(0, gameManager.UserGameInfos.Count);
+            firstIndex = rnd.Next(0, gameManager.UserGameInfos.Count);
             int counter = 0;
             foreach (var VARIABLE in gameManager.UserGameInfos)
             {
-                if (counter == fristIndex)
+                if (counter == firstIndex)
                 {
                     gameManager.focausUser = VARIABLE.Value.user;
                     
@@ -43,7 +43,7 @@ public class ShowItemAndSpeakState : BaseGameTurnState
             
             foreach (var VARIABLE in gameManager.UserGameInfos)
             {
-                if (counter == (gameManager.currentSpeakedCount + fristIndex) % (gameManager.UserGameInfos.Count))
+                if (counter == (gameManager.currentSpeakedCount + firstIndex) % (gameManager.UserGameInfos.Count))
                 {
                     gameManager.focausUser = VARIABLE.Value.user;
                     
