@@ -52,7 +52,7 @@ public class GameManager
         public readonly SemaphoreSlim userLock 
             = new SemaphoreSlim(1, 1);
     }
-    StateMachine<IState> stateMachine;
+    StateMachine<IUpdatableState> stateMachine;
 
     public IState currentTurnState => stateMachine.CurrentState;
 
@@ -247,7 +247,7 @@ public class GameManager
     {
         
         this.currentRoom = currentRoom;
-        stateMachine = new StateMachine<IState>();
+        stateMachine = new StateMachine<IUpdatableState>();
         
         
         
@@ -300,16 +300,22 @@ public class GameManager
         
     }
 
+    public void Tick(int intarvelMs)
+    {
+        stateMachine.Tick(intarvelMs);
+    }
+
     public void GameStart()
     {
         if(IsGameRunning) return;
-        // if(currentRoom.members.Count < 3)
-        // {
-        //     Console.WriteLine($"[총 유저가 3명 미만] 총 유저 수 : {currentRoom.members.Count}");
-        //     return;
-        // };
+        if(currentRoom.members.Count < 3)
+        {
+            Console.WriteLine($"[총 유저가 3명 미만] 총 유저 수 : {currentRoom.members.Count}");
+            return;
+        };
         Init();
         stateMachine.ChangeState<GameStartState>();
+        
     }
 
     private void Init()
@@ -346,6 +352,8 @@ public class GameManager
         }
         Console.WriteLine($"테스트4번 위치");
 
+        currentSpeakedCount = 0;
+        skipCount = 0;
         currentCycle = 0;
         currentRound = 0;
         currentCategory = AllCategories[0];

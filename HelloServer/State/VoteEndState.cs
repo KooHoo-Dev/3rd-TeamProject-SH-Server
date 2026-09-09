@@ -9,7 +9,7 @@ public class VoteEndState : GameTurnState
 
 
     private string result = "";
-    public VoteEndState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
+    public VoteEndState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
 
@@ -53,9 +53,9 @@ public class VoteEndState : GameTurnState
     }
 
 
-    protected override void Tick(object sender, ElapsedEventArgs e)
+    public override void Tick(int deltaMs)
     {
-        base.Tick(sender, e);
+        base.Tick(deltaMs);
         if (currentMsTime > MaxMsTime)
         {
 

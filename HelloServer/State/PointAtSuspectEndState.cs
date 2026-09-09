@@ -9,7 +9,7 @@ public class PointAtSuspectEndState : GameTurnState
 {
 
     
-    public PointAtSuspectEndState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
+    public PointAtSuspectEndState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
 
@@ -26,10 +26,9 @@ public class PointAtSuspectEndState : GameTurnState
         BroadcastAsync(TurnMessageFactory.PointAtSuspectEnd(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.MostFrequent));
 
     }
-
-    protected override void Tick(object sender, ElapsedEventArgs e)
+    public override void Tick(int deltaMs)
     {
-        base.Tick(sender, e);
+        base.Tick(deltaMs);
         if (currentMsTime > MaxMsTime)
         {
 
@@ -41,7 +40,7 @@ public class PointAtSuspectEndState : GameTurnState
             else if (string.IsNullOrEmpty(gameManager.MostFrequent) &&
                      gameManager.currentCycle >= gameManager.currentRoom.GameConfig.MaxCycle)
             {
-                
+                gameManager.SkipCount = 0;
                 stateMachine.ChangeState<PointAtSuspectState>();
             }
             else if (string.IsNullOrEmpty(gameManager.MostFrequent) == false)

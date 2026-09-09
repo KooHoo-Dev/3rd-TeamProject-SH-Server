@@ -8,7 +8,7 @@ public class LiarOutButtonPressedState : GameTurnState
 {
 
 
-    public LiarOutButtonPressedState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
+    public LiarOutButtonPressedState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
 
@@ -23,9 +23,9 @@ public class LiarOutButtonPressedState : GameTurnState
     }
 
 
-    protected override void Tick(object sender, ElapsedEventArgs e)
+    public override void Tick(int deltaMs)
     {
-        base.Tick(sender, e);
+        base.Tick(deltaMs);
         if (currentMsTime > MaxMsTime)
         {
             stateMachine.ChangeState<LiarKeywordGuessState>();

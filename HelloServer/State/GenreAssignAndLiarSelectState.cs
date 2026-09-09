@@ -7,7 +7,7 @@ namespace HelloServer.State;
 public class GenreAssignAndLiarSelectState: GameTurnState
 {
  
-    public GenreAssignAndLiarSelectState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
+    public GenreAssignAndLiarSelectState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
         
     }
@@ -58,9 +58,9 @@ public class GenreAssignAndLiarSelectState: GameTurnState
         BroadcastAsync(TurnMessageFactory.GenreAssignAndLiarSelect(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.CurrentGanre.GenreId,gameManager.LiarId ));
     }
  
-    protected override void Tick(object sender, ElapsedEventArgs e)
+    public override void Tick(int deltaMs)
     {
-        base.Tick(sender, e);
+        base.Tick(deltaMs);
         if (currentMsTime > MaxMsTime)
         {
             stateMachine.ChangeState<KeywordDistributeState>();

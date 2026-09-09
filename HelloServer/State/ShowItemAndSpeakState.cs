@@ -9,7 +9,7 @@ public class ShowItemAndSpeakState : GameTurnState
 
 
     private int fristIndex = 0;
-    public ShowItemAndSpeakState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
+    public ShowItemAndSpeakState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
 
@@ -58,9 +58,9 @@ public class ShowItemAndSpeakState : GameTurnState
     }
 
 
-    protected override void Tick(object sender, ElapsedEventArgs e)
+    public override void Tick(int deltaMs)
     {
-        base.Tick(sender, e);
+        base.Tick(deltaMs);
         bool trigger = gameManager.ChangeSpeakerTrigger;
         if (string.IsNullOrEmpty(gameManager.PressedLiarId) == false)
         {

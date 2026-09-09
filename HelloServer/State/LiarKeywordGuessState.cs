@@ -7,7 +7,7 @@ namespace HelloServer.State;
 public class LiarKeywordGuessState : GameTurnState
 {
 
-    public LiarKeywordGuessState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
+    public LiarKeywordGuessState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
 
@@ -19,9 +19,9 @@ public class LiarKeywordGuessState : GameTurnState
     }
 
 
-    protected override void Tick(object sender, ElapsedEventArgs e)
+    public override void Tick(int deltaMs)
     {
-        base.Tick(sender, e);
+        base.Tick(deltaMs);
         if (currentMsTime > MaxMsTime || string.IsNullOrEmpty(gameManager.LiarGuessKeyWord) == false)
         {
             stateMachine.ChangeState<LiarKeywordGuessEndState>();

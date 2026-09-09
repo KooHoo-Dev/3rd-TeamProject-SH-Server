@@ -76,7 +76,7 @@ namespace Jay.FSM
             return CurrentState is T;
         }
 
-        public void Tick(float deltaTime)
+        public void Tick(int deltaTime)
         {
             if (CurrentState is IUpdatableState updatable)
             {

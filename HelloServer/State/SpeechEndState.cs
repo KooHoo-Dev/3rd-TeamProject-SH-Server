@@ -7,7 +7,7 @@ namespace HelloServer.State;
 public class SpeechEndState : GameTurnState
 {
 
-    public SpeechEndState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
+    public SpeechEndState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
 
@@ -22,9 +22,9 @@ public class SpeechEndState : GameTurnState
     }
 
 
-    protected override void Tick(object sender, ElapsedEventArgs e)
+    public override void Tick(int deltaMs)
     {
-        base.Tick(sender, e);
+        base.Tick(deltaMs);
         if (currentMsTime > MaxMsTime)
         {
             if (gameManager.currentSpeakedCount >= gameManager.maxSpeakedCount)

@@ -7,7 +7,7 @@ namespace HelloServer.State;
 public class MartReturnState : GameTurnState
 {
 
-    public MartReturnState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
+    public MartReturnState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
     }
 
@@ -41,9 +41,9 @@ public class MartReturnState : GameTurnState
         BroadcastAsync(TurnMessageFactory.MartReturn(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,userItemLists,userQuestInfos));
     }
     
-    protected override void Tick(object sender, ElapsedEventArgs e)
+    public override void Tick(int deltaMs)
     {
-        base.Tick(sender, e);
+        base.Tick(deltaMs);
         if (currentMsTime > MaxMsTime)
         {
             stateMachine.ChangeState<ShowItemAndSpeakState>();

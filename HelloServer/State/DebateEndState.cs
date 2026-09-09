@@ -7,7 +7,7 @@ namespace HelloServer.State;
 public class DebateEndState: GameTurnState
 {
 
-    public DebateEndState(StateMachine<IState> stateMachine, GameManager gameManager, float maxTime) : base(stateMachine, gameManager, maxTime)
+    public DebateEndState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float maxTime) : base(stateMachine, gameManager, maxTime)
     {
     }
 
@@ -19,9 +19,9 @@ public class DebateEndState: GameTurnState
     }
 
 
-    protected override void Tick(object sender, ElapsedEventArgs e)
+    public override void Tick(int deltaMs)
     {
-        base.Tick(sender, e);
+        base.Tick(deltaMs);
         if (currentMsTime > MaxMsTime)
         {
             stateMachine.ChangeState<VoteState>();

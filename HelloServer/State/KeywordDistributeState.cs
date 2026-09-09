@@ -7,7 +7,7 @@ namespace HelloServer.State;
 public class KeywordDistributeState : GameTurnState
 {
 
-    public KeywordDistributeState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
+    public KeywordDistributeState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
 
     }
@@ -70,9 +70,9 @@ public class KeywordDistributeState : GameTurnState
         }
         
     }
-    protected override void Tick(object sender, ElapsedEventArgs e)
+    public override void Tick(int deltaMs)
     {
-        base.Tick(sender, e);
+        base.Tick(deltaMs);
         if (currentMsTime > MaxMsTime)
         {
             stateMachine.ChangeState<MartEnterState>();

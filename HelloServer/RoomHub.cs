@@ -62,7 +62,7 @@ public class RoomHub
             {
                 
                 entry = new Entry()
-                    {Room = new Room(code, logMovesPerSecond, DefulatConfig, 100), Users = 0};
+                    {Room = new Room(code, logMovesPerSecond, DefulatConfig, broadcastPerSecond), Users = 0};
                 rooms.Add(code, entry);
                 
                 Console.WriteLine($"[{code}] 방을 열었다. 총 방의 개수 : {rooms.Count}");
@@ -84,7 +84,7 @@ public class RoomHub
             entry.Users--;
             
             if (entry.Users > 0) return;
-            rooms[code].Room.timer.Dispose();
+
             rooms.Remove(code);
             Console.WriteLine($"[{code}] 아무도 없어서 방을 지움. 총 방의 개수 {rooms.Count}");
         }
@@ -153,6 +153,12 @@ public class RoomHub
                 List<Task> sending = new List<Task>();
                 foreach (Room room in snapshot)
                 {
+                    // 만약 게임 중이라면 게임 진행을 한다.
+                    if (room.gameManager.IsGameRunning)
+                    {
+                        room.GameTick();
+                        
+                    }
                     // 상태정보 보내는 Task를 가져와서 sending에 추가해준다.
                     sending.Add(room.BroadcastStateAsync());
                 }

@@ -6,7 +6,7 @@ namespace HelloServer.State;
 
 public class LiarConfirmedState : GameTurnState
 {
-    public LiarConfirmedState(StateMachine<IState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
+    public LiarConfirmedState(StateMachine<IUpdatableState> stateMachine, GameManager gameManager, float MaxMsTime) : base(stateMachine, gameManager, MaxMsTime)
     {
         
     }
@@ -19,10 +19,9 @@ public class LiarConfirmedState : GameTurnState
         BroadcastAsync(TurnMessageFactory.LiarConfirmed(MaxMsTime,gameManager.currentCycle,gameManager.currentRound,gameManager.LiarId));
     }
 
-
-    protected override void Tick(object sender, ElapsedEventArgs e)
+    public override void Tick(int deltaMs)
     {
-        base.Tick(sender, e);
+        base.Tick(deltaMs);
         if (currentMsTime > MaxMsTime)
         {
             stateMachine.ChangeState<LiarKeywordGuessState>();

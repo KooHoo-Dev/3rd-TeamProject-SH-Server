@@ -3,9 +3,9 @@ using Jay.FSM;
 
 namespace HelloServer.State;
 
-public abstract class GameTurnState : IState
+public abstract class GameTurnState : IUpdatableState
 {
-    public StateMachine<IState> stateMachine;
+    public StateMachine<IUpdatableState> stateMachine;
     public GameManager gameManager { get; set; }
 
 
@@ -13,12 +13,12 @@ public abstract class GameTurnState : IState
     public int currentMsTime;
     public float MaxMsTime{get;set;}
 
-    public GameTurnState(StateMachine<IState> stateMachine,GameManager gameManager, float MaxTime)
+    public GameTurnState(StateMachine<IUpdatableState> stateMachine,GameManager gameManager, float MaxTime)
     {
         this.stateMachine = stateMachine;
         this.gameManager = gameManager;
         this.MaxMsTime = MaxTime * 1000;
-        deltaMsTime = gameManager.currentRoom.IntarvelMs;
+        deltaMsTime = gameManager.currentRoom.DeltaMs;
     }
 
 
@@ -30,11 +30,9 @@ public abstract class GameTurnState : IState
             Console.WriteLine($"[조기 종료됨]; 게임매니저 == null :{gameManager == null}, 현재 방 == null : {gameManager?.currentRoom == null}");
             return;
         }
-
-        gameManager.currentRoom.timer.AutoReset = true;
+        
      currentMsTime = 0;
-     gameManager.currentRoom.timer.Elapsed += Tick;
-     gameManager.currentRoom.timer.Start();
+
         Console.WriteLine($"[스테이트 머신] 현재 Enter 상태: {stateMachine.CurrentState} , 현재 사이클 {gameManager.currentCycle} , 현재 라운드 {gameManager.currentRound} , 제한시간(ms): {MaxMsTime}");
      
     }
@@ -46,12 +44,10 @@ public abstract class GameTurnState : IState
     public virtual void Exit()
     {
         currentMsTime = 0;
-        
-        gameManager.currentRoom.timer.Elapsed -= Tick;
-        gameManager.currentRoom.timer.Stop();
+
 
     }
-    protected virtual void Tick(object sender, ElapsedEventArgs e)
+    public virtual void Tick(int deltaMs)
     {
         currentMsTime += deltaMsTime;
         if(currentMsTime % 5000 == 0)

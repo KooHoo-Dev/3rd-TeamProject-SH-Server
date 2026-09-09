@@ -2,7 +2,7 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using Timer = System.Timers.Timer;
+
 
 
 namespace HelloServer;
@@ -64,10 +64,9 @@ public class Room
 {
 
     public  GameManager gameManager;
-
-    public int IntarvelMs = 100;
-
-    public System.Timers.Timer timer;
+    public int broadcastPerSecond { get; private set; }
+    public int DeltaMs {get; private set;}
+    
     // 접속자 한 명.
     public class Member
     {
@@ -118,17 +117,23 @@ public class Room
     
     public bool IsEmpty => members.IsEmpty;
     public GameConfig GameConfig { get; }
-    
-    public Room(string code, int logMovesPerSecond, GameConfig config, int intarvelMs)
+    public bool roomExpired = false;
+    private readonly CancellationTokenSource roomExpiredCancellation = new();
+    public Room(string code, int logMovesPerSecond, GameConfig config, int broadcastPerSecond)
     {
         this.code = code;
         this.logMovesPerSecond = logMovesPerSecond;
         this.GameConfig = config;
-        IntarvelMs = intarvelMs;
-        timer = new Timer(intarvelMs);
+        DeltaMs = (TimeSpan.FromSeconds(1.0 / broadcastPerSecond).Milliseconds);
         gameManager = new GameManager(config,this);
     }
 
+    // 게임의 틱 업데이트(진행)을 담당하는 함수( RoomHub의 모든 룸의 함수를 실행시키는 곳에서 실행된다.)
+    public void GameTick()
+    {
+        gameManager.Tick(DeltaMs);
+    }
+    
     #region 듣기
 
     // 글자를 받는다. 상대가 연결을 닫았으면 nulll을 돌려준다
@@ -154,9 +159,16 @@ public class Room
             // 웹소켓 수신 결과를 저장할 수있는 객체를 선언해주고,
             // await 키워드를 이용하여 해당 소켓(유저와 연결된..)에
             // 메시지가 들어올때까지 기다려 줍니다.
-            WebSocketReceiveResult result = 
-                await socket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
-
+            WebSocketReceiveResult result;
+            try
+            {
+                result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
+            }
+            catch (WebSocketException)
+            {
+                // 인사 없이 끊었다. 닫힌 것과 똑같이 취급한다.
+                return null;
+            }
             // 예외 처리부터 해줍니다. 소켓이 닫혔을 경우.
             if (result.MessageType == WebSocketMessageType.Close) return null;
             // 일단 메세지가 도착을 했으면 StringBuilder에 이어 붙혀 줍니다. 
@@ -428,7 +440,7 @@ public class Room
     {
        Protocol.ReadyMessage readyMessage = JsonSerializer.Deserialize<Protocol.ReadyMessage>(text);
 
-       members[readyMessage.ID].IsReady = true;
+       members[member.User.Id].IsReady = true;
        Console.WriteLine($"[{code}] {readyMessage.ID} : 준비 버튼을 눌렀다!");
        bool isAllReeay = false;
        int count = 0;
@@ -633,6 +645,7 @@ public class Room
     private async Task<Member> JoinAsync(WebSocket socket, 
         string id, CancellationToken token)
     {
+        if (gameManager.IsGameRunning) return null;
         // 첫 메시지를 들어 봅니다. 지금 서버코드 규약에 따르면
         // hello 여야 합니다
         string first = await ReceiveTextAsync(socket, token);
@@ -730,6 +743,12 @@ public class Room
                 }
             }
             members.TryRemove(member.User.Id, out _);
+            if (gameManager.IsGameRunning)
+            {
+                roomExpired = true;
+                gameManager.GameEnd();
+                await roomExpiredCancellation.CancelAsync();
+            }
             // 퇴장한것을 알려줍니다.
             await BroadcastAsync(new Protocol.LeaveMessage { Id = member.User.Id }, member.User.Id);
         }
@@ -747,6 +766,9 @@ public class Room
     public async Task HandleAsync(WebSocket socket,
         string id, CancellationToken token)
     {
+        using CancellationTokenSource linkedCancellation =
+            CancellationTokenSource.CreateLinkedTokenSource(
+                token, roomExpiredCancellation.Token);
         // Join처리를 실행하고 끝난뒤 멤버 객체를 저장해준다.
         Member member = await JoinAsync(socket, id, token);
         // hello 안보내고 딴소리 했다. 방에 못 들인다
@@ -760,6 +782,10 @@ public class Room
         catch (OperationCanceledException)
         {
             // 서버 꺼지는 중. 정상임
+        }
+        catch (WebSocketException)
+        {
+            
         }
         finally
         {

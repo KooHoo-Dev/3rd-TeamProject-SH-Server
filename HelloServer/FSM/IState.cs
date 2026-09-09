@@ -14,6 +14,6 @@ namespace Jay.FSM
 
     public interface IUpdatableState : IState
     {
-        void Tick(float deltaTime);
+        void Tick(int deltaMs);
     }
 }
