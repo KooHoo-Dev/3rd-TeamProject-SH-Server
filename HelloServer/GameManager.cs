@@ -356,7 +356,7 @@ public class GameManager
             SkipUsers.Clear();
         }
     }
-    private void SetRandomCategories()
+    public void SetRandomCategories()
     {
         
         List<CategoryType> pool = DataManager.Instance.GetAllTypes();

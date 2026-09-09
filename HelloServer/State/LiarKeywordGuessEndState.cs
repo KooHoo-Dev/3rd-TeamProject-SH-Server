@@ -45,6 +45,14 @@ public class LiarKeywordGuessEndState : BaseGameTurnState
             Protocol.UserScoreInfo scoreInfo = new Protocol.UserScoreInfo();
             scoreInfo.UserId = userGameInfoDic.Key;
             scoreInfo.UserScore = userGameInfoDic.Value.score;
+
+            // 만약 투표 당선자일 시 일단 -1점
+            if (gameManager.MostFrequent == userGameInfoDic.Value.user.Id)
+            {
+                scoreInfo.UserScore += -1;
+            }
+            
+            
             if (userGameInfoDic.Value.IsLiar)
             {
                 scoreInfo.UserScore +=
