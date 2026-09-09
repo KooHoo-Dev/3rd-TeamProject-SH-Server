@@ -43,12 +43,12 @@ public class LiarKeywordGuessEndState : GameTurnState
         Protocol.UserScoreInfo[] resultInfo = new Protocol.UserScoreInfo[gameManager.UserGameInfos.Count];
 
 
-        int MaxVoteCount = gameManager.VoteQueue.Count;
+        int MaxVoteCount = gameManager.Votes.Count;
         Dictionary<string, Protocol.VoteMessage> voteDic = new Dictionary<string, Protocol.VoteMessage>();
-        for (int i = 0; i < MaxVoteCount; i++)
+        foreach (var voteMessage in gameManager.Votes.Values)
         {
-            gameManager.VoteQueue.TryDequeue(out Protocol.VoteMessage msg);
-            voteDic.Add(msg.UserID,msg);
+            gameManager.Votes.TryGetValue(voteMessage.UserID, out Protocol.VoteMessage vote);
+            voteDic.Add(vote.UserID,vote);
         }
         
         int counter = 0;

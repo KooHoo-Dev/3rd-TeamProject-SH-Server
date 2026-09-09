@@ -15,7 +15,7 @@ public class VoteState : GameTurnState
     {
         base.Enter();
 
-        gameManager.VoteQueue.Clear();
+        gameManager.Votes.Clear();
         BroadcastAsync(TurnMessageFactory.Vote(MaxMsTime,gameManager.currentCycle,gameManager.currentRound));
     }
 
@@ -23,7 +23,7 @@ public class VoteState : GameTurnState
     public override void Tick(int deltaMs)
     {
         base.Tick(deltaMs);
-        if (currentMsTime > MaxMsTime || gameManager.VoteQueue.Count == (gameManager.UserGameInfos.Count - 1))
+        if (currentMsTime > MaxMsTime || gameManager.Votes.Count >= gameManager.UserGameInfos.Count - 1)
         {
             stateMachine.ChangeState<VoteEndState>();
         }

@@ -13,7 +13,8 @@ using Jay.FileIO;
         private Dictionary<int, ItemDef> itemDefs = new();
 
         public int Count => itemDefs.Count;
-        public ItemDef Get(int i) => itemDefs[i];
+        // ItemTable — 없는 ID는 예외가 아니라 '없음'이다. 물어보는 쪽이 클라이언트이기 때문이다.
+        public ItemDef Get(int id) => itemDefs.TryGetValue(id, out ItemDef def) ? def : null;
         
         public List<ItemDef> GetListAll()
         {

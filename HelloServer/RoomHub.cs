@@ -67,7 +67,7 @@ public class RoomHub
                 
                 Console.WriteLine($"[{code}] 방을 열었다. 총 방의 개수 : {rooms.Count}");
             }
-
+            if (entry.Users >= 4) return null;   // 요구사항: 최대 4인
             entry.Users++;
             return entry.Room;
         }

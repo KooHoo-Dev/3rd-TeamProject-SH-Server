@@ -12,7 +12,7 @@ using Jay.FileIO;
         private Dictionary<int, ItemCategoryDef> itemCategoryDefs = new();
 
         public int Count => itemCategoryDefs.Count;
-        public ItemCategoryDef Get(int i) => itemCategoryDefs[i];
+        public ItemCategoryDef Get(int id) => itemCategoryDefs.TryGetValue(id, out ItemCategoryDef def) ? def : null;
 
         public void Load()
         {

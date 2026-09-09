@@ -206,7 +206,7 @@ public class Room
             if(kind?.Type == "move") HandleMove(member, text);
             else if(kind?.Type == "chat") await HandleChatAsync(member, text);
             else if (kind?.Type == "ready") await HandleReady(member, text);
-            else if (kind?.Type == "게임 시작") await HandleGameStart();
+            else if (kind?.Type == "게임 시작") await HandleGameStart(member);
             else if(kind?.Type == "NonPoint")  await HandleNonPoint(member, text);
             else if(kind?.Type == "Select") await HandleSelectUser( member, text);
             else if(kind?.Type == "LiarSelfDisclose") HandleLiarButtonPressed(member, text);
@@ -393,8 +393,11 @@ public class Room
     {
         if(gameManager.currentTurnState != gameManager.voteState) return;
         
+// Room.HandleVote — 나중에 누른 것으로 덮어쓴다(마음 바꾸기 허용). 중복이 쌓이지 않는다.
         Protocol.VoteMessage voteMessage = JsonSerializer.Deserialize<Protocol.VoteMessage>(text);
-        gameManager.VoteQueue.Enqueue(voteMessage);
+        if (voteMessage == null) return;
+        voteMessage.UserID = member.User.Id;
+        gameManager.Votes[member.User.Id] = voteMessage;
        await BroadcastAsync(voteMessage);
     }
 
@@ -476,14 +479,15 @@ public class Room
        
     }
 
-    private async Task HandleGameStart()
+    private async Task HandleGameStart(Member member)
     {
-        if(gameManager.IsGameRunning) return;
+        // 시작은 호스트만 누른다.
+        if (member.IsHost == false) return;
         if(members.Count < 3) return;
 
-        foreach (var member in members.Values)
+        foreach (var m in members.Values)
         {
-            member.IsReady = false;
+            m.IsReady = false;
         }
         
         Protocol.GameStartOKMessage gameStartOkMessage = new Protocol.GameStartOKMessage();

@@ -56,7 +56,9 @@ public class GameManager
 
     public IState currentTurnState => stateMachine.CurrentState;
 
-    public bool IsGameRunning = false;
+    // GameManager: bool 대신 int 를 쓴다
+    private int isGameRunning;
+    public bool IsGameRunning => Volatile.Read(ref isGameRunning) == 1;
 
     public Room currentRoom;
 
@@ -131,8 +133,8 @@ public class GameManager
         = new SemaphoreSlim(1, 1);
 
     #region 비동기 함수에서 보내는 정보들
-    public readonly ConcurrentQueue<Protocol.VoteMessage> VoteQueue = new ConcurrentQueue<Protocol.VoteMessage>();
-    
+    // GameManager: ConcurrentQueue<VoteMessage> 대신
+    public readonly ConcurrentDictionary<string, Protocol.VoteMessage> Votes = new();    
     // 라이어 버튼을 누른 '일반 유저ID'가 담기는 버튼
     public readonly ConcurrentQueue<string> LiarOutButtonQueue = new ConcurrentQueue<string>();
 
@@ -307,7 +309,8 @@ public class GameManager
 
     public void GameStart()
     {
-        if(IsGameRunning) return;
+        // 0 -> 1 로 바꾼 사람만 통과. 두 명이 동시에 눌러도 한 명만 들어온다.
+        if (Interlocked.CompareExchange(ref isGameRunning, 1, 0) != 0) return;
         if(currentRoom.members.Count < 3)
         {
             Console.WriteLine($"[총 유저가 3명 미만] 총 유저 수 : {currentRoom.members.Count}");
@@ -320,7 +323,7 @@ public class GameManager
 
     private void Init()
     {
-        IsGameRunning = true;
+        isGameRunning++;
         Console.WriteLine($"테스트1번 위치");
         List<Room.Member> memberList = currentRoom.members.Values.ToList();
         UserGameInfos = new ConcurrentDictionary<string, UserInfo>();
@@ -406,7 +409,7 @@ public class GameManager
     }
     public void GameEnd()
     {
-        IsGameRunning = false;
+        isGameRunning = 0;
         stateMachine.StopStateMachine();
         PointInfo.Clear();
         CurrentGanre = new GenreDef();

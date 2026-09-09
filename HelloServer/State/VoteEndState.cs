@@ -18,10 +18,10 @@ public class VoteEndState : GameTurnState
         base.Enter();
 
         BroadcastAsync(TurnMessageFactory.VoteEnd(MaxMsTime,gameManager.currentCycle,gameManager.currentRound));
-        int count = gameManager.VoteQueue.Count;
+        int count = gameManager.Votes.Count;
 
         List<string> resultList = new List<string>();
-        List<Protocol.VoteMessage> list = gameManager.VoteQueue.ToList();
+        List<Protocol.VoteMessage> list = gameManager.Votes.Values.ToList();
         
         for (int i = 0; i < count; i++)
         {
