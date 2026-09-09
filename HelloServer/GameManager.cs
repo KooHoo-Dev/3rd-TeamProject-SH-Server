@@ -323,7 +323,7 @@ public class GameManager
 
     private void Init()
     {
-        isGameRunning++;
+        Interlocked.Exchange(ref isGameRunning, 1);
         Console.WriteLine($"테스트1번 위치");
         List<Room.Member> memberList = currentRoom.members.Values.ToList();
         UserGameInfos = new ConcurrentDictionary<string, UserInfo>();

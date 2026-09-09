@@ -150,7 +150,7 @@ public class RoomHub
                     }
                 }
 
-                List<Task> sending = new List<Task>();
+
                 foreach (Room room in snapshot)
                 {
                     // 만약 게임 중이라면 게임 진행을 한다.
@@ -160,10 +160,9 @@ public class RoomHub
                         
                     }
                     // 상태정보 보내는 Task를 가져와서 sending에 추가해준다.
-                    sending.Add(room.BroadcastStateAsync());
+                  _= room.BroadcastStateAsync();
                 }
                 
-                await Task.WhenAll(sending);
             }
 
         }

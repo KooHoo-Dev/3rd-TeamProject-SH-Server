@@ -64,9 +64,10 @@ public class Room
 {
 
     public  GameManager gameManager;
-    public int broadcastPerSecond { get; private set; }
     public int DeltaMs {get; private set;}
-    
+
+    private int isBroadcasting;
+    private bool IsBroadcasting => Volatile.Read(ref isBroadcasting) == 1;
     // 접속자 한 명.
     public class Member
     {
@@ -591,16 +592,24 @@ public class Room
         // 소켓이 끊겨있는지 확인을 해준다. 보내기전에 마지막 체크
         if (member.Socket.State != WebSocketState.Open) return;
         
+
+        // A가 채팅 한 줄을 보내면, A의 수신 루프는 B·C·D 전송이 전부 끝날 때까지 다음 메시지를 못 읽습니다.
+        // 이러한 구조 때문에 너무 오래 걸릴 시 예외처리
+        using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
         // 보내는 중인 메시지가 있다면 lock이 풀릴때까지 잠깐 기다린다.
         // 그리고 내가 보낼 턴이면 잠궈버린다. 두가지를 동시에 수행합니다.
-        await member.SendLock.WaitAsync();
+        await member.SendLock.WaitAsync(cts.Token);
 
         try
         {
             // 보낼때는 string이 아니라 byte배열로 바꿔준다
             byte[] bytes = Encoding.UTF8.GetBytes(json);
-            await member.Socket.SendAsync(
-                bytes, WebSocketMessageType.Text, true, CancellationToken.None);
+            await member.Socket.SendAsync(bytes, WebSocketMessageType.Text, true, cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // 3초 안에 못 보냈다 = 사실상 끊긴 사람. 소켓을 중단시켜 ReceiveLoop가 스스로 빠져나오게 한다.
+            member.Socket.Abort();
         }
         catch (WebSocketException)
         {
@@ -625,7 +634,8 @@ public class Room
     {
         // 방에 멤버가 없다면(방이 사라질때) 보내지 않는다.
         if (members.IsEmpty) return;
-        
+        if(IsBroadcasting) return;
+        Interlocked.Exchange(ref isBroadcasting, 1);
         // 사람마다 위치 데이터 객체 하나씩 만든다.
         List<Protocol.PlayerState> states = new List<Protocol.PlayerState>();
 
@@ -642,6 +652,7 @@ public class Room
 
         // states를 배열로 바꿔서 뿌린다(Broadcast)
         await BroadcastAsync(new Protocol.StateMessage() { States = states.ToArray() });
+        Interlocked.Exchange(ref isBroadcasting, 0);
     }
     
     #endregion
