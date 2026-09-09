@@ -16,7 +16,6 @@ public class MartEnterState : BaseGameTurnState
         base.Enter();
         gameManager.itemOwnersDic.Clear();
         gameManager.SetRandomCategories();
-        gameManager.ChangeCategory();
         gameManager.SetMartItemsDicCategory();
         Random random = new Random();
         int randomIndex;

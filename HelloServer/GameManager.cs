@@ -450,5 +450,9 @@ public class GameManager
             currentCategory = AllCategories[(currentCategoryIndex + 1) % AllCategories.Length];
             
         }
+        else
+        {
+            currentCategory = AllCategories.First();
+        }
     }
 }
