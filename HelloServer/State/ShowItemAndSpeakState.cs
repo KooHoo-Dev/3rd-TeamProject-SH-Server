@@ -24,9 +24,9 @@ public class ShowItemAndSpeakState : BaseGameTurnState
             gameManager.currentCycle++;
             gameManager.SkipUserDicClear();
             Random rnd = new Random();
-            firstIndex = rnd.Next(0, gameManager.UserGameInfos.Count);
 
             List<GameManager.UserInfo> userList = gameManager.UserGameInfos.Values.ToList().OrderBy(info => info.user.Id).ToList();
+            firstIndex = rnd.Next(userList.Count);
             for (int i = 0; i < userList.Count; i++)
             {
                 if (i == firstIndex)
