@@ -1,4 +1,5 @@
-﻿using System.Net.WebSockets;
+﻿using System.Collections.Concurrent;
+using System.Net.WebSockets;
 
 namespace HelloServer;
 
@@ -18,7 +19,7 @@ public class RoomHub
         public int Users;
     }
     
-    private readonly Dictionary<string, Entry> rooms = new();
+    private readonly ConcurrentDictionary<string, Entry> rooms = new();
 
     private readonly int broadcastPerSecond;
 
@@ -63,8 +64,13 @@ public class RoomHub
                 
                 entry = new Entry()
                     {Room = new Room(code, DefulatConfig), Users = 0};
-                rooms.Add(code, entry);
-                
+                bool won = rooms.TryAdd(code, entry);
+                if (won == false)
+                {
+                    Console.WriteLine($"[{code}] 레이스 컨디션 조건에 걸림 중 복 방 열림 방지(들어가게는 해줌)");
+                    entry.Users++;
+                    return entry.Room;
+                }
                 Console.WriteLine($"[{code}] 방을 열었다. 총 방의 개수 : {rooms.Count}");
             }
             if (entry.Users >= 4) return null;   //  최대 4인 제한
@@ -86,7 +92,7 @@ public class RoomHub
             
             if (entry.Users > 0) return;
 
-            rooms.Remove(code);
+            rooms.Remove(code, out entry);
             Console.WriteLine($"[{code}] 아무도 없어서 방을 지움. 총 방의 개수 {rooms.Count}");
         }
     }
