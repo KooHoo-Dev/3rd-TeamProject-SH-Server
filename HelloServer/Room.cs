@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-
+using System.Threading.Channels;
 
 
 namespace HelloServer;
@@ -96,13 +96,12 @@ public class Room
         // 출력 서식을 따로 지정할 수 있습니다. 그거는 MS 홈페이지 가서 보세요
         public DateTime LastLogAt;
         
-        // 보낼때 여러메시지를 동시에 보내지 않기 위에
-        // 사람(멤버)마다 Gate를 하나씩 두고 한번에 하나씩 보내기 위해
-        // 사용하는 클래스. (비동기에서 lock처리가 안되서 사용)
-        // 읽는것은 여러 쓰레드에서 읽을 수 있는데 사용(Write)는
-        // 하나의 쓰레드에서만 온전히 돌아갈 수 있도록 하게 해주는 클래스
-        public readonly SemaphoreSlim SendLock 
-            = new SemaphoreSlim(1, 1);
+        // Member 안에 SendLock 대신:
+        public readonly Channel<byte[]> Outbox = 
+            Channel.CreateUnbounded<byte[]>(new UnboundedChannelOptions { SingleReader = true });
+        
+        public readonly CancellationTokenSource WriterCts = new CancellationTokenSource();
+        public Task WriterTask; // 나중에 정리(await)하려고 참조를 들고 있는다
     }
     
     // race condition이 일어나도 여러 쓰레드에서 동시적으로
@@ -117,6 +116,8 @@ public class Room
     private readonly SemaphoreSlim gate = new SemaphoreSlim(1, 1);
     public readonly string code; // 방번호
 
+
+
     
     public bool IsEmpty => members.IsEmpty;
     public GameConfig GameConfig { get; }
@@ -129,6 +130,37 @@ public class Room
 
         this.GameConfig = config;
         gameManager = new GameManager(config,this);
+    }
+    
+    
+    private static async Task WriterLoopAsync(Member member)
+    {
+        try
+        {
+            // 채널 자체 취소 + 개별 Send 타임아웃을 하나로 묶는다
+            await foreach (byte[] bytes in member.Outbox.Reader.ReadAllAsync(member.WriterCts.Token))
+            {
+                if (member.Socket.State != WebSocketState.Open) continue;
+
+                using var sendCts = CancellationTokenSource.CreateLinkedTokenSource(member.WriterCts.Token);
+                sendCts.CancelAfter(TimeSpan.FromSeconds(1));
+
+                try
+                {
+                    await member.Socket.SendAsync(bytes, WebSocketMessageType.Text, true, sendCts.Token);
+                }
+                catch (OperationCanceledException) when (member.WriterCts.IsCancellationRequested == false)
+                {
+                    // 멤버가 나가려는 게 아니라 진짜 타임아웃 → 끊긴 걸로 간주
+                    member.Socket.Abort();
+                }
+                catch (WebSocketException) { }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // WriterCts가 취소됨 = 정상적인 퇴장/종료 신호. 조용히 빠져나온다.
+        }
     }
 
     // 게임의 틱 업데이트(진행)을 담당하는 함수( RoomHub의 모든 룸의 함수를 실행시키는 곳에서 실행된다.)
@@ -203,7 +235,7 @@ public class Room
         {
             if (RoomExpired)
             {
-               await LeaveAsync(member);
+               await SendAsync(member, new Protocol.LeaveMessage{Id = member.User.Id});
                return;
             }
             string text = await ReceiveTextAsync(member.Socket, token);
@@ -229,7 +261,7 @@ public class Room
                 
             }
             if(kind?.Type == "move") HandleMove(member, text);
-            else if(kind?.Type == "chat") HandleChatAsync(member, text);
+            else if(kind?.Type == "chat") await HandleChatAsync(member, text);
             else if (kind?.Type == "ready") await HandleReady(member, text);
             else if (kind?.Type == "게임 시작") await HandleGameStart(member);
             else if(kind?.Type == "NonPoint")  await HandleNonPoint(member, text);
@@ -593,104 +625,25 @@ public class Room
     #region 뿌리기
 
     // 메시지를 여러명한테 뿌리는 함수
-    public async Task BroadcastAsync(object message, string exceptId = null)
+    public Task BroadcastAsync(object message, string exceptId = null)
     {
-        byte[] bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message, message.GetType()));
         
-       // Console.WriteLine($"[직렬화 체크][{code}] {json}");
-        // 보낼 json객체를 미리 생성하고,
-        // 유저수에 맞게 보내는 작업을 처리한다.
-        List<Task> sending = new List<Task>();
-
-        // 딕셔너리에 있는 모든 멤버를 순회한다
+        byte[] bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message, message.GetType()));
         foreach (Member member in members.Values)
         {
-            // 제외 대상이라면 건너 뛴다
-            if(member.User.Id == exceptId) continue;
-            // 한명단위 메시지 Task를 만들어서 List에 넣어준다
-            sending.Add(SendRawAsync(member, bytes));
+            if (member.User.Id == exceptId) continue;
+            member.Outbox.Writer.TryWrite(bytes); // 락 대기 없음, 순서 보장됨
         }
-        
-        await Task.WhenAll(sending);
+        return Task.CompletedTask;
     }
-    // 한명의 User에게 메시지를 보내는 함수( Json을 Byte로 바로 받아서 보내는 최적화 함수)
-    private async Task SendRawAsync(Member member, byte[] bytes)
+    // 한명의 User에게 메시지를 보내는 함수
+    private Task SendRawAsync(Member member, string json)
     {
-        // 소켓이 끊겨있는지 확인을 해준다. 보내기전에 마지막 체크
-        if (member.Socket.State != WebSocketState.Open) return;
-        
-
-        // A가 채팅 한 줄을 보내면, A의 수신 루프는 B·C·D 전송이 전부 끝날 때까지 다음 메시지를 못 읽습니다.
-        // 이러한 구조 때문에 너무 오래 걸릴 시 예외처리
-        using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
-        // 보내는 중인 메시지가 있다면 lock이 풀릴때까지 잠깐 기다린다.
-        // 그리고 내가 보낼 턴이면 잠궈버린다. 두가지를 동시에 수행합니다.
-        await member.SendLock.WaitAsync(cts.Token);
-
-        try
-        {
-            await member.Socket.SendAsync(bytes, WebSocketMessageType.Text, true, cts.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            // 3초 안에 못 보냈다 = 사실상 끊긴 사람. 소켓을 중단시켜 ReceiveLoop가 스스로 빠져나오게 한다.
-            member.Socket.Abort();
-        }
-        catch (WebSocketException)
-        {
-            // 보내는 순간 끊길 수 있음.
-            // 나가기 처리는 다른 곳에서 함.
-        }
-        catch (ObjectDisposedException)
-        {
-            member.Socket.Abort();
-            Console.WriteLine($"[폐기된 리소스 접근] : 멤버 {member.User.Id}의 접근");
-        }
-        finally // 예외가 발생하든 안하든 꼭 처리되는 finally 구문(찾아 보십쇼) 
-        {
-            member.SendLock.Release();
-        }
+        byte[] bytes = Encoding.UTF8.GetBytes(json);
+        member.Outbox.Writer.TryWrite(bytes); // 락 대기 없음, 순서 보장됨
+        return Task.CompletedTask;
     }
-    // 한명의 User에게 메시지를 보내는 함수 (Json을 받아 내부에서 Byte로 변환해 보내는 함수)
-    private async Task SendRawAsync(Member member, string json)
-    {
-        // 소켓이 끊겨있는지 확인을 해준다. 보내기전에 마지막 체크
-        if (member.Socket.State != WebSocketState.Open) return;
-        
 
-        // A가 채팅 한 줄을 보내면, A의 수신 루프는 B·C·D 전송이 전부 끝날 때까지 다음 메시지를 못 읽습니다.
-        // 이러한 구조 때문에 너무 오래 걸릴 시 예외처리
-        using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
-        // 보내는 중인 메시지가 있다면 lock이 풀릴때까지 잠깐 기다린다.
-        // 그리고 내가 보낼 턴이면 잠궈버린다. 두가지를 동시에 수행합니다.
-        await member.SendLock.WaitAsync(cts.Token);
-
-        try
-        {
-            // 보낼때는 string이 아니라 byte배열로 바꿔준다
-            byte[] bytes = Encoding.UTF8.GetBytes(json);
-            await member.Socket.SendAsync(bytes, WebSocketMessageType.Text, true, cts.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            // 3초 안에 못 보냈다 = 사실상 끊긴 사람. 소켓을 중단시켜 ReceiveLoop가 스스로 빠져나오게 한다.
-            member.Socket.Abort();
-        }
-        catch (WebSocketException)
-        {
-            // 보내는 순간 끊길 수 있음.
-            // 나가기 처리는 다른 곳에서 함.
-        }
-        catch (ObjectDisposedException)
-        {
-            member.Socket.Abort();
-            Console.WriteLine($"[폐기된 리소스 접근] : 멤버 {member.User.Id}의 접근");
-        }
-        finally // 예외가 발생하든 안하든 꼭 처리되는 finally 구문(찾아 보십쇼) 
-        {
-            member.SendLock.Release();
-        }
-    }
 
     // 단순 호출용 유틸 함수
     public Task SendAsync(Member member, object message)
@@ -821,7 +774,7 @@ public class Room
         // 들어오기 나가기는 방의 멤버를 수정하고 메시지를 처리하기 때문에
         // 같은 자물쇠를 사용해줘야 합니다.
         // (안하면 유령객체 생길수도?)
-        await gate.WaitAsync(TimeSpan.FromSeconds(5));
+        await gate.WaitAsync(TimeSpan.FromSeconds(1));
 
         try
         {
@@ -837,10 +790,11 @@ public class Room
                 }
             }
             members.TryRemove(member.User.Id, out _);
-            if (gameManager.IsGameRunning)
+            if (gameManager.IsGameRunning && roomExpiredCancellation.IsCancellationRequested == false)
             {
                 Interlocked.Exchange(ref roomExpired, 1);
                 gameManager.GameEnd();
+                
                 await roomExpiredCancellation.CancelAsync();
             }
           
@@ -864,14 +818,15 @@ public class Room
             CancellationTokenSource.CreateLinkedTokenSource(
                 token, roomExpiredCancellation.Token);
         // Join처리를 실행하고 끝난뒤 멤버 객체를 저장해준다.
-        Member member = await JoinAsync(socket, id, token);
+        Member member = await JoinAsync(socket, id, linkedCancellation.Token);
         // hello 안보내고 딴소리 했다. 방에 못 들인다
         if (member == null) return;
+        member.WriterTask = Task.Run(() => WriterLoopAsync(member));
         try
         {
             // 접속완료 했으면 메시지를 계속 들을 수 있게
             // 루프를 호출해준다.
-            await ReceiveLoopAsync(member, token);
+            await ReceiveLoopAsync(member, linkedCancellation.Token);
         }
         catch (OperationCanceledException)
         {
@@ -883,6 +838,13 @@ public class Room
         }
         finally
         {
+            // 1) writer에게 "그만 받아라" 신호
+            await member.WriterCts.CancelAsync();
+            member.Outbox.Writer.TryComplete();
+
+            // 2) writer가 실제로 끝날 때까지 기다려서 리소스 정리 확인
+            try { await member.WriterTask; } catch { /* 취소로 인한 예외는 무시 */ }
+            member.WriterCts.Dispose();
             // 루프가 종료되었으면 연결이 끊어진 것
             // 퇴장 처리 해준다
             await LeaveAsync(member);
