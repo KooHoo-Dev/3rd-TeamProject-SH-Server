@@ -106,6 +106,17 @@ public class RoomHub
         WebSocket socket, CancellationToken token)
     {
         Room room = Enter(code);
+        // 방이 꽉 찼거나 방 개수 상한에 걸리면 null.
+        // Enter에서 인원을 늘리지 않았으므로 Leave도 하지 않고 닫는다.
+        if (room == null)
+        {
+            try
+            {
+                await socket.CloseAsync(WebSocketCloseStatus.PolicyViolation, "방에 들어갈 수 없습니다 (인원 또는 방 개수 상한)", token);
+            }
+            catch (WebSocketException) { }
+            return;
+        }
         // lastId를 여러 접속자가 동시에 수정 할수 있으므로
         // Interlocked를 이용해서 락을 걸어줍니다.
         // 이것도 외워버리십쇼.
