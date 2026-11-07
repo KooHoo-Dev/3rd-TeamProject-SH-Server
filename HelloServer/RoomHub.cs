@@ -61,7 +61,9 @@ public class RoomHub
             
             if (rooms.TryGetValue(code, out Entry entry) == false)
             {
-                
+                // 최대 방 개수 제한. 방을 만들기 "전에" 봐야 한다.
+                if (rooms.Count >= MaxRooms) return null;
+
                 // 이 블록 전체가 lock(gate) 안이라 "찾기 → 없으면 추가"에
                 // 다른 스레드가 끼어들 수 없다. 별도의 TryAdd 방어는 필요 없다.
                 entry = new Entry()
@@ -70,7 +72,6 @@ public class RoomHub
                 Console.WriteLine($"[{code}] 방을 열었다. 총 방의 개수 : {rooms.Count}");
             }
             if (entry.Users >= 4) return null;   //  최대 4인 제한
-            if (rooms.Count >= MaxRooms && rooms.ContainsKey(code) == false) return null; // 최대 방 개수 제한
             entry.Users++;
             return entry.Room;
         }
