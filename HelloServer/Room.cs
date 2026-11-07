@@ -324,15 +324,15 @@ public class Room
             }
             case Protocol.InteractionType.ItemDropQuery:
             {
-
-                if (gameManager.itemOwnersDic.TryRemove(interactionMessage.receivedId, out string userId))
+                // 들고 있는 본인만 내려놓을 수 있다.
+                // 키(아이템 ID)와 값(소유자 ID)이 둘 다 맞을 때만 지운다. 비교와 삭제가 한 번에 일어난다.
+                var owned = new KeyValuePair<string, string>(interactionMessage.receivedId, member.User.Id);
+                if (gameManager.itemOwnersDic.TryRemove(owned) == false)
                 {
-                    Console.WriteLine($"[내려놓기 성공]: {userId}");
+                    Console.WriteLine($"[내려놓기 거부] {member.User.Id} 는 아이템 {interactionMessage.receivedId} 의 소유자가 아님");
+                    return;
                 }
-                else
-                {
-                    Console.WriteLine("[내려놓기 실패]:(키가 없음)");
-                }
+                Console.WriteLine($"[내려놓기 성공]: {member.User.Id}");
                 interactionMessage.InteractionType = Protocol.InteractionType.ItemDropAnswer;
                 interactionMessage.IsSuccess = true;
                 break;
