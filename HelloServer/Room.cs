@@ -774,7 +774,11 @@ public class Room
         // 들어오기 나가기는 방의 멤버를 수정하고 메시지를 처리하기 때문에
         // 같은 자물쇠를 사용해줘야 합니다.
         // (안하면 유령객체 생길수도?)
-        await gate.WaitAsync(TimeSpan.FromSeconds(1));
+        // 1초 안에 자물쇠를 못 잡으면 false가 돌아온다.
+        // 이때는 퇴장 처리를 그대로 진행하되(유령 멤버 방지), 잡지 않은 자물쇠는 풀지 않는다.
+        bool entered = await gate.WaitAsync(TimeSpan.FromSeconds(1));
+        if (entered == false)
+            Console.WriteLine($"[{code}] {member.User.Id} 퇴장: 1초 안에 자물쇠를 잡지 못해 자물쇠 없이 진행");
 
         try
         {
@@ -801,7 +805,7 @@ public class Room
         }
         finally
         {
-            gate.Release();
+            if (entered) gate.Release();
         }
         // 퇴장한것을 알려줍니다.
         await BroadcastAsync(new Protocol.LeaveMessage { Id = member.User.Id }, member.User.Id);
