@@ -62,15 +62,11 @@ public class RoomHub
             if (rooms.TryGetValue(code, out Entry entry) == false)
             {
                 
+                // 이 블록 전체가 lock(gate) 안이라 "찾기 → 없으면 추가"에
+                // 다른 스레드가 끼어들 수 없다. 별도의 TryAdd 방어는 필요 없다.
                 entry = new Entry()
                     {Room = new Room(code, DefulatConfig), Users = 0};
-                bool won = rooms.TryAdd(code, entry);
-                if (won == false)
-                {
-                    Console.WriteLine($"[{code}] 레이스 컨디션 조건에 걸림 중 복 방 열림 방지(들어가게는 해줌)");
-                    entry.Users++;
-                    return entry.Room;
-                }
+                rooms[code] = entry;
                 Console.WriteLine($"[{code}] 방을 열었다. 총 방의 개수 : {rooms.Count}");
             }
             if (entry.Users >= 4) return null;   //  최대 4인 제한
